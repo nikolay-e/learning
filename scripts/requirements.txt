@@ -1,0 +1,2 @@
+# Сборка и проверки страницы (scripts/build.py, scripts/validate.py)
+PyYAML==6.0.2

@@ -56,8 +56,9 @@ version, say so in `versions` — it renders on the card.
 ## Checks
 
 ```bash
-npm install                # build/test tooling only, never shipped to the browser
-npm run check              # validate + html-validate + prettier + Playwright + axe
+pip install -r scripts/requirements.txt   # PyYAML, for build.py and validate.py
+npm install                               # build/test tooling, never shipped to the browser
+npm run check                             # validate + html-validate + prettier + Playwright + axe
 ```
 
 ## Tool conflicts, resolved deliberately

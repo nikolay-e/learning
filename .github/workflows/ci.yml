@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - run: pip install pyyaml
+      - run: pip install -r scripts/requirements.txt
       # Падает, если: index.html разошёлся с content/; у принципа нет
       # классификации; битая якорная ссылка; дублирующийся id; button без type;
       # счётчики в README и в шапке не совпали с числом принципов;
@@ -55,5 +55,6 @@ jobs:
         if: failure()
         with:
           name: playwright-report
-          path: playwright-report/
+          # HTML-репортёр пишет рядом с конфигом, то есть в tests/
+          path: tests/playwright-report/
           retention-days: 7
