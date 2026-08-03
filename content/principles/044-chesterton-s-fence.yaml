@@ -1,0 +1,11 @@
+id: 44
+slug: chesterton-s-fence
+title: Chesterton's Fence
+nav_label: Chesterton's Fence
+section: s8
+keywords: chesterton fence code removal git log refactoring
+blocks:
+  - type: lede
+    html:
+      Не удаляй код, назначения которого не понял. <code>git log -S"strange_condition"</code> перед
+      удалением — минимальная процедура. Контрмера к рефакторинг-энтузиазму.

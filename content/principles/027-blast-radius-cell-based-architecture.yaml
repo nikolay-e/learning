@@ -1,0 +1,13 @@
+id: 27
+slug: blast-radius-cell-based-architecture
+title: Blast radius / cell-based architecture
+nav_label: Blast radius / cells
+section: s4
+keywords: blast radius cell based architecture shuffle sharding isolation
+blocks:
+  - type: lede
+    html:
+      "Единица отказа проектируется заранее: клиенты шардируются по ячейкам, инцидент задевает одну
+      ячейку, а не всех. Shuffle sharding — вариант с комбинаторным снижением пересечения."
+  - type: note
+    html: Выражается топологией деплоя, не кодом.

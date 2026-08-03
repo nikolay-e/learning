@@ -1,0 +1,31 @@
+id: 26
+slug: tail-at-scale-dean-barroso
+title: Tail at Scale (Dean &amp; Barroso)
+nav_label: Tail at Scale
+section: s4
+keywords: tail at scale hedged requests p99 latency percentile fan-out dean barroso
+blocks:
+  - type: lede
+    html:
+      "p99, а не среднее: при fan-out 100 ваш p99 — это медиана пользователя. Hedged requests: отправить
+      дубль после p95-задержки, взять первый ответ."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java · JDK 25 (structured concurrency, JEP 505)
+        highlight: java
+        code:
+          "// hedged request на виртуальных потоках\ntry (var scope = StructuredTaskScope.open(Joiner.<Reply>anySuccessfulResultOrThrow()))\
+          \ {\n    scope.fork(() -> replica1.get(key));\n    scope.fork(() -> { Thread.sleep(p95Latency);\
+          \ return replica2.get(key); }); // hedge\n    return scope.join();  // первый успешный, второй отменяется\n\
+          }\n\n// На JDK 21, где structured concurrency ещё preview (JEP 453), форма другая:\n// try (var\
+          \ scope = new StructuredTaskScope.ShutdownOnSuccess<Reply>()) {\n//     scope.fork(() -> replica1.get(key));\n\
+          //     scope.fork(() -> { Thread.sleep(p95Latency); return replica2.get(key); });\n//     scope.join();\n\
+          //     return scope.result();\n// }"
+  - type: note
+    html:
+      '<strong>Арифметика и цена.</strong> При fan-out в 100 независимых обращений вероятность задеть
+      хотя бы один хвост компонента ≈ 1 − 0.99¹⁰⁰ ≈ 63 %: p99 компонента становится обычным опытом пользователя.
+      Hedging применим только к идемпотентным и отменяемым операциям (<a href="#p22">22</a>) и покупает
+      латентность за дополнительный трафик — у него должен быть бюджет и доля hedged-запросов в метриках.'

@@ -1,0 +1,28 @@
+id: 52
+slug: prompty-shemy-i-konfig-modeli-versioniruemye-art
+title: Промпты, схемы и конфиг модели — версионируемые артефакты
+nav_label: Промпты как артефакты
+section: s9
+keywords: prompt versioning model pinning alias snapshot changelog rollback
+blocks:
+  - type: lede
+    html:
+      "Промпт = код: ревью, версия, changelog, откат. Модель пиннится точной версией — <code>gpt-x-latest</code>
+      в проде — это unpinned dependency (Hyrum's law для моделей: поведение любой версии — наблюдаемый
+      контракт, смена версии — breaking change до доказательства обратного)."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: prompts/invoice_extract/v3.yaml
+        highlight: yaml
+        code:
+          "# рядом golden set и eval-результаты\nmodel: claude-haiku-4-5-20251001    # датированный snapshot;\
+          \ claude-haiku-4-5 —\n                                    # алиас семейства, то есть unpinned dependency\n\
+          temperature: 0\nprompt_sha: 8f3ab2\neval_baseline: { schema_ok: 0.998, amounts_ok: 0.974 }   # ниже\
+          \ — деплой блокируется"
+  - type: note
+    html:
+      "<code>temperature: 0</code> не даёт детерминизма — на нём его не строят. Версионируется весь
+      контур: снапшот модели и провайдер, системный промпт, определения инструментов, схемы, версия retrieval-индекса,
+      параметры рантайма и конфигурация безопасности."

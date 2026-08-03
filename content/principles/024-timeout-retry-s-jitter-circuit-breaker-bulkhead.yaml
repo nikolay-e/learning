@@ -1,0 +1,68 @@
+id: 24
+slug: timeout-retry-s-jitter-circuit-breaker-bulkhead
+title: Timeout + retry с jitter, circuit breaker, bulkhead
+nav_label: Retry с jitter, breaker, bulkhead
+section: s4
+keywords: retry jitter exponential backoff circuit breaker bulkhead timeout deadline
+blocks:
+  - type: lede
+    html:
+      "Retry без jitter — распределённый метроном: синхронизированная толпа добивает восстанавливающийся
+      сервис."
+  - type: code
+    panes:
+      - lang: rust
+        tab: Rust
+        label: Rust · полный jitter (AWS-рецепт)
+        highlight: rust
+        code:
+          "async fn retry<T, E>(mut f: impl FnMut() -> BoxFuture<'static, Result<T, E>>) -> Result<T,\
+          \ E> {\n    let base = Duration::from_millis(100);\n    for attempt in 0..5 {\n        match f().await\
+          \ {\n            Ok(v) => return Ok(v),\n            Err(_) if attempt < 4 => {\n              \
+          \  let cap = base * 2u32.pow(attempt);\n                sleep(Duration::from_millis(rand::random_range(0..cap.as_millis()\
+          \ as u64))).await;\n            }\n            Err(e) => return Err(e),\n        }\n    }\n    unreachable!()\n\
+          }"
+      - lang: go
+        tab: Go
+        label: Go · сквозной дедлайн
+        highlight: go
+        code:
+          "// context с дедлайном — сквозной; таймаут задаёт вызывающий, а не библиотека
+
+          ctx, cancel := context.WithTimeout(ctx, 800*time.Millisecond)
+
+          defer cancel()
+
+
+          resp, err := s.gw.Charge(ctx, req) // весь стек ниже уважает дедлайн"
+      - lang: java
+        tab: Java
+        label: Java · Resilience4j
+        highlight: java
+        code:
+          "// breaker + bulkhead композицией декораторов\nvar decorated = Decorators.ofSupplier(() ->\
+          \ gateway.charge(req))\n    .withCircuitBreaker(CircuitBreaker.ofDefaults(\"gw\"))\n    .withBulkhead(Bulkhead.of(\"\
+          gw\", BulkheadConfig.custom().maxConcurrentCalls(20).build()))\n    .withRetry(Retry.of(\"gw\",\
+          \ RetryConfig.custom().intervalFunction(\n        IntervalFunction.ofExponentialRandomBackoff()).build()))\n\
+          \    .decorate();"
+      - lang: python
+        tab: Python
+        label: Python · tenacity
+        highlight: python
+        code: "# экспонента + jitter объявлены декларативно
+
+          from tenacity import retry, stop_after_attempt, wait_random_exponential
+
+
+          @retry(stop=stop_after_attempt(5), wait=wait_random_exponential(multiplier=0.1, max=3))
+
+          async def charge(req: PaymentReq) -> Payment: ..."
+  - type: note
+    html:
+      '<strong>Чего не хватает в примере выше.</strong> Он повторяет любую ошибку. Рабочая политика
+      различает: retryable (таймаут, 5xx, перегрузка) и non-retryable (валидация, аутентификация, 4xx) —
+      второе повторять бессмысленно и вредно; уважает <code>Retry-After</code> вместо собственного backoff;
+      ограничена сквозным дедлайном, а не суммой отдельных таймаутов; отменяется вместе с контекстом; имеет
+      retry budget на клиента, чтобы ретраи не составили большую часть трафика; и никогда не повторяет неидемпотентную
+      операцию без ключа идемпотентности (<a href="#p22">22</a>). Число попыток и исчерпание бюджета — метрики,
+      иначе деградация невидима.'

@@ -1,0 +1,24 @@
+{
+  "name": "learning-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build and QA toolchain for the static reference site. The published page has no runtime dependencies.",
+  "license": "MIT",
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "validate": "python3 scripts/validate.py",
+    "lint:html": "html-validate index.html",
+    "format": "prettier --write \"assets/*.{css,js}\" \"tests/*.js\" \"**/*.md\" \".github/**/*.yml\" templates/page.html",
+    "format:check": "prettier --check \"assets/*.{css,js}\" \"tests/*.js\" \"**/*.md\" \".github/**/*.yml\" templates/page.html",
+    "test": "playwright test --config tests/playwright.config.js",
+    "check": "npm run validate && npm run lint:html && npm run format:check && npm test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.56.0",
+    "axe-core": "^4.10.3",
+    "html-validate": "^8.29.0",
+    "prettier": "^3.3.3"
+  }
+}

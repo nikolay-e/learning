@@ -1,0 +1,46 @@
+id: 71
+slug: cache-stampede-singleflight-jitter-negative-cach
+title: "Cache stampede: singleflight, jitter, negative caching"
+nav_label: Cache stampede
+section: s11
+keywords: cache stampede thundering herd singleflight negative caching xfetch jitter
+blocks:
+  - type: lede
+    html:
+      "Протухание горячего ключа = синхронный залп всех подписчиков в origin, self-DDoS по расписанию.
+      Три обязательных механизма: коллапс одновременных промахов в один запрос (singleflight), рандомизация
+      TTL (протухают не хором), кэширование отсутствия (иначе каждый запрос несуществующего id — удар в
+      базу)."
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go · singleflight
+        highlight: go
+        code:
+          "var g singleflight.Group\n\nfunc (s *Svc) Product(ctx context.Context, id string) (Product,\
+          \ error) {\n    if p, ok := s.cache.Get(id); ok { return p, nil }\n    v, err, _ := g.Do(id, func()\
+          \ (any, error) {      // N промахов → 1 запрос в origin\n        p, err := s.db.Product(ctx, id)\n\
+          \        if errors.Is(err, ErrNotFound) {\n            s.cache.SetNegative(id, 30*time.Second) \
+          \ // negative cache, короткий TTL\n            return Product{}, err\n        }\n        s.cache.Set(id,\
+          \ p, jitterTTL(5*time.Minute)) // ±20% — рассинхрон протухания\n        return p, err\n    })\n\
+          \    ...\n}"
+      - lang: python
+        tab: Python
+        label: Python · XFetch
+        highlight: python
+        code:
+          "# вероятностное раннее обновление: горячие ключи обновляются ДО протухания,\n# вероятность\
+          \ растёт по мере приближения к TTL\nimport math, random, time\n\ndef should_refresh(expires_at:\
+          \ float, delta: float, beta: float = 1.0) -> bool:\n    return time.time() - delta * beta * math.log(random.random())\
+          \ >= expires_at"
+  - type: note
+    html:
+      Negative caching без короткого TTL — способ закэшировать транзиентную ошибку навсегда; кэшируйте
+      <em>отсутствие</em>, не <em>ошибку</em> (5xx origin'а в кэш не пишется никогда).
+  - type: note
+    html:
+      <strong>Границы применимости.</strong> Negative caching нужен там, где промахи реально дороги,
+      иначе это лишний слой. Ключ кэша обязан включать тенанта и права доступа — иначе singleflight объединит
+      запросы пользователей с разной видимостью и отдаст чужие данные. И отмена контекста первого вызывающего
+      не должна отменять работу для всех, кто к нему присоединился.

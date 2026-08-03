@@ -1,0 +1,36 @@
+id: 18
+slug: sovmestimost-shem-kak-tip
+title: Совместимость схем как тип
+nav_label: Совместимость схем как тип
+section: s3
+keywords: schema compatibility avro protobuf backward forward reserved fields
+blocks:
+  - type: lede
+    html:
+      "Protobuf/Avro-правила: additive-only, никогда не переиспользовать номера полей, <code>reserved</code>
+      для удалённых."
+  - type: code
+    panes:
+      - lang: protobuf
+        tab: Protobuf
+        label: Protobuf
+        highlight: protobuf
+        code:
+          "message Order {\n  reserved 3, 7;                 // удалённые поля: номера сожжены навсегда\n\
+          \  reserved \"legacy_status\";\n\n  string id = 1;\n  int64 amount_cents = 2;\n  OrderStatus status\
+          \ = 4;        // добавление — единственная безопасная операция\n}"
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// потребитель обязан переживать неизвестные поля (forward compat)\nObjectMapper mapper = JsonMapper.builder()\n\
+          \    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // осознанно\n    .build();"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "#[derive(Deserialize)]\n#[serde(deny_unknown_fields)]  // на ГРАНИЦЕ ДОВЕРИЯ — строгость;\n\
+          struct AdminCommand { ... }    // на межсервисном контракте — наоборот,\n                      \
+          \         // терпимость к новым полям"

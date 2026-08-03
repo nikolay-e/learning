@@ -1,0 +1,41 @@
+id: 9
+slug: property-based-type-driven-testing
+title: Property-based / type-driven testing
+nav_label: Property-based testing
+section: s1
+keywords: property based testing quickcheck fuzzing invariant roundtrip
+blocks:
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: jqwik
+        highlight: java
+        code:
+          "// свойство вместо примеров\n@Property\nvoid settlementConservesMoney(@ForAll(\"trades\") List<Trade>\
+          \ trades) {\n    var entries = Settlement.settle(trades, RATES, DAY);\n    assertThat(sumDebits(entries)).isEqualTo(sumCredits(entries));\n\
+          }"
+      - lang: rust
+        tab: Rust
+        label: proptest
+        highlight: rust
+        code:
+          "// roundtrip — самое дешёвое и самое отлавливающее свойство\nproptest! {\n    #[test]\n   \
+          \ fn serde_roundtrip(cfg in any::<Config>()) {\n        let json = serde_json::to_string(&cfg).unwrap();\n\
+          \        prop_assert_eq!(serde_json::from_str::<Config>(&json).unwrap(), cfg);\n    }\n}"
+      - lang: go
+        tab: Go
+        label: Go fuzzing
+        highlight: go
+        code:
+          "// testing/quick устарел; идиома — rapid или встроенный fuzzing\nfunc FuzzParseEmail(f *testing.F)\
+          \ {\n    f.Fuzz(func(t *testing.T, raw string) {\n        e, err := ParseEmail(raw)\n        if\
+          \ err == nil && !strings.Contains(e.String(), \"@\") {\n            t.Fatalf(\"parsed invalid email:\
+          \ %q\", raw) // парсер принял мусор\n        }\n    })\n}"
+      - lang: python
+        tab: Python
+        label: hypothesis
+        highlight: python
+        code:
+          "from hypothesis import given, strategies as st\n\n@given(st.lists(trade_strategy()))\ndef test_settlement_conserves_money(trades):\n\
+          \    entries = settle(trades, RATES, DAY)\n    assert sum_debits(entries) == sum_credits(entries)"

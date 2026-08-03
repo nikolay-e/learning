@@ -1,0 +1,53 @@
+id: 5
+slug: functional-core-imperative-shell
+title: Functional core, imperative shell
+nav_label: Functional core, imperative shell
+section: s1
+keywords: hexagonal ports and adapters mock hell pure function shell
+blocks:
+  - type: lede
+    html:
+      "Логика — чистые функции без I/O; тонкая оболочка исполняет эффекты. Убивает мок-ад: если в тесте
+      есть <code>when(repo.findById(...))</code>, логика перемешана с I/O."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// core: чистая функция, тестируется таблично без единого мока\nstatic List<LedgerEntry> settle(List<Trade>\
+          \ trades, FxRates rates, LocalDate day) { ... }\n\n// shell: весь I/O здесь, логики нет\nvoid settleDaily()\
+          \ {\n    var trades = repo.tradesFor(today);          // I/O\n    var rates  = fxClient.ratesFor(today);\
+          \       // I/O\n    var entries = Settlement.settle(trades, rates, today);  // pure\n    repo.saveAll(entries);\
+          \                       // I/O\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// Rust подталкивает к этому сам: чистое ядро не требует async и Send/Sync\nfn settle(trades:\
+          \ &[Trade], rates: &FxRates, day: NaiveDate) -> Vec<LedgerEntry> { ... }\n\nasync fn settle_daily(db:\
+          \ &Db, fx: &FxClient) -> Result<()> {\n    let (trades, rates) = tokio::try_join!(db.trades(today),\
+          \ fx.rates(today))?;\n    db.save(settle(&trades, &rates, today)).await\n}"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// ядро — пакет без единого импорта I/O; это проверяется депс-линтером
+
+          package settlement // импортирует только time и domain-типы
+
+
+          func Settle(trades []Trade, rates FxRates, day time.Time) []LedgerEntry { ... }"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# ядро без I/O тестируется hypothesis'ом; оболочка — 5 строк\ndef settle(trades: list[Trade],\
+          \ rates: FxRates, day: date) -> list[LedgerEntry]:\n    ...  # ни одного await, open(), requests\
+          \ — по конструкции\n\nasync def settle_daily(db: Db, fx: FxClient) -> None:\n    trades, rates =\
+          \ await asyncio.gather(db.trades(TODAY), fx.rates(TODAY))\n    await db.save(settle(trades, rates,\
+          \ TODAY))"

@@ -1,0 +1,29 @@
+id: 33
+slug: least-privilege
+title: Least privilege
+nav_label: Least privilege
+section: s6
+keywords: least privilege capability rbac securitycontext narrow interface
+blocks:
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// Каждый компонент — минимум прав; в коде это узкие интерфейсы возможностей
+
+          type OrderReader interface{ GetOrder(ctx context.Context, id OrderID) (Order, error) }
+
+          type OrderWriter interface{ PutOrder(ctx context.Context, o Order) error }
+
+
+          // репорт-сервис получает OrderReader; физически не может писать"
+      - lang: yaml
+        tab: Kubernetes
+        label: Kubernetes
+        highlight: yaml
+        code:
+          "securityContext:\n  runAsNonRoot: true\n  readOnlyRootFilesystem: true\n  allowPrivilegeEscalation:\
+          \ false\n  capabilities: { drop: [\"ALL\"] }"

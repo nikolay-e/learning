@@ -1,0 +1,28 @@
+id: 25
+slug: crash-only-software
+title: Crash-only software
+nav_label: Crash-only software
+section: s4
+keywords: crash only recovery wal restart graceful shutdown
+blocks:
+  - type: lede
+    html:
+      Единственный путь остановки — падение; recovery тестируется каждым деплоем. Отдельный shutdown-код
+      не исполняется годами и потому не работает.
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          "// Оркестратор (k8s) убивает POD'ы постоянно — значит старт обязан быть recovery\nfunc main()\
+          \ {\n    state := mustRecoverFromLog(walPath)   // старт == восстановление, всегда\n\n    // graceful\
+          \ shutdown минимален: только отпустить лидерство/дренировать LB,\n    // корректность от него НЕ\
+          \ зависит\n}"
+  - type: note
+    html:
+      "<strong>Уточнение.</strong> Тезис в том, что <em>корректность</em> не должна зависеть от graceful
+      shutdown. Само по себе аккуратное завершение остаётся полезной оптимизацией: дренирование соединений
+      и балансировщика, передача лидерства, сокращение повторной работы после рестарта. Отказ от него —
+      не следствие crash-only, а отдельное решение."

@@ -1,0 +1,435 @@
+# Классификация утверждений. kind/confidence/example_status обязательны для всех принципов —
+# validate.py падает, если чего-то нет. caveat заполняется там, где формулировка принципа
+# сильнее, чем её область применимости; sources — только проверенные канонические ссылки.
+#
+# kind:            theorem | empirical-law | heuristic | pattern | practice | editorial
+# confidence:      established | context-dependent | opinionated
+# example_status:  fragment | config | pseudocode | none
+#   fragment    — реальный синтаксис, но не самостоятельная программа (нужны окружающие типы)
+#   config      — декларативная конфигурация, а не код
+#   pseudocode  — иллюстрация формы, синтаксис не гарантирован
+#   none        — примеров нет
+defaults:
+  last_reviewed: '2026-08-04'
+principles:
+  1:
+    kind: heuristic
+    confidence: opinionated
+    example_status: fragment
+    caveat: Оценки в таблице — редакционная позиция этой страницы, а не консенсус. ISP и DIP тоже
+      дают проверяемые failure modes; «единственный заслуживающий примеров» — утверждение автора,
+      а не свойство SOLID.
+  2:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  3:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  4:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment
+  5:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  6:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment
+  7:
+    kind: heuristic
+    confidence: opinionated
+    example_status: pseudocode
+    caveat: «Интерфейс только при двух реализациях» механистично. Единственная реализация оправданна,
+      когда есть настоящий consumer-owned port, plugin boundary, security capability или стабильный
+      внешний API. Критерий — доказанная ось изменения, а не число классов.
+  8:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  9:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  10:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  11:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  12:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+    sources:
+      - title: Module (Java SE 25 API)
+        url: https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Module.html
+  13:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+  14:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  15:
+    kind: empirical-law
+    confidence: established
+    example_status: none
+  16:
+    kind: empirical-law
+    confidence: established
+    example_status: fragment
+    sources:
+      - title: The Go Programming Language Specification
+        url: https://go.dev/ref/spec
+  17:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+    sources:
+      - title: Pydantic — Fields
+        url: https://docs.pydantic.dev/latest/concepts/fields/
+  18:
+    kind: practice
+    confidence: context-dependent
+    example_status: fragment
+    caveat: 'additive-only — безопасная политика по умолчанию, но не полное описание совместимости:
+      она зависит от формата, defaults, compatibility mode и сочетания версий reader/writer. Отдельные
+      удаления с reserved и часть изменений типов wire-compatible, оставаясь semantic-breaking.'
+  19:
+    kind: editorial
+    confidence: opinionated
+    example_status: fragment
+    sources:
+      - title: RFC 9413 — Maintaining Robust Protocols
+        url: https://www.rfc-editor.org/rfc/rfc9413.html
+  20:
+    kind: heuristic
+    confidence: established
+    example_status: config
+  21:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+  22:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  23:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  24:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  25:
+    kind: practice
+    confidence: context-dependent
+    example_status: fragment
+  26:
+    kind: empirical-law
+    confidence: established
+    example_status: fragment
+    versions: 'StructuredTaskScope — preview API в JDK 25 (JEP 505): нужен --enable-preview.'
+    sources:
+      - title: 'JEP 505: Structured Concurrency (Fifth Preview)'
+        url: https://openjdk.org/jeps/505
+  27:
+    kind: pattern
+    confidence: context-dependent
+    example_status: none
+  28:
+    kind: editorial
+    confidence: opinionated
+    example_status: fragment
+    caveat: 'Wide events не заменяют метрики. Рабочая позиция — комплементарность: метрики для дешёвого
+      агрегатного детектирования, трейсы для причинной цепочки, события для деталей, профили для CPU/памяти.
+      Высокая кардинальность требует контроля стоимости и приватности.'
+  29:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  30:
+    kind: practice
+    confidence: established
+    example_status: config
+    caveat: Исчерпание бюджета не обязано автоматически замораживать любой релиз — это policy decision.
+      Иногда reliability-фикс нужно выпустить именно при исчерпанном бюджете.
+  31:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment
+  32:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  33:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  34:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  35:
+    kind: practice
+    confidence: established
+    example_status: config
+    sources:
+      - title: 'Go Wiki: Go Modules'
+        url: https://go.dev/wiki/Modules
+  36:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  37:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+    versions: testing.B.Loop — Go 1.24+.
+    sources:
+      - title: More predictable benchmarking with testing.B.Loop
+        url: https://go.dev/blog/testing-b-loop
+      - title: net/http/pprof
+        url: https://pkg.go.dev/net/http/pprof
+  38:
+    kind: theorem
+    confidence: established
+    example_status: none
+  39:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment
+    caveat: Все примеры исходят из cache line 64 B — это platform-specific. Размер проверяется на
+      целевой платформе, выигрыш — hardware counters, а не рассуждением. @Contended — internal API
+      JDK и требует отдельного флага запуска.
+  40:
+    kind: heuristic
+    confidence: established
+    example_status: none
+  41:
+    kind: heuristic
+    confidence: opinionated
+    example_status: none
+  42:
+    kind: heuristic
+    confidence: opinionated
+    example_status: none
+    caveat: '«Ровно на третьем повторении» — мнемоника, а не порог. Критерий тот же, что в 7: доказанная
+      общая ось изменения.'
+  43:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: pseudocode
+  44:
+    kind: heuristic
+    confidence: established
+    example_status: none
+  45:
+    kind: empirical-law
+    confidence: context-dependent
+    example_status: none
+    caveat: Законы Лемана выведены для E-type систем (встроенных в изменяющуюся среду) на материале
+      1970–90-х. Это эмпирические наблюдения, а не теоремы.
+  46:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+  47:
+    kind: editorial
+    confidence: opinionated
+    example_status: none
+    caveat: «На порядок чаще» — риторическая оценка, а не измерение.
+  48:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  49:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  50:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment
+  51:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  52:
+    kind: practice
+    confidence: established
+    example_status: config
+  53:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  54:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  55:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  56:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  57:
+    kind: practice
+    confidence: established
+    example_status: fragment
+    sources:
+      - title: OpenTelemetry semantic conventions — Gen AI attributes
+        url: https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/
+  58:
+    kind: practice
+    confidence: established
+    example_status: none
+  59:
+    kind: editorial
+    confidence: opinionated
+    example_status: none
+    caveat: 'Жёсткий лимит на размер PR порождает искусственно раздробленные изменения. Работает risk-based
+      ревьюабельность: логическая связность, отделение сгенерированного кода, владение, семантический
+      дифф, поэтапная раскатка.'
+  60:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: none
+  61:
+    kind: heuristic
+    confidence: opinionated
+    example_status: none
+  62:
+    kind: editorial
+    confidence: opinionated
+    example_status: none
+    caveat: '«Качество генерации = качество контекста» редуктивно: результат зависит ещё от модели,
+      задачи, инструментов, policy и eval-петли. Маленькие файлы — не самоцель, связность важнее размера.'
+  63:
+    kind: empirical-law
+    confidence: established
+    example_status: none
+  64:
+    kind: theorem
+    confidence: established
+    example_status: none
+  65:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+    caveat: '«Иерархия по цене» — упрощение: causal consistency и session guarantees покрывают разные
+      оси и не образуют тотального порядка во всех системах.'
+  66:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  67:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  68:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  69:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  70:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+  71:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  72:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  73:
+    kind: pattern
+    confidence: established
+    example_status: config
+  74:
+    kind: practice
+    confidence: context-dependent
+    example_status: fragment
+  75:
+    kind: heuristic
+    confidence: opinionated
+    example_status: none
+    caveat: «Три токена» — метафора Дэна Маккинли, а не измеримый лимит.
+  76:
+    kind: empirical-law
+    confidence: context-dependent
+    example_status: none
+    caveat: Закон Брукса зависит от декомпозируемости задачи, стоимости онбординга и стадии проекта;
+      это наблюдение из «Мифического человеко-месяца», не универсальное ограничение.
+  77:
+    kind: practice
+    confidence: context-dependent
+    example_status: config
+  78:
+    kind: practice
+    confidence: context-dependent
+    example_status: fragment
+  79:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+    versions: 'Flink 1.20 / 2.x: в 2.x перегрузки с org.apache.flink.streaming.api.windowing.time.Time
+      удалены в пользу java.time.Duration — сверяйтесь с версией кластера.'
+    sources:
+      - title: Apache Flink — Streaming Analytics
+        url: https://nightlies.apache.org/flink/flink-docs-stable/docs/learn-flink/streaming_analytics/
+  80:
+    kind: practice
+    confidence: context-dependent
+    example_status: fragment
+  81:
+    kind: pattern
+    confidence: context-dependent
+    example_status: fragment
+  82:
+    kind: practice
+    confidence: established
+    example_status: fragment
+  83:
+    kind: pattern
+    confidence: established
+    example_status: fragment
+  84:
+    kind: practice
+    confidence: opinionated
+    example_status: none
+    caveat: 'Merge queue и 10–15 минут CI — ориентиры из практики крупных монорепозиториев, а не константы.
+      Флаги — не единственный механизм: branch by abstraction и обратно-совместимые срезы дают то
+      же без flag debt.'
+  85:
+    kind: practice
+    confidence: context-dependent
+    example_status: none
+    caveat: Добровольность распространяется на developer-facing workflow, но не на security/compliance
+      guardrails — те бывают обязательными по построению.
+  86:
+    kind: practice
+    confidence: established
+    example_status: config
+    sources:
+      - title: Terraform — lifecycle meta-argument
+        url: https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle
+  87:
+    kind: heuristic
+    confidence: context-dependent
+    example_status: fragment

@@ -1,0 +1,46 @@
+id: 6
+slug: immutability-po-umolchaniyu
+title: Immutability по умолчанию
+nav_label: Immutability по умолчанию
+section: s1
+keywords: immutable persistent data structure defensive copy value object
+blocks:
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// record + List.copyOf; коллекции — через неизменяемые фабрики\npublic record Portfolio(String\
+          \ owner, List<Position> positions) {\n    public Portfolio { positions = List.copyOf(positions);\
+          \ }  // защитная копия\n\n    public Portfolio withPosition(Position p) {\n        var next = new\
+          \ ArrayList<>(positions); next.add(p);\n        return new Portfolio(owner, next);\n    }\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code: "// иммутабельность — дефолт языка; mut — явное исключение
+
+          let portfolio = Portfolio::new(owner, positions); // менять нельзя без mut
+
+
+          // разделяемое состояние: Arc<Portfolio> дёшев и безопасен именно потому,
+
+          // что содержимое неизменяемо"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// иммутабельности в языке нет; конвенция — маленькие value-типы копируются,\n// слайсы в конструкторах\
+          \ копируются явно\nfunc NewPortfolio(owner string, ps []Position) Portfolio {\n    return Portfolio{owner:\
+          \ owner, positions: slices.Clone(ps)}\n}"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# frozen dataclass + tuple вместо list\n@dataclass(frozen=True, slots=True)\nclass Portfolio:\n\
+          \    owner: str\n    positions: tuple[Position, ...]\n\n    def with_position(self, p: Position)\
+          \ -> \"Portfolio\":\n        return replace(self, positions=(*self.positions, p))"

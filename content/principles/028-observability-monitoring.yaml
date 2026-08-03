@@ -1,0 +1,34 @@
+id: 28
+slug: observability-monitoring
+title: Observability ≠ мониторинг
+nav_label: Observability ≠ мониторинг
+section: s5
+keywords: observability wide structured events high cardinality unknown unknowns
+blocks:
+  - type: lede
+    html:
+      Способность отвечать на вопросы, которые не были предвидены. Wide structured events с высокой
+      кардинальностью вместо заранее агрегированных счётчиков.
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// Один широкий event на запрос вместо десятка разрозненных лог-строк\nlogger.Info(\"request_completed\"\
+          ,\n    \"trace_id\", traceID, \"customer_id\", custID, \"endpoint\", \"/charge\",\n    \"duration_ms\"\
+          , ms, \"retry_count\", retries, \"gateway\", gw, \"outcome\", outcome,\n    \"amount_cents\", amt,\
+          \ \"deploy_sha\", buildSHA)\n\n// потом: \"покажи p99 по gateway для клиентов из EU на версии abc123\"\
+          \ — отвечается"
+      - lang: python
+        tab: Python
+        label: Python · structlog
+        highlight: python
+        code: '# контекст накапливается по пути запроса
+
+          log = structlog.get_logger().bind(trace_id=tid, customer_id=cid)
+
+          ...
+
+          log.info("request_completed", duration_ms=ms, outcome="declined", reason=r)'

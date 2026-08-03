@@ -1,0 +1,38 @@
+id: 81
+slug: poison-pill-ne-ostanavlivaet-partitsiyu-dlq-obya
+title: Poison pill не останавливает партицию; DLQ — обязательство, не мусорка
+nav_label: Poison pill и DLQ
+section: s12
+keywords: poison pill dead letter queue dlq re-drive partition stuck ordering отравленное сообщение
+blocks:
+  - type: lede
+    html:
+      "Один непарсящийся message в партиции при наивном consumer'е останавливает всю партицию навсегда
+      (crash-loop на одном offset'е). Политика по построению: N попыток → dead letter с полным контекстом
+      (исходный message, ошибка, offset, стектрейс, версия схемы) → партиция едет дальше. Но DLQ — очередь
+      <em>необработанных обязательств</em>: у неё есть владелец, алерт на рост и процедура re-drive; DLQ
+      без потребителя — это <code>/dev/null</code> с чистой совестью."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          "if err := process(msg); err != nil {\n    if !errors.Is(err, ErrTransient) || attempts(msg)\
+          \ >= 3 {\n        dlq.Send(ctx, DeadLetter{\n            Original: msg.Raw, Topic: msg.Topic, Offset:\
+          \ msg.Offset,\n            Error: err.Error(), SchemaVer: msg.Header(\"schema\"), FirstSeen: now,\n\
+          \        })\n        consumer.Commit(msg) // партиция разблокирована — это и была цель\n       \
+          \ return nil\n    }\n    return err // transient → retry с backoff (24), offset не двигаем\n}"
+  - type: note
+    html:
+      '<strong>Честная оценка.</strong> DLQ ломает per-key ordering: если message N ушёл в DLQ, а N+1
+      того же ключа обработан, re-drive применит N <em>после</em> N+1. Для ordering-чувствительных ключей
+      (балансы, статусы) корректная альтернатива — парковка всего ключа (pause key, не партицию) либо re-drive
+      через полный replay ключа (<a href="#p80">80</a>). Выбор — по инварианту, и он должен быть записан.'
+  - type: note
+    html:
+      "«Поставить ключ на паузу» — не встроенная операция Kafka, а отдельная архитектура: буферизация
+      или маршрутизация по ключу, <code>pause()</code> партиции либо retry-топики с восстановлением порядка.
+      Плюс детали, без которых DLQ вредна: счётчик попыток вне оперативной памяти, редакция PII в payload,
+      метаданные схемы и версии, идемпотентный re-drive, карантин для ядовитых сообщений и обрезка стектрейсов."

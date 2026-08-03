@@ -1,0 +1,30 @@
+id: 50
+slug: human-in-the-loop-dlya-neobratimyh-deystviy
+title: Human-in-the-loop для необратимых действий
+nav_label: Human-in-the-loop
+section: s9
+keywords: human in the loop approval irreversible action one way door agent
+blocks:
+  - type: lede
+    html:
+      One-way doors (платёж, удаление, отправка письма клиенту) требуют подтверждения; two-way doors
+      (черновик, поиск) — нет. Это принцип reversible/irreversible decisions, применённый к агентам.
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java
+        highlight: java
+        code:
+          "sealed interface AgentAction permits Draft, Search, Irreversible {}
+
+          record Irreversible(Action a, Justification j) implements AgentAction {}
+
+
+          // pipeline: Irreversible идёт в очередь апрува; Draft/Search исполняются сразу"
+  - type: note
+    html:
+      "Один критерий обратимости приводит к rubber-stamping: если апрувов слишком много, их перестают
+      читать. Порог складывается из обратимости, масштаба воздействия, полномочий инициатора и неопределённости.
+      И апрув должен быть привязан к хешу конкретного неизменяемого действия — иначе между «показали на
+      подтверждение» и «выполнили» остаётся TOCTOU-щель."

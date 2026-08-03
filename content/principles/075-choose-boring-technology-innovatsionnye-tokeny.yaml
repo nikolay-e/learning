@@ -1,0 +1,17 @@
+id: 75
+slug: choose-boring-technology-innovatsionnye-tokeny
+title: "Choose boring technology: инновационные токены"
+nav_label: Choose boring technology
+section: s8
+keywords: choose boring technology innovation tokens скучные технологии постгрес выбор стека
+blocks:
+  - type: lede
+    html:
+      "У команды примерно три innovation tokens; каждая «интересная» технология тратит один — на операционку,
+      найм, неизвестные failure modes. Boring ≠ плохое: boring = failure modes известны и загуглены. Postgres,
+      пока не доказано обратное, — не консерватизм, а экономика."
+  - type: note
+    html:
+      <strong>Проверяемая форма.</strong> Новая технология в стеке требует ADR с ответом «какую essential-сложность
+      (<a href="#p40">40</a>) не решает скучный вариант» плюс измерение (<a href="#p37">37</a>), а не бенчмарк
+      из блога вендора. Токен тратится по профилю нагрузки, не по конференц-докладу.

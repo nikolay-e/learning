@@ -1,0 +1,53 @@
+id: 66
+slug: raspredelennaya-blokirovka-bez-fencing-token-slo
+title: Распределённая блокировка без fencing token сломана
+nav_label: Fencing token
+section: s11
+keywords: fencing token distributed lock redlock lease zookeeper блокировка зомби consensus
+blocks:
+  - type: lede
+    html:
+      'Любой lock с TTL (Redis, ZooKeeper lease, k8s lease) не защищает сам по себе: держатель может
+      зависнуть (GC-пауза, сетевой delay), TTL истечёт, лок получит другой — и «мертвец» проснётся и запишет
+      поверх. Единственная корректная схема: лок выдаёт монотонный token, а <strong>хранилище</strong> отвергает
+      записи со stale token. Защита живёт на стороне ресурса, не на стороне лока — это E2E argument (<a
+      href="#p21">21</a>), применённый к блокировкам.'
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          'token, err := locker.Acquire(ctx, "settlement-2026-08-04") // token = 34
+
+          if err != nil { return err }
+
+          defer locker.Release(token)
+
+
+          // хранилище проверяет: принятый max token = 33 → 34 проходит;
+
+          // если зомби придёт с token = 33 после того, как видели 34 — отказ
+
+          if err := store.Write(ctx, key, val, WithFenceToken(token)); err != nil { ... }'
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// токен в типе — запись без него не сконструировать\npub struct Fenced<T> { token: FenceToken,\
+          \ payload: T }\n\nimpl Store {\n    pub fn write(&self, w: Fenced<Write>) -> Result<(), Stale> {\
+          \ ... }\n}"
+  - type: note
+    html:
+      "<strong>Честная оценка.</strong> Redlock без fencing — известный спор Kleppmann vs antirez; практический
+      вывод: если ресурс не умеет проверять токен (S3 без precondition, внешний API), лок даёт <em>efficiency</em>
+      (не делать работу дважды), но не <em>correctness</em>. Не путать эти два применения — вторая половина
+      инцидентов с «distributed lock» именно отсюда. И отдельно: consensus (Raft/Paxos) — алгоритм, а не
+      эвристика; своей реализации ему не пишут, берут готовую."
+  - type: note
+    html:
+      "Точнее: ресурс обязан применять <em>монотонную</em> проверку — fencing token, версию или conditional
+      write / compare-and-swap. Fencing token — частный случай; CAS и preconditions выражают ту же защиту.
+      И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; свою реализацию для него не пишут."

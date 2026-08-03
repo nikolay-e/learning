@@ -1,0 +1,38 @@
+id: 39
+slug: mechanical-sympathy
+title: Mechanical sympathy
+nav_label: Mechanical sympathy
+section: s7
+keywords: mechanical sympathy false sharing cache line numa syscall padding
+blocks:
+  - type: lede
+    html:
+      Cache line 64B, false sharing, NUMA, стоимость syscall. Смежно с DOD, но шире — включает знание
+      рантайма.
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// false sharing: два счётчика в одной cache line убивают многопоточный инкремент
+
+          @jdk.internal.vm.annotation.Contended  // или padding вручную
+
+          volatile long producerIdx;"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "#[repr(align(64))]                       // счётчик на собственной cache line
+
+          struct PaddedCounter(AtomicU64);"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: "// Идиома: per-P шардированные счётчики + padding
+
+          type shard struct { n atomic.Uint64; _ [56]byte } // добивка до 64B"

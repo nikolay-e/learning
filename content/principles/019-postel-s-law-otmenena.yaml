@@ -1,0 +1,36 @@
+id: 19
+slug: postel-s-law-otmenena
+title: Postel's Law — отменена
+nav_label: Postel's Law — отменена
+section: s3
+keywords: postel law robustness principle rfc 9413 be liberal ossification
+blocks:
+  - type: lede
+    html:
+      "«Будь либерален к входу» породила XSS, request smuggling и невозможность эволюции протоколов.
+      Современная позиция: строгая валидация на границе, отказ вместо угадывания."
+  - type: note
+    html:
+      "<strong>Честно про заголовок.</strong> RFC 9413 называется «Maintaining Robust Protocols» и формально
+      ничего не отменяет: он показывает, что либеральный приём сам по себе становится источником окостенения
+      (ossification) и уязвимостей, и рекомендует активное управление допусками, а не их запрет. «Отменена»
+      — редакционная позиция этой страницы, а не текст RFC."
+  - type: code
+    panes:
+      - lang: python
+        tab: Python
+        label: Python · pydantic v2
+        highlight: python
+        code:
+          "# strict mode на внешней границе\nclass PaymentIn(BaseModel):\n    model_config = ConfigDict(strict=True,\
+          \ extra=\"forbid\")  # \"123\" не станет 123\n\n    amount_cents: int\n    currency: Literal[\"\
+          EUR\", \"USD\"]"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: "dec := json.NewDecoder(r.Body)
+
+          dec.DisallowUnknownFields()
+
+          // неизвестное поле от внешнего клиента = 400, не молчаливый дроп"

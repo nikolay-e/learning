@@ -1,0 +1,11 @@
+id: 42
+slug: yagni-rule-of-three-aha
+title: YAGNI + Rule of Three (AHA)
+nav_label: YAGNI + Rule of Three
+section: s8
+keywords: yagni rule of three aha avoid hasty abstraction duplication
+blocks:
+  - type: lede
+    html:
+      "Абстракция появляется на третьем повторении. Первое дублирование дешевле неверной абстракции:
+      неверная абстракция заставляет все будущие случаи врать о своей природе."

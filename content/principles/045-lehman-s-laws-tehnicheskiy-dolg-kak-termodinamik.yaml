@@ -1,0 +1,11 @@
+id: 45
+slug: lehman-s-laws-tehnicheskiy-dolg-kak-termodinamik
+title: Lehman's Laws / технический долг как термодинамика
+nav_label: Lehman's Laws
+section: s8
+keywords: lehman laws technical debt entropy software evolution
+blocks:
+  - type: lede
+    html:
+      Используемая система обязана меняться; её сложность растёт, пока в неё не вкладывают работу специально.
+      Бюджет на снижение энтропии — регулярная статья, а не «когда-нибудь потом».

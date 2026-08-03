@@ -1,0 +1,89 @@
+id: 1
+slug: solid-kratko-s-chestnoy-otsenkoy
+title: SOLID — кратко, с честной оценкой
+nav_label: SOLID
+section: s1
+keywords: solid srp ocp lsp isp dip liskov substitution single responsibility
+blocks:
+  - type: table
+    head:
+      - Принцип
+      - Суть
+      - Статус
+    rows:
+      - - html: SRP
+          class: ""
+        - html: Одна причина для изменения (один stakeholder)
+          class: ""
+        - html: Неоперационализируем, риторика
+          class: verdict-weak
+      - - html: OCP
+          class: ""
+        - html: Расширение новым кодом, не правкой старого
+          class: ""
+        - html: Конфликтует с YAGNI при преждевременном применении
+          class: verdict-weak
+      - - html: LSP
+          class: ""
+        - html: Подтип подставим без нарушения контракта
+          class: ""
+        - html: Единственный проверяемый; нарушения = реальные баги
+          class: verdict-ok
+      - - html: ISP
+          class: ""
+        - html: Клиент не зависит от неиспользуемых методов
+          class: ""
+        - html: Переносится куда угодно, полезен
+          class: ""
+      - - html: DIP
+          class: ""
+        - html: Зависимость направлена к абстракции; интерфейс принадлежит потребителю
+          class: ""
+        - html: Полезен, но вырождается в интерфейсы с одной реализацией
+          class: ""
+  - type: text
+    html: LSP-нарушение и исправление — единственный SOLID-принцип, заслуживающий примеров.
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// sealed вместо наследования — контракт закрыт и проверяем компилятором
+
+          sealed interface Shape permits Rect, Square {}
+
+
+          record Rect(double w, double h) implements Shape {}
+
+          record Square(double side) implements Shape {}
+
+
+          // Square extends Rectangle невозможен по построению — нет мутирующего setWidth"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// LSP выражается через trait-контракты; нарушение — паника вместо Err\ntrait Storage {\n \
+          \   fn get(&self, k: &str) -> Result<Option<Vec<u8>>, StorageErr>; // контракт: не паникует\n}\n\
+          \n// impl, делающий unwrap() внутри get — нарушение LSP,\n// ловится в code review + proptest"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// io.Reader — контракт из документации; реализация, паникующая вместо\n// возврата error,\
+          \ нарушает LSP, хотя компилятор доволен\ntype SafeReader struct{ inner io.Reader }\n\nfunc (r SafeReader)\
+          \ Read(p []byte) (int, error) {\n    n, err := r.inner.Read(p)\n    if err != nil && err != io.EOF\
+          \ {\n        return n, fmt.Errorf(\"read: %w\", err) // не panic\n    }\n    return n, err\n}"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# Protocol + контракт-тест, прогоняемый по всем реализациям\nfrom typing import Protocol\n\n\
+          class Storage(Protocol):\n    def get(self, key: str) -> bytes | None: ...\n\ndef storage_contract_suite(impl:\
+          \ Storage):   # один набор тестов на все реализации\n    assert impl.get(\"missing\") is None  \
+          \     # не KeyError — это контракт"

@@ -1,0 +1,26 @@
+id: 85
+slug: paved-road-platforma-produkt-s-dobrovolnym-priny
+title: "Paved road: платформа — продукт с добровольным принятием"
+nav_label: Paved road
+section: s13
+keywords:
+  paved road platform engineering internal developer platform golden path adoption time to first
+  deploy monoculture
+blocks:
+  - type: lede
+    html:
+      "Внутренняя платформа, навязанная мандатом, получает malicious compliance; платформа-продукт выигрывает
+      тем, что paved road <em>дешевле</em> обходного пути: онбординг за час, миграции — забота платформы,
+      не команды. Отклонение легально, но с явной ценой: съехал с paved road — владеешь своим стеком сам,
+      включая on-call и апгрейды. Метрика платформы — adoption и time-to-first-deploy, не количество фич."
+  - type: note
+    html:
+      '<strong>Честная оценка.</strong> Тёмная сторона paved road — платформа становится монокультурой:
+      её баг — всеобщий баг (blast radius, <a href="#p27">27</a>; версионируйте платформу и раскатывайте
+      её саму canary, <a href="#p72">72</a>, по командам-потребителям). И Conway (<a href="#p15">15</a>)
+      во весь рост: платформенная команда, до которой нельзя дойти с вопросом, порождает обходные пути независимо
+      от качества кода. Платформа без поддержки — это библиотека, а не продукт.'
+  - type: note
+    html:
+      Выражается структурой владения и SLA платформенной команды; в коде видна как «шаблон нового сервиса
+      = один командный вызов».

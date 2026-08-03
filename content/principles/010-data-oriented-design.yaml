@@ -1,0 +1,50 @@
+id: 10
+slug: data-oriented-design
+title: Data-Oriented Design
+nav_label: Data-Oriented Design
+section: s1
+keywords: data oriented design soa aos struct of arrays cache locality simd
+blocks:
+  - type: lede
+    html:
+      "Дизайн от layout данных: SoA вместо AoS, cache lines, батчи вместо поэлементной обработки. Противоречит
+      инкапсуляции — это осознанный трейдофф для hot path."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// до Valhalla объекты — это указатели и промахи кэша.\n// SoA вручную + примитивные массивы,\
+          \ либо MemorySegment (FFM API)\nfinal class Particles {           // вместо List<Particle>\n   \
+          \ final float[] x, y, vx, vy;   // 4 плотных массива, SIMD-дружелюбно\n\n    void step(float dt)\
+          \ {\n        for (int i = 0; i < x.length; i++) { x[i] += vx[i] * dt; y[i] += vy[i] * dt; }\n  \
+          \  }\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// SoA + итераторы компилируются в SIMD; #[repr(C)] контролирует layout\nstruct Particles {\
+          \ x: Vec<f32>, y: Vec<f32>, vx: Vec<f32>, vy: Vec<f32> }\n\nimpl Particles {\n    fn step(&mut self,\
+          \ dt: f32) {\n        for (x, vx) in self.x.iter_mut().zip(&self.vx) { *x += vx * dt; }\n      \
+          \  for (y, vy) in self.y.iter_mut().zip(&self.vy) { *y += vy * dt; }\n    }\n}"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: "// то же — слайсы примитивов вместо []*Particle
+
+          // (убирает pointer chasing и нагрузку на GC)
+
+          type Particles struct{ X, Y, VX, VY []float32 }"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# DOD = \"выйди из интерпретатора\" — numpy/arrow, векторизация вместо циклов\nimport numpy\
+          \ as np\n\nclass Particles:\n    def __init__(self, n): self.x, self.vx = np.zeros(n), np.zeros(n)\n\
+          \    def step(self, dt): self.x += self.vx * dt   # одна C-операция вместо n итераций\n\n# polars/duckdb\
+          \ для табличных данных — тот же принцип уровнем выше"

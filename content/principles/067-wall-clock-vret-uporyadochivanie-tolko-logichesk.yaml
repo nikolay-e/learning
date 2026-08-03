@@ -1,0 +1,45 @@
+id: 67
+slug: wall-clock-vret-uporyadochivanie-tolko-logichesk
+title: "Wall clock врёт: упорядочивание — только логическими часами"
+nav_label: Wall clock врёт
+section: s11
+keywords: clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы
+blocks:
+  - type: lede
+    html:
+      "NTP-дрейф, leap smearing, VM-паузы: <code>System.currentTimeMillis()</code> двух машин несравним,
+      и «last write wins по timestamp» молча теряет записи. Упорядочивание — Lamport clock / HLC / версионные
+      векторы; wall clock — только для людей (логи, метрики) и для TTL с запасом."
+  - type: code
+    panes:
+      - lang: python
+        tab: Python
+        label: Python · HLC
+        highlight: python
+        code:
+          "# физическое время + логический счётчик, монотонность гарантирована\n@dataclass(frozen=True,\
+          \ order=True)\nclass HLC:\n    wall_ms: int\n    logical: int\n\n    def tick(self, now_ms: int)\
+          \ -> \"HLC\":\n        if now_ms > self.wall_ms:\n            return HLC(now_ms, 0)\n        return\
+          \ HLC(self.wall_ms, self.logical + 1)   # часы ушли назад — растим счётчик\n\n    def recv(self,\
+          \ other: \"HLC\", now_ms: int) -> \"HLC\":\n        m = max(self.wall_ms, other.wall_ms, now_ms)\n\
+          \        l = max(self.logical if m == self.wall_ms else -1,\n                other.logical if m\
+          \ == other.wall_ms else -1) + 1\n        return HLC(m, l)"
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// симптом для ревью: сравнение времён, записанных разными нодами\nif (eventA.timestamp().isBefore(eventB.timestamp()))\
+          \ { ... } // ← флаг, если A и B\n                                                             //\
+          \   писались разными нодами"
+  - type: note
+    html:
+      "Google TrueTime — исключение, подтверждающее правило: Spanner покупает сравнимость часов атомными
+      часами и <em>явным интервалом неопределённости</em> (commit-wait). Если у вас нет атомных часов —
+      у вас нет сравнимых timestamp'ов."
+  - type: note
+    html:
+      "Три разных часов не смешивать: wall clock — для календарного времени и отображения; monotonic
+      clock — для длительностей, таймаутов и дедлайнов; HLC или векторы версий — для причинного порядка.
+      И last-write-wins не всегда ошибка: это допустимая политика сходимости, если потеря конкурирующего
+      обновления — осознанное решение, а не сюрприз."

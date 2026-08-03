@@ -1,0 +1,33 @@
+id: 57
+slug: nablyudaemost-llm-payplaynov
+title: Наблюдаемость LLM-пайплайнов
+nav_label: Наблюдаемость LLM-пайплайнов
+section: s9
+keywords: llm observability tokens cost latency prompt sha drift span
+blocks:
+  - type: lede
+    html:
+      "Токены, стоимость, латентность, версия промпта и модели — в каждом trace-span, по семантическим
+      соглашениям OpenTelemetry <code>gen_ai.*</code>, а не по самодельным именам: иначе дашборды и бэкенды
+      не понимают ваши атрибуты. Дрейф качества ловится непрерывными evals на проде, не жалобами пользователей."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go · OpenTelemetry GenAI
+        highlight: go
+        code:
+          "span.SetAttributes(\n    // стандартные атрибуты gen_ai.* — их понимают готовые дашборды\n\
+          \    attribute.String(\"gen_ai.provider.name\", \"anthropic\"),\n    attribute.String(\"gen_ai.request.model\"\
+          , \"claude-haiku-4-5-20251001\"),\n    attribute.Int(\"gen_ai.usage.input_tokens\", usage.In),\n\
+          \    attribute.Int(\"gen_ai.usage.output_tokens\", usage.Out),\n    // своё — только там, где стандартного\
+          \ атрибута нет\n    attribute.String(\"app.prompt_sha\", promptSHA),\n    attribute.Float64(\"app.cost_usd\"\
+          , cost),\n    attribute.Bool(\"app.cache_hit\", hit),\n)\n// Содержимое (промпты, ответы, аргументы\
+          \ инструментов, retrieval-запросы)\n// в span НЕ пишется: gen_ai-конвенции отдельно предупреждают,\
+          \ что там PII."
+  - type: note
+    html:
+      <strong>Содержимое — отдельный поток с другими правилами.</strong> Capture выключен по умолчанию
+      и включается точечно; редакция PII — до экспортёра, а не в бэкенде; длина обрезается; включается сэмплирование;
+      у метаданных и содержимого разные retention и ACL; разделение по тенантам обязательно; секреты в атрибутах
+      спана недопустимы. В обычном трейсе едет версия промпта (<code>prompt_sha</code>), а не сам промпт.

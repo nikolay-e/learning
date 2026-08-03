@@ -1,0 +1,16 @@
+id: 76
+slug: brooks-s-law-i-second-system-effect
+title: Brooks's Law и second-system effect
+nav_label: Brooks's Law
+section: s8
+keywords: brooks law mythical man-month second-system effect найм скоуп переписывание
+blocks:
+  - type: lede
+    html:
+      'Добавление людей в опаздывающий проект замедляет его: коммуникация растёт квадратично, онбординг
+      отбирает самых знающих. Second-system effect: вторая версия — самая опасная, в неё сгружают всё, что
+      «не влезло» в первую, — прямое нарушение Gall''s Law (<a href="#p41">41</a>) изнутри команды-автора.'
+  - type: note
+    html:
+      Кодом не выражается; выражается решением «резать скоуп, а не нанимать» и требованием к rewrite-предложениям
+      проходить через strangler fig (<a href="#p73">73</a>), а не через «на этот раз сделаем правильно».

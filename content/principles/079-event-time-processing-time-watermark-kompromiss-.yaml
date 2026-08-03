@@ -1,0 +1,35 @@
+id: 79
+slug: event-time-processing-time-watermark-kompromiss-
+title: Event time ≠ processing time; watermark — компромисс, а не техническая деталь
+nav_label: Event time и watermark
+section: s12
+keywords: event time processing time watermark late data flink windowing allowed lateness retract
+blocks:
+  - type: lede
+    html:
+      "Время события и время обработки расходятся всегда: сеть, ретраи, офлайн-клиенты, replay. Watermark
+      — это явное заявление «данные старше T считаем прибывшими», то есть выбор между полнотой и латентностью,
+      который делает бизнес, а не фреймворк. Late data — нормальный режим, не ошибка: у каждого окна должна
+      быть политика, выбранная осознанно."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java · Flink
+        highlight: java
+        code:
+          "// каждая константа здесь — бизнес-решение, не конфиг «по умолчанию»\nWatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ofSeconds(30))\n\
+          \    .withIdleness(Duration.ofMinutes(1));\n\nstream.keyBy(Event::customerId)\n    .window(TumblingEventTimeWindows.of(Duration.ofMinutes(5)))\n\
+          \n    .allowedLateness(Duration.ofMinutes(10))\n    // Состояние окна живёт ещё 10 минут после watermark'а.\
+          \ Событие, пришедшее\n    // в этот интервал, ПОПАДАЕТ в окно и вызывает повторный firing — то есть\n\
+          \    // обновлённую версию агрегата. Именно это, а не side output, обязан\n    // уметь принять\
+          \ даунстрим.\n\n    .sideOutputLateData(lateTag)\n    // Сюда попадает то, что пришло позже window\
+          \ end + allowedLateness:\n    // в окно оно уже не войдёт и было бы просто отброшено.\n\n    .aggregate(new\
+          \ Revenue());\n\n// Рост доли событий в side output — сдвиг реальности, а не «шум»:\n// чинить источник\
+          \ или пересматривать 30s."
+  - type: note
+    html:
+      "<strong>Честная оценка.</strong> «Exactly-once event-time aggregation» не отменяет проблему:
+      окно, закрытое watermark'ом, закрыто <em>по заявленному компромиссу</em>, и опоздавшее событие либо
+      теряется, либо порождает исправление. Даунстрим, не умеющий принимать повторный firing (append-only
+      отчёт), молча фиксирует ложь — политика late data сквозная, до последнего потребителя."

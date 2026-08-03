@@ -1,0 +1,14 @@
+id: 59
+slug: revyu-uzkoe-mesto-generatsiya-desheva-verifikats
+title: Ревью — узкое место; генерация дешева, верификация дорога
+nav_label: Ревью — узкое место
+section: s9
+keywords: code review bottleneck verification generation diff size accountability
+blocks:
+  - type: lede
+    html: "Стоимость сместилась: написать код почти бесплатно, проверить — нет."
+  - type: text
+    html:
+      "Следствия: маленькие диффы (ревьюабельность важнее скорости генерации), запрет на PR больше,
+      чем ревьюер способен честно прочитать, и ответственность автора не делегируется — «модель написала»
+      не оправдание в постмортеме."

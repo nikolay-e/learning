@@ -1,0 +1,52 @@
+id: 17
+slug: expand-migrate-contract
+title: Expand — Migrate — Contract
+nav_label: Expand — Migrate — Contract
+section: s3
+keywords: expand migrate contract parallel change zero downtime rename column
+blocks:
+  - type: lede
+    html:
+      Единственный корректный протокол изменения схемы или API при непрерывном деплое. Никогда «rename
+      column» — всегда последовательность, в которой на каждом шаге старый и новый код работают одновременно.
+  - type: text
+    html:
+      "Полный цикл: <strong>1)</strong> expand — nullable-колонка и совместимый код; <strong>2)</strong>
+      двойная запись; <strong>3)</strong> батчевый бэкфилл с чекпойнтом; <strong>4)</strong> сверка старого
+      и нового значений; <strong>5)</strong> переключение чтения; <strong>6)</strong> период наблюдения;
+      <strong>7)</strong> NOT NULL и constraint; <strong>8)</strong> contract — снос старого."
+  - type: code
+    panes:
+      - lang: sql
+        tab: SQL
+        label: SQL
+        highlight: sql
+        code:
+          "-- 1. EXPAND: колонка nullable и без default — быстрая операция метаданных.\n--    NOT NULL\
+          \ и backfill на этом шаге взяли бы ACCESS EXCLUSIVE на всю таблицу.\nALTER TABLE users ADD COLUMN\
+          \ email_normalized TEXT;\n\n-- 2. DUAL-WRITE делает приложение: оба поля пишутся в одной транзакции.\n\
+          \n-- 3. BACKFILL батчами с чекпойнтом, а не одним UPDATE:\n--    один большой UPDATE = долгие блокировки,\
+          \ раздувание WAL, bloat,\n--    лаг реплик и невозможность прервать работу.\nWITH batch AS (\n \
+          \   SELECT id FROM users\n    WHERE email_normalized IS NULL AND id > :checkpoint\n    ORDER BY\
+          \ id LIMIT 5000 FOR UPDATE SKIP LOCKED\n)\nUPDATE users u SET email_normalized = lower(u.email)\n\
+          FROM batch b WHERE u.id = b.id\nRETURNING u.id;   -- максимум возвращённого id — новый :checkpoint\n\
+          \n-- 4. VERIFY: расхождений быть не должно; это условие перехода к шагу 5\nSELECT count(*) FROM\
+          \ users\nWHERE email_normalized IS DISTINCT FROM lower(email);\n\n-- 5-6. Чтение переключается флагом\
+          \ (72), двойная запись живёт весь период наблюдения.\n\n-- 7. Ограничение добавляется в два шага,\
+          \ чтобы не держать долгую блокировку\nALTER TABLE users ADD CONSTRAINT users_email_norm_not_null\n\
+          \    CHECK (email_normalized IS NOT NULL) NOT VALID;\nALTER TABLE users VALIDATE CONSTRAINT users_email_norm_not_null;\n\
+          \n-- 8. CONTRACT: только после того, как ни один живой деплой не читает старое поле\nALTER TABLE\
+          \ users DROP COLUMN email;"
+      - lang: python
+        tab: Python
+        label: Python · pydantic v2
+        highlight: python
+        code:
+          "# То же для API-полей: deprecated-поле живёт параллельно, отдаём оба.\n# Пометка ставится на\
+          \ само поле — она попадает в JSON Schema и в OpenAPI\nclass UserOut(BaseModel):\n    email: str\
+          \ = Field(deprecated=\"Используйте email_normalized\")\n    email_normalized: str"
+  - type: note
+    html:
+      'Откат на каждом шаге разный: до шага 5 достаточно перестать писать в новое поле, после — вернуть
+      чтение флагом. После шага 8 отката нет, это one-way door (<a href="#p20">20</a>). Поэтому между 5
+      и 8 нужен период наблюдения, измеряемый в неделях деплоев, а не в часах.'

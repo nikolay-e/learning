@@ -1,0 +1,22 @@
+id: 30
+slug: slo-i-error-budget
+title: SLO и error budget
+nav_label: SLO и error budget
+section: s5
+keywords: slo sli error budget sre burn rate multiwindow sloth
+blocks:
+  - type: lede
+    html:
+      "Переводят надёжность из религии в бюджет: «99.9% за 30 дней = 43 минуты даунтайма; бюджет исчерпан
+      → фичи стоп, релизы заморожены» — формализованный компромисс."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Sloth / Prometheus
+        highlight: yaml
+        code:
+          "slos:\n  - name: charge-availability\n    objective: 99.9\n    sli:\n      events:\n      \
+          \  error_query: sum(rate(http_requests_total{path=\"/charge\",code=~\"5..\"}[5m]))\n        total_query:\
+          \ sum(rate(http_requests_total{path=\"/charge\"}[5m]))\n    alerting:\n      page_alert: { labels:\
+          \ { severity: page } }   # multiwindow multi-burn-rate"

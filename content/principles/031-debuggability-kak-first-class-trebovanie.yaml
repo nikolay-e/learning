@@ -1,0 +1,43 @@
+id: 31
+slug: debuggability-kak-first-class-trebovanie
+title: Debuggability как first-class требование
+nav_label: Debuggability
+section: s5
+keywords: debuggability deterministic simulation testing dst replay dry run mttr seed
+blocks:
+  - type: lede
+    html:
+      Детерминированный replay, dry-run режимы, инспектируемое промежуточное состояние. Система без
+      этого имеет неограниченный MTTR.
+  - type: code
+    panes:
+      - lang: rust
+        tab: Rust
+        label: Rust · deterministic simulation testing
+        highlight: rust
+        code: "// FoundationDB/TigerBeetle-стиль: весь I/O за трейтом,
+
+          // в тестах — детерминированный симулятор с seed
+
+          trait Clock { fn now(&self) -> Instant; }
+
+          trait Net { fn send(&self, to: NodeId, msg: Msg); }
+
+
+          // прод: реальные; тест: SimClock + SimNet с контролируемыми отказами
+
+          // упал тест с seed=42 → воспроизводится побайтово, всегда"
+      - lang: python
+        tab: Python
+        label: Python · dry-run
+        highlight: python
+        code:
+          "# Dry-run как режим, а не как флаг в трёх if-ах\nclass Executor(Protocol):\n    def apply(self,\
+          \ change: Change) -> None: ...\n\nclass RealExecutor: ...\n\nclass DryRunExecutor:            #\
+          \ печатает план; логика ВЫШЕ не знает разницы\n    def apply(self, change: Change) -> None: print(f\"\
+          WOULD apply: {change}\")"
+  - type: note
+    html:
+      Dry-run обязан строить <em>тот же</em> неизменяемый план, который потом применяется. Две отдельные
+      ветки <code>dryRun()</code> и <code>apply()</code> расходятся — и расходятся молча, ровно в тот момент,
+      когда на dry-run полагаются.

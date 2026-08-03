@@ -1,0 +1,70 @@
+id: 3
+slug: make-illegal-states-unrepresentable
+title: Make illegal states unrepresentable
+nav_label: Illegal states unrepresentable
+section: s1
+keywords: sum type adt algebraic data type exhaustiveness illegal states
+blocks:
+  - type: lede
+    html:
+      Sum types вместо комбинаций флагов. <code>{isLoading, data, error}</code> имеет 4 невозможных
+      состояния из 8; sum type — ноль.
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java 21
+        highlight: java
+        code:
+          "// sealed + record + pattern matching\nsealed interface FetchState<T> permits Loading, Loaded,\
+          \ Failed {}\nrecord Loading<T>() implements FetchState<T> {}\nrecord Loaded<T>(T data) implements\
+          \ FetchState<T> {}\nrecord Failed<T>(Exception cause) implements FetchState<T> {}\n\nString render(FetchState<String>\
+          \ s) {\n    return switch (s) {                     // компилятор требует полноты\n        case\
+          \ Loading<String> l -> \"spinner\";\n        case Loaded<String>(var data) -> data;\n        case\
+          \ Failed<String>(var e) -> \"error: \" + e.getMessage();\n    };\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// enum — родная конструкция, exhaustiveness бесплатно\nenum FetchState<T> {\n    Loading,\n\
+          \    Loaded(T),\n    Failed(anyhow::Error),\n}\n\n// match без wildcard: добавили вариант — не скомпилируется,\
+          \ пока не обработаете"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// sum types нет; ближайшая замена — закрытый интерфейс + type switch.
+
+          // Честная оценка: exhaustiveness не проверяется компилятором, только линтером
+
+          // (go-check-sumtype / exhaustive)
+
+          type fetchState interface{ isFetchState() }
+
+
+          type Loading struct{}
+
+          type Loaded struct{ Data []byte }
+
+          type Failed struct{ Err error }
+
+
+          func (Loading) isFetchState() {}
+
+          func (Loaded) isFetchState()  {}
+
+          func (Failed) isFetchState()  {}"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# union + match, полнота проверяется mypy/pyright через assert_never\nfrom dataclasses import\
+          \ dataclass\nfrom typing import assert_never\n\n@dataclass(frozen=True)\nclass Loading: pass\n\n\
+          @dataclass(frozen=True)\nclass Loaded: data: bytes\n\n@dataclass(frozen=True)\nclass Failed: cause:\
+          \ Exception\n\ntype FetchState = Loading | Loaded | Failed\n\ndef render(s: FetchState) -> str:\n\
+          \    match s:\n        case Loading():      return \"spinner\"\n        case Loaded(data):   return\
+          \ data.decode()\n        case Failed(cause):  return f\"error: {cause}\"\n        case _:      \
+          \        assert_never(s)   # статическая полнота"

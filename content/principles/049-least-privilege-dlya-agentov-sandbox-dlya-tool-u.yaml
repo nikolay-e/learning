@@ -1,0 +1,33 @@
+id: 49
+slug: least-privilege-dlya-agentov-sandbox-dlya-tool-u
+title: Least privilege для агентов / sandbox для tool use
+nav_label: Least privilege для агентов
+section: s9
+keywords: agent least privilege tool use sandbox capability code execution
+blocks:
+  - type: lede
+    html:
+      Агент получает узкий набор инструментов под задачу, а не «весь API». Инструменты с побочными эффектами
+      разделены по уровням риска.
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// Инструменты как capability-объекты: у read-only агента writer'а физически нет
+
+          type ReadTools struct{ Orders OrderReader; Docs DocSearcher }
+
+          type WriteTools struct{ ReadTools; Refunds RefundIssuer } // выдаётся отдельно, с апрувом
+
+
+          func runSupportAgent(t ReadTools, query string) Answer { ... } // не может сделать refund"
+      - lang: yaml
+        tab: Sandbox
+        label: Sandbox
+        highlight: yaml
+        code: "# Исполнение сгенерированного кода — только в песочнице
+
+          sandbox: { network: none, fs: readonly-except:/tmp, timeout: 30s, memory: 512Mi }"

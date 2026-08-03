@@ -1,0 +1,39 @@
+id: 82
+slug: state-samaya-dorogaya-chast-striminga-ego-shema-
+title: State — самая дорогая часть стриминга; его схема планируется как схема БД
+nav_label: State и его эволюция
+section: s12
+keywords: stateful streaming savepoint checkpoint state ttl operator uid schema evolution kryo rocksdb
+blocks:
+  - type: lede
+    html:
+      'Stateless-оператор перезапускается бесплатно; stateful тащит за собой чекпойнты, savepoint-совместимость
+      и миграции. State — это база данных, размазанная по джобу: у каждого оператора стабильный uid (иначе
+      savepoint не восстановится после рефакторинга), у каждого state-типа — эволюционируемая сериализация
+      (POJO/Avro, не Kryo по умолчанию), у каждого ключа — TTL или явное решение «живёт вечно» (иначе state
+      растёт монотонно до OOM — Lehman, <a href="#p45">45</a>, в одном джобе).'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java · Flink
+        highlight: java
+        code:
+          "// три решения, которые нельзя принять «потом»\nstream.keyBy(...)\n    .process(new Dedupe())\n\
+          \    .uid(\"dedupe-v1\");                      // 1. стабильный uid: переименование класса\n   \
+          \                                         //    не должно терять state\n\nStateTtlConfig ttl = StateTtlConfig\
+          \         // 2. TTL — из бизнес-горизонта\n    .newBuilder(Duration.ofDays(7))         //    (дедуп-окно),\
+          \ не «пока влезает»\n    .cleanupInRocksdbCompactFilter(1000).build();\n\n// 3. тип state'а — POJO/Avro\
+          \ с явной эволюцией; Kryo generic = state,\n//    который нельзя изменить без полной пересборки\
+          \ из источника (= 80)"
+  - type: note
+    html:
+      'Проверка перед каждым релизом джоба: «восстановится ли этот код из прошлого savepoint''а?» —
+      это contract test (<a href="#p74">74</a>) между версиями самого себя. Если ответ «нет» — это миграция
+      state''а со своим expand — migrate — contract, а не деплой.'
+  - type: note
+    html:
+      "Стоимость state — не только heap: RocksDB упирается в локальный диск, компакции, усиление чекпойнтов
+      и время восстановления. К трём решениям добавляются снапшоты сериализаторов, <code>maxParallelism</code>
+      и key groups (задаётся один раз и ограничивает будущее перешардирование) и семантика очистки TTL —
+      ленивая уборка не освобождает диск в момент истечения."

@@ -1,0 +1,33 @@
+id: 51
+slug: eval-driven-development
+title: Eval-driven development
+nav_label: Eval-driven development
+section: s9
+keywords: eval driven development golden set llm as judge regression prompt ci
+blocks:
+  - type: lede
+    html:
+      "Evals — это тесты для недетерминированного компонента. Без evals замена промпта/модели — вслепую.
+      Иерархия по цене: assertion-based → golden set + метрики → LLM-as-judge (сам нуждается в калибровке
+      против человеческой разметки)."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Python
+        highlight: python
+        code:
+          "# Уровень 1: дешёвые программные проверки, гоняются на каждый PR промпта\ndef eval_extraction(case:\
+          \ Case) -> Score:\n    out = pipeline(case.document)\n    return Score(\n        json_valid   =\
+          \ is_valid_json(out),\n        schema_ok    = validate_schema(out, InvoiceSchema),\n        amounts_ok\
+          \   = out[\"total\"] == case.expected_total,   # точный матч, не similarity\n        no_leak   \
+          \   = case.ssn not in out_raw,\n    )\n\n# Уровень 2: golden set версионируется рядом с промптом;\
+          \ регрессия = красный CI\n# Уровень 3: LLM-judge — только для стиля/тональности,\n#            с\
+          \ периодической сверкой с людьми"
+  - type: note
+    html:
+      "Уровень 1 — не весь eval. Недетерминированный компонент требует: повторных прогонов и доверительных
+      интервалов вместо одного числа; срезов (по языку, длине, типу документа), потому что среднее прячет
+      провал на срезе; adversarial-кейсов; калибровки LLM-судьи против человеческой разметки; проверки на
+      утечку golden set в промпт; и наблюдения за дрейфом на проде. Стоимость и латентность меряются рядом
+      с качеством, а не отдельно."

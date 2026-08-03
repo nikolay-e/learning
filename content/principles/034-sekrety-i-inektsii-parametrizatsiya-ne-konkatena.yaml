@@ -1,0 +1,30 @@
+id: 34
+slug: sekrety-i-inektsii-parametrizatsiya-ne-konkatena
+title: "Секреты и инъекции: параметризация, не конкатенация"
+nav_label: Параметризация, не конкатенация
+section: s6
+keywords: sql injection prepared statement parameterized query owasp secrets
+blocks:
+  - type: code
+    panes:
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code: '# Единственный корректный способ во всех языках
+
+          cur.execute("SELECT * FROM users WHERE email = %s", (email,))  # не f-string. никогда.'
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          'var ps = conn.prepareStatement("SELECT * FROM users WHERE email = ?");
+
+          ps.setString(1, email);'
+  - type: note
+    html:
+      'Параметризация закрывает значения, но не идентификаторы: имена таблиц, колонок и направление
+      <code>ORDER BY</code> подставить плейсхолдером нельзя. Там работает только allowlist или типобезопасный
+      query builder. Управление самими секретами — отдельная тема (<a href="#p35">35</a>), здесь речь только
+      про инъекции.'

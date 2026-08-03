@@ -37,9 +37,9 @@ html[data-theme="light"] {
   --ink: #262a30;
   --ink-strong: #10131a;
   --muted: #6d6659;
-  --accent: #a25f14;
+  --accent: #8f5310;
   --accent-ink: #fffaf2;
-  --accent-soft: rgba(162, 95, 20, 0.1);
+  --accent-soft: rgba(143, 83, 16, 0.12);
   --danger: #b03a26;
   --ok: #2f7a51;
 }
@@ -822,4 +822,236 @@ html[data-theme="light"] .hljs-params {
     color: #000;
     font-size: 11pt;
   }
+}
+
+/* ---------- generated-page additions ---------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skiplink {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 0 0 8px 0;
+}
+.skiplink:focus {
+  left: 0;
+  top: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.principle .anchor:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 12px 0 0 46px;
+  padding: 0;
+}
+.badge {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--surface);
+  cursor: help;
+}
+.badge-kind {
+  color: var(--ink-strong);
+  border-color: var(--ink-strong);
+}
+.badge-established {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 55%, transparent);
+}
+.badge-context-dependent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.badge-opinionated {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+}
+
+.caveat,
+.versions,
+.conflicts-ref,
+.sources {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 10px 0 0 46px;
+  max-width: 70ch;
+}
+.caveat {
+  border-left: 2px solid var(--danger);
+  padding-left: 12px;
+}
+.caveat strong,
+.versions strong,
+.conflicts-ref strong,
+.sources strong {
+  color: var(--ink-strong);
+}
+
+.langbar .status {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-right: 6px;
+  cursor: help;
+}
+
+.fallback-note {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--line);
+  margin: 0;
+  padding: 7px 18px;
+}
+
+caption {
+  caption-side: top;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 14px 10px;
+}
+
+@media (max-width: 1080px) {
+  .meta,
+  .caveat,
+  .versions,
+  .conflicts-ref,
+  .sources {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  :root,
+  html[data-theme="light"],
+  html[data-theme="dark"] {
+    --bg: #fff;
+    --bg-alt: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --line: #bbb;
+    --line-soft: #ddd;
+    --ink: #111;
+    --ink-strong: #000;
+    --muted: #444;
+    --accent: #6b4310;
+    --accent-soft: transparent;
+    --danger: #8a2b1a;
+    --ok: #1d5c38;
+  }
+  .code,
+  .code pre,
+  .note,
+  .badge {
+    background: #fff !important;
+  }
+  .hljs-keyword,
+  .hljs-string,
+  .hljs-number,
+  .hljs-title,
+  .hljs-type,
+  .hljs-attr,
+  .hljs-built_in,
+  .hljs-literal,
+  .hljs-meta,
+  .hljs-params,
+  .hljs-name,
+  .hljs-section,
+  .hljs-symbol,
+  .hljs-variable {
+    color: #000 !important;
+  }
+  .hljs-comment {
+    color: #555 !important;
+  }
+  .langbar {
+    display: flex !important;
+  }
+  .langbar .copy,
+  .langtab {
+    display: none !important;
+  }
+  .paneflag {
+    display: block !important;
+  }
+  .skiplink,
+  .fallback-note {
+    display: none !important;
+  }
+}
+
+/* ссылка в тексте отличается не только цветом — иначе WCAG 1.4.1 */
+.principle p a,
+.hero p a,
+.section-lede a,
+td a,
+li a:not(.rail-group li a),
+caption a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.langtabs {
+  display: flex;
+  gap: 2px;
 }

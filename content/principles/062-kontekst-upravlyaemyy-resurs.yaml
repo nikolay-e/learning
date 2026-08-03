@@ -1,0 +1,14 @@
+id: 62
+slug: kontekst-upravlyaemyy-resurs
+title: Контекст — управляемый ресурс
+nav_label: Контекст — ресурс
+section: s9
+keywords: context engineering claude.md conventions repo structure readme retrieval
+blocks:
+  - type: lede
+    html: Качество генерации = качество контекста.
+  - type: text
+    html:
+      "Практики: <code>CLAUDE.md</code> / conventions-файлы в репозитории (соглашения проекта как машиночитаемый
+      артефакт), структура репо, дружественная извлечению (маленькие файлы, говорящие имена), актуальные
+      README у модулей. Документация впервые получила потребителя, который её реально читает."

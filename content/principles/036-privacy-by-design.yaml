@@ -1,0 +1,32 @@
+id: 36
+slug: privacy-by-design
+title: Privacy by design
+nav_label: Privacy by design
+section: s6
+keywords: privacy by design gdpr crypto shredding right to be forgotten pii retention
+blocks:
+  - type: lede
+    html:
+      "Retention и удаление — свойство схемы, а не скрипт. Прямой конфликт с event sourcing разрешается
+      crypto-shredding: PII шифруется per-subject ключом; удаление субъекта = удаление ключа, лог остаётся
+      неизменным."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java
+        highlight: java
+        code:
+          "record CustomerEvent(UUID customerId, EncryptedPayload pii, byte[] nonPii) {}
+
+
+          // keystore.delete(customerId) => все события субъекта нечитаемы навсегда,
+
+          // Kafka-лог не переписывается"
+  - type: note
+    html:
+      "<strong>Чего crypto-shredding не делает.</strong> Удаление ключа делает недоступным именно зашифрованный
+      payload — и только если все копии данных и ключей входят в тот же протокол удаления. Мимо него обычно
+      остаются: PII в логах, трейсах и DLQ; производные таблицы и поисковые индексы; кэши; выгрузки; резервные
+      копии ключей; расшифрованные копии в потребителях; агрегаты, допускающие повторную идентификацию.
+      Crypto-shredding — часть стратегии удаления, а не замена инвентаризации данных и enforcement'а retention."

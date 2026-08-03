@@ -1,0 +1,15 @@
+id: 40
+slug: essential-vs-accidental-complexity-brooks
+title: Essential vs accidental complexity (Brooks)
+nav_label: Essential vs accidental
+section: s8
+keywords: essential accidental complexity brooks no silver bullet
+blocks:
+  - type: lede
+    html:
+      "Рамка любого спора о «чистоте»: сложность предметной области неустранима; сложность, привнесённая
+      инструментами и абстракциями, — устранима и подлежит атаке."
+  - type: note
+    html:
+      "Вопрос на ревью: <strong>«какую essential-сложность выражает этот слой?»</strong> Нет ответа
+      — слой accidental."

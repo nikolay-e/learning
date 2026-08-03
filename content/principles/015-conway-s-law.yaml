@@ -1,0 +1,13 @@
+id: 15
+slug: conway-s-law
+title: Conway's Law
+nav_label: Conway's Law
+section: s2
+keywords: conway law inverse conway maneuver team topologies org chart
+blocks:
+  - type: lede
+    html:
+      "Архитектура сойдётся к структуре коммуникаций организации. Не совет, а наблюдение: хотите другую
+      архитектуру — сначала перестройте команды (inverse Conway maneuver)."
+  - type: note
+    html: Кодом не выражается; выражается орг-диаграммой.

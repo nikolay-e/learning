@@ -1,0 +1,12 @@
+id: 61
+slug: chesterton-s-fence-v-obe-storony
+title: Chesterton's Fence в обе стороны
+nav_label: Fence в обе стороны
+section: s9
+keywords: chesterton fence ai generated code understanding debt
+blocks:
+  - type: lede
+    html:
+      Ассистент не удаляет непонятый код — и человек не принимает непонятый сгенерированный код. «Работает,
+      но не знаю почему» — это накопление кода, у которого никогда не было понимавшего его автора; долг
+      нового типа.

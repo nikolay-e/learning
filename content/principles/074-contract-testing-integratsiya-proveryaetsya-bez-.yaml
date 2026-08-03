@@ -1,0 +1,30 @@
+id: 74
+slug: contract-testing-integratsiya-proveryaetsya-bez-
+title: "Contract testing: интеграция проверяется без интеграционного стенда"
+nav_label: Contract testing
+section: s3
+keywords: contract testing pact consumer-driven contracts интеграция провайдер потребитель
+blocks:
+  - type: lede
+    html:
+      'E2E-стенд со всеми сервисами — самый дорогой и самый нестабильный способ проверить совместимость.
+      Consumer-driven contracts: потребитель публикует свои ожидания (какие поля читает, какие статусы обрабатывает),
+      провайдер проверяет их в своём CI. Ломающее изменение находится до деплоя, у провайдера, с именем
+      пострадавшего потребителя. Это операционализация Hyrum''s Law (<a href="#p16">16</a>): контракт —
+      то, что потребители реально используют, записанное машинно.'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Python · pact-style
+        highlight: python
+        code:
+          "# ожидание потребителя\npact.given(\"invoice 42 exists\") \\\n    .upon_receiving(\"get invoice\"\
+          ) \\\n    .with_request(\"GET\", \"/invoices/42\") \\\n    .will_respond_with(200, body=Like({\"\
+          number\": \"42\", \"total_cents\": 12300}))\n\n# провайдер в своём CI прогоняет ВСЕ опубликованные\
+          \ контракты потребителей;\n# удаление поля, которое кто-то читает, — красный билд у провайдера"
+  - type: note
+    html:
+      Контракты проверяют структуру, не поведение — они дополняют, а не заменяют тесты провайдера. Схема-реестр
+      (protobuf + compatibility checks, <a href="#p18">18</a>) — то же самое для событий; contract testing
+      — для границ, где реестра нет (REST/JSON).

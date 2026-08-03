@@ -1,0 +1,34 @@
+id: 69
+slug: saga-raspredelennaya-tranzaktsiya-kompensatsii-m
+title: "Saga: распределённая транзакция = компенсации минус изоляция"
+nav_label: Saga
+section: s11
+keywords: saga compensation orchestration choreography temporal workflow распределённая транзакция изоляция
+blocks:
+  - type: lede
+    html:
+      "Распределённые ACID-транзакции существуют (XA, 2PC), но платят доступностью, латентностью и связностью:
+      координатор становится единой точкой отказа, а участники держат блокировки на время всего протокола.
+      Для продолжительных межсервисных процессов практичнее saga — цепочка локальных транзакций с компенсирующим
+      действием на каждую. Главная цена, которую забывают: <strong>пропала изоляция</strong> — промежуточные
+      состояния видимы другим участникам, и компенсация не «откатывает», а пишет новый факт (refund ≠ отмена
+      charge)."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java
+        highlight: java
+        code:
+          "// шаги и компенсации объявлены парой; состояние — явный persisted тип\nsealed interface SagaStep\
+          \ permits ReserveInventory, ChargeCard, BookShipment {}\n\nrecord ChargeCard(Cents amount) implements\
+          \ SagaStep {\n    Compensation compensation() { return new RefundCard(amount); } // новый факт,\
+          \ не rollback\n}\n\n// изоляция руками: семантический лок — заказ в статусе PENDING_PAYMENT\n//\
+          \ невидим для повторной продажи, пока saga не завершится или не компенсируется"
+  - type: note
+    html:
+      "<strong>Честная оценка.</strong> По мере роста числа шагов явный оркестратор (state machine)
+      обычно легче наблюдать и восстанавливать, чем неявная хореография: вопрос «кто сейчас владеет процессом»
+      перестаёт иметь однозначный ответ ровно тогда, когда он нужен в три часа ночи. Это эвристика, а не
+      порог: для двух участников с ясным контрактом хореография дешевле. Долгие saga = workflow engine (Temporal
+      и т. п.) — не новая идея, а persisted saga-оркестратор."

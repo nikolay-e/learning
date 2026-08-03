@@ -1,0 +1,33 @@
+id: 7
+slug: local-reasoning-inline-first
+title: Local reasoning / inline-first
+nav_label: Local reasoning / inline-first
+section: s1
+keywords: inline first abstraction navigation accept interfaces return structs
+blocks:
+  - type: lede
+    html:
+      "Метрика: сколько файлов надо открыть, чтобы понять фрагмент. Абстракция появляется на третьем
+      повторении, не на первом. Интерфейс с одной реализацией — минус к навигации без плюса к гибкости."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          '// Go-сообщество формулирует это явно: "accept interfaces, return structs",
+
+          // интерфейс объявляется у потребителя и только когда реализаций >= 2
+
+
+          // АНТИПАТТЕРН:              // НОРМА:
+
+          type UserService interface{} // func (h *Handler) route(...) { h.db.QueryUser(...) }
+
+          // + UserServiceImpl         // прямой вызов, одна точка чтения'
+  - type: text
+    html:
+      "Остальные языки — тот же принцип без синтаксиса: в Java не заводить <code>interface XService</code>
+      + <code>XServiceImpl</code>; в Rust не прятать единственную реализацию за <code>dyn Trait</code>;
+      в Python не строить иерархию ABC ради одного класса."

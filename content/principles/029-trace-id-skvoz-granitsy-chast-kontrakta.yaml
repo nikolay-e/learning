@@ -1,0 +1,32 @@
+id: 29
+slug: trace-id-skvoz-granitsy-chast-kontrakta
+title: Trace ID сквозь границы — часть контракта
+nav_label: Trace ID сквозь границы
+section: s5
+keywords: trace id opentelemetry propagation distributed tracing span context
+blocks:
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java · OpenTelemetry
+        highlight: java
+        code:
+          "// контекст течёт через HTTP → Kafka → Flink автоматически,\n// если пропагация настроена;\
+          \ вручную — inject/extract на каждой границе\nvar headers = new RecordHeaders();\nGlobalOpenTelemetry.getPropagators().getTextMapPropagator()\n\
+          \    .inject(Context.current(), headers, (h, k, v) -> h.add(k, v.getBytes()));\nproducer.send(new\
+          \ ProducerRecord<>(topic, null, key, value, headers));"
+      - lang: rust
+        tab: Rust
+        label: Rust · tracing
+        highlight: rust
+        code: "// span-иерархия в коде
+
+          #[tracing::instrument(skip(payload), fields(order_id = %payload.id))]
+
+          async fn process(payload: Order) -> Result<()> { ... }"
+  - type: note
+    html:
+      "Rust-пример показывает только локальный span. Через сетевую границу контекст сам не переезжает:
+      нужен явный inject на продьюсере и extract на консьюмере через <code>TextMapPropagator</code>. Для
+      Kafka — заголовки с фиксированной кодировкой и без дублирования уже существующих trace-заголовков."

@@ -1,0 +1,44 @@
+id: 65
+slug: modeli-konsistentnosti-chast-kontrakta-api
+title: Модели консистентности — часть контракта API
+nav_label: Модели консистентности
+section: s11
+keywords: consistency model linearizable causal session guarantees read your writes monotonic reads
+blocks:
+  - type: lede
+    html:
+      "«Прочитал то, что записал» — не свойство базы, а гарантия, которую сервис либо даёт, либо нет,
+      и это должно быть написано в контракте. Иерархия по цене: linearizable &gt; sequential &gt; causal
+      &gt; read-your-writes / monotonic reads (session guarantees) &gt; eventual. Большинству фич хватает
+      session guarantees — платить за linearizability по умолчанию значит платить за то, чем не пользуешься."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// read-your-writes через версионный токен, без sticky sessions\nrecord WriteResult(OrderId\
+          \ id, long lsn) {}          // LSN/HLC записи возвращается клиенту\n\nOrder read(OrderId id, long\
+          \ minLsn) {\n    var replica = pool.any();\n    replica.waitForLsn(minLsn, TIMEOUT);           \
+          \  // реплика догоняет или отдаём в primary\n    return replica.get(id);\n}\n// клиент носит lsn\
+          \ в cookie/header → его собственные записи видимы,\n// чужие — eventually; это и есть session guarantee,\
+          \ задекларированная явно"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// то же на уровне контракта: тип ответа содержит гарантию\ntype ReadConsistency int\n\nconst\
+          \ (\n    Eventual ReadConsistency = iota\n    ReadYourWrites\n    Linearizable // документированно\
+          \ дорого: идёт через лидера\n)\n\nfunc (s *Store) Get(ctx context.Context, id OrderID, c ReadConsistency)\
+          \ (Order, error)"
+  - type: note
+    html:
+      "Тест-вопрос на дизайн-ревью: «какой аномалией пользователь заплатит за эту оптимизацию — и знает
+      ли он об этом из контракта?»"
+  - type: note
+    html:
+      Возвращать наружу <code>long lsn</code> — это утечка PostgreSQL в контракт. Наружу отдают непрозрачный
+      consistency token с описанной семантикой, таймаутом ожидания и поведением при его истечении (деградация
+      в чтение с лидера или явная ошибка).

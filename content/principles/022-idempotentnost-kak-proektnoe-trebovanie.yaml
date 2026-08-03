@@ -1,0 +1,28 @@
+id: 22
+slug: idempotentnost-kak-proektnoe-trebovanie
+title: Идемпотентность как проектное требование
+nav_label: Идемпотентность
+section: s4
+keywords: idempotency key retry safe replay
+blocks:
+  - type: lede
+    html: Идемпотентный ключ — в контракте API, а не retry-логика в клиенте.
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// Ключ идемпотентности от клиента, результат кэшируется атомарно с операцией\nfunc (s *Svc)\
+          \ CreatePayment(ctx context.Context, key IdempotencyKey, req PaymentReq) (Payment, error) {\n  \
+          \  return s.store.WithIdempotency(ctx, key, func(tx Tx) (Payment, error) {\n        return s.doCreate(tx,\
+          \ req) // при повторе с тем же key вернётся сохранённый результат\n    })\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// Тип делает требование ненарушаемым: без ключа запрос не сконструировать
+
+          pub struct CreatePayment { pub idempotency_key: Uuid, pub amount: Cents }"

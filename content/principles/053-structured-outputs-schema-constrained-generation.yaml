@@ -1,0 +1,29 @@
+id: 53
+slug: structured-outputs-schema-constrained-generation
+title: Structured outputs / schema-constrained generation
+nav_label: Structured outputs
+section: s9
+keywords: structured output json schema constrained decoding function calling stringly typed
+blocks:
+  - type: lede
+    html:
+      Свободный текст между машинными компонентами — это stringly-typed интерфейс. Схема задаётся генерации,
+      выход валидируется всё равно (двойной контроль).
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// схема из типа, выход — в тип\nrecord Invoice(String number, long totalCents, LocalDate due)\
+          \ {}\n\nvar invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.class)),\n\
+          \                               Invoice.class); // и это может кинуть — обрабатываем"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "type Extract struct {\n    Number     string `json:\"number\"`\n    TotalCents int64  `json:\"\
+          total_cents\"`\n}\n\n// json.Unmarshal + доменная валидация ПОСЛЕ анмаршала — модель умеет\n// вернуть\
+          \ синтаксически валидный, семантически ложный JSON"

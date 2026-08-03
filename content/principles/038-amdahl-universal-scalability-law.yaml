@@ -1,0 +1,20 @@
+id: 38
+slug: amdahl-universal-scalability-law
+title: Amdahl / Universal Scalability Law
+nav_label: Amdahl / USL
+section: s7
+keywords: amdahl universal scalability law usl gunther coherency contention crosstalk
+blocks:
+  - type: lede
+    html:
+      "USL: пропускная способность <code>C(N) = λN / (1 + σ(N−1) + κN(N−1))</code>. Второй член (когерентность
+      κ) объясняет, почему добавление узлов даёт отрицательный прирост: crosstalk растёт квадратично."
+  - type: note
+    html:
+      "Практический вывод для Kafka/Flink: перед горизонтальным скейлом измерь σ и κ на нагрузочном
+      стенде — иначе платишь за ноды, снижающие throughput."
+  - type: note
+    html:
+      σ (contention) и κ (coherency) не известны заранее — они оцениваются подгонкой кривой по измерениям
+      на нескольких уровнях конкурентности. USL полезен как модель для экстраполяции и как язык для разговора,
+      а не как формула, в которую подставляют числа из документации.

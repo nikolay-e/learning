@@ -1,0 +1,13 @@
+id: 41
+slug: gall-s-law
+title: Gall's Law
+nav_label: Gall's Law
+section: s8
+keywords: gall law walking skeleton incremental big bang
+blocks:
+  - type: lede
+    html:
+      Работающая сложная система всегда эволюционировала из работающей простой. Спроектированная сложной
+      с нуля — не работает и не чинится.
+  - type: note
+    html: "Практика: walking skeleton → инкременты, никогда big-bang."

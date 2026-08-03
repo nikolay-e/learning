@@ -1,0 +1,24 @@
+id: 54
+slug: nedeterminizm-ogorozhen-ne-razmazan
+title: Недетерминизм огорожен, не размазан
+nav_label: Недетерминизм огорожен
+section: s9
+keywords: determinism golden traces fixtures llm boundary side effect
+blocks:
+  - type: lede
+    html:
+      "Тот же functional core, imperative shell: LLM-вызов — это I/O-эффект оболочки. Ядро (парсинг,
+      маршрутизация, бизнес-правила) остаётся детерминированным и тестируется без модели."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Rust
+        highlight: rust
+        code:
+          "trait Completion { async fn complete(&self, req: Req) -> Result<Raw>; }
+
+
+          // прод: HTTP-клиент; тест: записанные фикстуры (golden traces) — пайплайн
+
+          // тестируется детерминированно, evals гоняют живую модель отдельно и реже"

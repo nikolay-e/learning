@@ -1,0 +1,27 @@
+id: 73
+slug: strangler-fig-legasi-dushat-po-marshrutam-ne-per
+title: "Strangler Fig: легаси душат по маршрутам, не переписывают"
+nav_label: Strangler Fig
+section: s3
+keywords: strangler fig legacy migration rewrite удушение легаси
+blocks:
+  - type: lede
+    html:
+      'Big-bang rewrite нарушает Gall''s Law (<a href="#p41">41</a>) в промышленном масштабе. Strangler
+      fig: фасад перед легаси, маршруты переводятся на новую систему по одному, легаси умирает вытеснением.
+      Каждый шаг обратим (роутинг назад), прогресс измерим (% трафика), система работает всё время.'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Маршрутизация
+        highlight: yaml
+        code:
+          "# маршрутизация — и есть механизм миграции\nroutes:\n  - match: { path: /invoices/* }   # мигрировано\n\
+          \    backend: billing-v2\n  - match: { path: /* }            # всё остальное — пока легаси\n   \
+          \ backend: legacy-monolith"
+  - type: note
+    html:
+      "Самая дорогая часть — не роутинг, а расщепление данных: пока обе системы пишут в одну базу, легаси
+      не мёртв, а спрятан. Shared DB — промежуточная станция с датой выезда, иначе получили distributed
+      monolith."

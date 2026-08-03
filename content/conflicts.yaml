@@ -1,0 +1,84 @@
+# refs связывает строку с принципами: build.py по ним строит обратные ссылки
+# «конфликтует с» на карточках принципов, чтобы список не поддерживался в двух местах.
+conflicts:
+  - left: "DOD ↔ information hiding"
+    resolution: "Hot path — DOD; всё остальное — hiding. Граница по профилю"
+    refs: [10, 12]
+  - left: "Event sourcing ↔ privacy by design"
+    resolution: "Crypto-shredding, вместе с инвентаризацией всех копий данных и ключей"
+    refs: [36]
+  - left: "DRY ↔ bounded contexts"
+    resolution: "DRY только внутри контекста"
+    refs: [43, 14]
+  - left: "Local reasoning ↔ dataflow"
+    resolution: "Dataflow там, где планировщик даёт измеримый выигрыш"
+    refs: [7]
+  - left: "OCP ↔ YAGNI"
+    resolution: "Rule of three, а точнее — доказанная ось изменения"
+    refs: [1, 42]
+  - left: "Postel ↔ эволюция схем"
+    resolution: "Строгость на внешней границе, толерантность к новым полям на внутренних контрактах"
+    refs: [19, 18]
+  - left: "Backpressure ↔ availability"
+    resolution: "Load shedding — тоже availability, но честная"
+    refs: [23]
+  - left: "HITL ↔ автономность агентов"
+    resolution: "Порог по обратимости, влиянию и полномочиям, не по «уверенности» модели"
+    refs: [50]
+  - left: "Linearizability ↔ latency/availability (PACELC)"
+    resolution: "Линеаризуемость только для инвариантов (деньги, уникальность); остальное — session guarantees"
+    refs: [64, 65]
+  - left: "Кэш ↔ консистентность"
+    resolution: "TTL = задокументированный staleness budget, выведенный из бизнес-требования"
+    refs: [70]
+  - left: "Saga ↔ изоляция"
+    resolution: "Семантические локи и pending-состояния; компенсация — новый факт, не rollback"
+    refs: [69]
+  - left: "Feature flags ↔ local reasoning"
+    resolution: "Removal date в декларации флага; удаление — часть DoD"
+    refs: [72, 7]
+  - left: "Canary ↔ миграции схем"
+    resolution: "Expand — migrate — contract обязателен: две версии кода живут одновременно всегда"
+    refs: [72, 17]
+  - left: "Outbox ↔ latency записи"
+    resolution: "Outbox добавляет строку в транзакцию — это цена корректности; CDC с WAL, если и она велика"
+    refs: [68]
+  - left: "Chaos engineering ↔ error budget"
+    resolution: "Chaos тратит бюджет осознанно и останавливается при его исчерпании"
+    refs: [77, 30]
+  - left: "Boring technology ↔ mechanical sympathy"
+    resolution: "Innovation token тратится по измеренному профилю, не по докладу"
+    refs: [75, 39]
+  - left: "Contract testing ↔ скорость провайдера"
+    resolution: "Провайдер получает право ломать то, что ни один контракт не использует, — это ускорение, не тормоз"
+    refs: [74, 16]
+  - left: "Watermark: полнота ↔ латентность"
+    resolution: "Bounded out-of-orderness — из бизнес-требования; late data меряется и имеет политику до последнего потребителя"
+    refs: [79]
+  - left: "Replay ↔ побочные эффекты"
+    resolution: "Эффекты только за идемпотентным/транзакционным sink; иначе replay в теневой sink + сравнение"
+    refs: [80, 22]
+  - left: "DLQ ↔ per-key ordering"
+    resolution: "Для ordering-чувствительных ключей — парковка ключа или re-drive через replay ключа, не сообщением"
+    refs: [81]
+  - left: "Retention как стоимость ↔ replay-горизонт"
+    resolution: "Retention = страховой горизонт репроцессинга; сокращение — one-way door с ADR"
+    refs: [80, 20]
+  - left: "Кэш сборки ↔ корректность"
+    resolution: "Cache hit легален только при герметичном ключе; невоспроизводимость — баг, не особенность"
+    refs: [83]
+  - left: "Trunk-based ↔ незавершённые фичи"
+    resolution: "Флаги или branch by abstraction вместо веток: скрытый долг меняется на видимый"
+    refs: [84, 72]
+  - left: "Paved road ↔ автономия команд"
+    resolution: "Отклонение легально с полной ценой владения; guardrails безопасности остаются обязательными"
+    refs: [85]
+  - left: "Paved road ↔ blast radius"
+    resolution: "Монокультура платформы: версионирование и canary самой платформы по командам"
+    refs: [85, 27]
+  - left: "Immutable infra ↔ stateful-системы"
+    resolution: "Машины — cattle, данные — pet: пересоздаём compute, мигрируем данные, не путаем"
+    refs: [86]
+  - left: "Shadow-run ↔ стоимость"
+    resolution: "Двойной прогон — временный, с датой cutover и порогом diff-rate, записанными до старта"
+    refs: [87, 78]

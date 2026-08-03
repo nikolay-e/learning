@@ -1,0 +1,34 @@
+id: 56
+slug: grounding-utverzhdeniya-privyazany-k-istochnikam
+title: "Grounding: утверждения привязаны к источникам"
+nav_label: Grounding
+section: s9
+keywords: grounding rag citation retrieved chunk hallucination uncited
+blocks:
+  - type: lede
+    html:
+      "RAG-ответ без ссылки на извлечённый фрагмент — непроверяемое утверждение. Но и непустой список
+      ссылок ничего не гарантирует: проверять надо поддержку каждого утверждения отдельно, а не наличие
+      библиографии у ответа целиком."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Python
+        highlight: python
+        code:
+          "class Claim(BaseModel):\n    text: str\n    support: list[ChunkRef]\n    support_status: Literal[\"\
+          supported\", \"partial\", \"unsupported\"]\n\nclass GroundedAnswer(BaseModel):\n    claims: list[Claim]\
+          \                      # утверждения, а не сплошной текст\n\n    @model_validator(mode=\"after\"\
+          )\n    def must_be_supported(self):\n        for c in self.claims:\n            if c.support_status\
+          \ != \"supported\":\n                raise ValueError(f\"unsupported claim: {c.text[:60]}\")\n \
+          \           for ref in c.support:\n                if not index.exists(ref):    # chunk реально\
+          \ существует\n                    raise ValueError(f\"phantom citation: {ref}\")\n             \
+          \   if not acl.readable(ref, self.actor):  # и виден этому пользователю\n                    raise\
+          \ ValueError(f\"citation leaks source: {ref}\")\n        return self"
+  - type: note
+    html:
+      'Валидатор проверяет форму. Содержательная часть — отдельный шаг: entailment-проверка (поддерживает
+      ли фрагмент утверждение) и coverage-метрика — какая доля проверяемых утверждений имеет поддержку.
+      Обе выносятся в evals (<a href="#p51">51</a>), потому что стоят дорого и недетерминированы. Отсутствие
+      поддержки → «не знаю» дешевле галлюцинации.'

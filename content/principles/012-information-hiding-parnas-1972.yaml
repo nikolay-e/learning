@@ -1,0 +1,48 @@
+id: 12
+slug: information-hiding-parnas-1972
+title: Information Hiding (Parnas, 1972)
+nav_label: Information Hiding
+section: s2
+keywords: information hiding parnas encapsulation module secret
+blocks:
+  - type: lede
+    html:
+      "Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается, если
+      это решение пересмотрят». SRP — размытый пересказ этого принципа."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// модульная система (module-info.java) — hiding на уровне артефакта\nmodule billing.core {\n\
+          \    exports com.acme.billing.api;      // только API\n    // com.acme.billing.internal не экспортирован\
+          \ и не открыт: обычный доступ\n    // запрещён, deep reflection запрещена по умолчанию. Доступ всё\
+          \ ещё можно\n    // выдать явно — opens, Module.addOpens(), --add-opens. Это граница\n    // по\
+          \ умолчанию, а не физическая невозможность.\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code: "// pub(crate) / приватность по умолчанию — hiding встроен в язык
+
+          pub struct RateLimiter { /* поля приватны */ }
+
+
+          pub(crate) mod internal;   // виден внутри крейта, невиден потребителям"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: "// пакет internal/ — компилятор запрещает импорт извне поддерева
+
+          // myservice/internal/ratelimit — недоступен из чужих модулей физически"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          '# конвенция _prefix + __all__; принудительного hiding нет — и это честно
+
+          __all__ = ["RateLimiter"]   # публичный контракт задекларирован явно'

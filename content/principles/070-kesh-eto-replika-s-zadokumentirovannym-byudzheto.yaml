@@ -1,0 +1,36 @@
+id: 70
+slug: kesh-eto-replika-s-zadokumentirovannym-byudzheto
+title: Кэш — это реплика с задокументированным бюджетом staleness
+nav_label: Кэш и staleness budget
+section: s11
+keywords: cache ttl staleness budget invalidation write-through write-behind cache-aside кэш инвалидация
+blocks:
+  - type: lede
+    html:
+      "Кэш — не «ускорение», а осознанное ослабление консистентности: TTL — это SLA на устаревание,
+      и он должен быть выведен из бизнес-требования («цена может врать 60 секунд»), а не из «ну пусть 5
+      минут». Инвалидация по событию и TTL как страховочный пол — не «или», а «и»: событие теряется (at-least-once
+      ≠ exactly-once), TTL ограничивает ущерб потери."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          "// TTL как контракт, а не константа в глубине кода\ntype CachePolicy struct {\n    TTL    \
+          \              time.Duration // = задокументированный staleness budget\n    StaleWhileRevalidate\
+          \ time.Duration // отдаём протухшее, обновляем фоном\n}\n\nvar pricePolicy = CachePolicy{TTL: 60\
+          \ * time.Second, StaleWhileRevalidate: 10 * time.Second}\n// ревью-вопрос: \"откуда 60?\" должен\
+          \ иметь ответ со ссылкой на требование"
+  - type: note
+    html:
+      "Cache-aside / read-through / write-through / write-behind — не вкусовщина: write-behind теряет
+      данные при падении кэша и допустим только для восстановимого (счётчики, метрики). Ключ с двумя писателями
+      (сервис и инвалидатор) — гонка по построению; версионируйте значение или пишите через одну точку."
+  - type: note
+    html:
+      "<strong>Точность.</strong> At-least-once сама по себе не теряет инвалидации — потери приходят
+      от конкретных операционных отказов: падения релея, переполнения, ошибки маршрутизации, рассинхрона
+      после rebalance. Событие плюс TTL — хороший дефолт, а не универсальная обязанность: durable write-through
+      с явно заданными гарантиями тоже корректен."

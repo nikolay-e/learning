@@ -1,0 +1,17 @@
+id: 63
+slug: fallacies-of-distributed-computing
+title: Fallacies of Distributed Computing
+nav_label: Fallacies of distributed computing
+section: s11
+keywords: fallacies of distributed computing deutsch gosling заблуждения сеть надёжна
+blocks:
+  - type: lede
+    html:
+      "Восемь заблуждений (Deutsch / Gosling): сеть надёжна, латентность нулевая, полоса бесконечна,
+      сеть безопасна, топология неизменна, администратор один, транспорт бесплатен, сеть однородна. Каждое
+      «очевидно ложно» — и каждое регулярно закладывается в дизайн неявно."
+  - type: note
+    html:
+      "<strong>Проверяемая форма.</strong> Любой межсервисный вызов в коде обязан отвечать на три вопроса:
+      таймаут? ретрай-политика? что при недоступности? Отсутствие ответа = заложенное заблуждение №1. Кодом
+      не выражается; выражается чек-листом ревью для каждой сетевой границы."

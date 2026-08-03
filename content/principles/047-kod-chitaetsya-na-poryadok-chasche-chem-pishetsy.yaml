@@ -1,0 +1,12 @@
+id: 47
+slug: kod-chitaetsya-na-poryadok-chasche-chem-pishetsy
+title: Код читается на порядок чаще, чем пишется
+nav_label: Код читается чаще
+section: s8
+keywords: readability explicit over implicit zen of python magic reflection
+blocks:
+  - type: lede
+    html:
+      "Обоснование явности над магией: в Java — меньше рефлексии и аннотационной магии; в Rust — меньше
+      макро-DSL; в Go — это философия языка целиком; в Python — «explicit is better than implicit» из <code>import
+      this</code>."

@@ -1,0 +1,24 @@
+id: 64
+slug: cap-mertv-pacelc-zhiv
+title: CAP недостаточен; PACELC добавляет trade-off нормального режима
+nav_label: CAP недостаточен, PACELC полнее
+section: s11
+keywords: cap theorem pacelc partition consistency availability latency кворум
+blocks:
+  - type: lede
+    html:
+      "CAP в популярной форме вырожден: P не выбирается — partition случается, выбор только между C
+      и A <em>во время</em> partition. PACELC честнее: даже без partition (E) выбор между latency (L) и
+      consistency (C) существует всегда — синхронная репликация стоит RTT на каждую запись."
+  - type: note
+    html:
+      "<strong>Честная оценка.</strong> «CP или AP» как ярлык базы данных — маркетинговая таксономия;
+      реальные системы настраиваются per-operation (<code>quorum</code> vs <code>one</code> в Cassandra,
+      <code>synchronous_commit</code> в Postgres). Принцип: уровень консистентности — свойство операции,
+      не системы, и выбирается по инварианту, который операция защищает."
+  - type: note
+    html:
+      "PACELC не отменяет CAP, а расширяет его: CAP описывает поведение во время partition, PACELC добавляет
+      выбор в нормальном режиме. Заголовок про «мёртв» относится к популярному использованию CAP как ярлыка
+      для баз данных. И <code>synchronous_commit</code> в PostgreSQL — параметр подтверждения коммита и
+      durability/репликации, а не переключатель модели консистентности на операцию."

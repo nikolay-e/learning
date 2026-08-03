@@ -1,0 +1,54 @@
+id: 37
+slug: izmer-potom-optimiziruy
+title: Измерь, потом оптимизируй
+nav_label: Измерь, потом оптимизируй
+section: s7
+keywords: premature optimization knuth jmh criterion pprof py-spy profiling benchmark
+blocks:
+  - type: lede
+    html: "Кнут в оригинале: не «оптимизация — зло», а «без измерения — зло»."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java · JMH
+        highlight: java
+        code: "// единственный корректный способ микробенчмарка на JVM
+
+          @Benchmark
+
+          @BenchmarkMode(Mode.SampleTime)
+
+          public Portfolio settle(BenchState s) { return Settlement.settle(s.trades, s.rates, DAY); }
+
+
+          // не System.nanoTime вокруг цикла: JIT, warmup, DCE сделают из этого лотерею"
+      - lang: rust
+        tab: Rust
+        label: Rust · criterion
+        highlight: rust
+        code: '// статистика + защита от DCE через black_box
+
+          c.bench_function("settle", |b| b.iter(|| settle(black_box(&trades), &rates, day)));'
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// встроенный harness + профили из production (net/http/pprof — включён всегда)\nfunc BenchmarkSettle(b\
+          \ *testing.B) {\n    for b.Loop() { Settle(trades, rates, day) }\n}\n\n// go tool pprof -http=:\
+          \ http://svc:6060/debug/pprof/profile"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: bash
+        code:
+          "# pyperf для микро; py-spy/scalene для прода — сэмплирующие, без инструментации
+
+          $ py-spy record --pid 4711 --format speedscope"
+  - type: note
+    html:
+      "<strong>Оговорки к примерам.</strong> JMH — стандарт для JVM-микробенчмарков, но не единственный
+      корректный способ измерения: продовые профили и нагрузочные стенды отвечают на другие вопросы. <code>testing.B.Loop</code>
+      требует Go 1.24+. <code>net/http/pprof</code> не «включён всегда»: пакет нужно импортировать и поднять
+      HTTP-обработчик, а в проде закрыть сетью и аутентификацией — это отладочная поверхность."

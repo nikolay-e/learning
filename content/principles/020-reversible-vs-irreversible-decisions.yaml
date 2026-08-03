@@ -1,0 +1,23 @@
+id: 20
+slug: reversible-vs-irreversible-decisions
+title: Reversible vs irreversible decisions
+nav_label: Reversible vs irreversible
+section: s3
+keywords: one-way door two-way door adr architecture decision record reversible
+blocks:
+  - type: lede
+    html:
+      Скорость решения обратно пропорциональна стоимости отката. Выбор библиотеки логирования — two-way
+      door, решается за час. Выбор формата хранения / партиционирования / ID-схемы — one-way door, требует
+      ADR.
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: ADR
+        highlight: markdown
+        code:
+          "# ADR-014: Ключ партиционирования topic'а orders\n\nStatus: accepted   Date: 2026-03-02\n\n\
+          Context: repartition Kafka-топика на проде = даунтайм консьюмеров\n         + пересборка state stores\
+          \ Flink\n\nDecision: партиционируем по customer_id, не по order_id\n\nConsequences: горячие ключи\
+          \ для крупных B2B-клиентов;\n              митигируем salted keys при >5% skew"

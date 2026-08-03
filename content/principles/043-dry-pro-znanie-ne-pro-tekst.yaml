@@ -1,0 +1,26 @@
+id: 43
+slug: dry-pro-znanie-ne-pro-tekst
+title: DRY — про знание, не про текст
+nav_label: DRY — про знание
+section: s8
+keywords: dry dont repeat yourself knowledge duplication shared code
+blocks:
+  - type: lede
+    html:
+      "Одинаковые пять строк в двух bounded contexts — не дублирование: они меняются по разным причинам.
+      Их «устранение» связывает то, что обязано меняться независимо."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          "// НЕ надо: pkg/common/validation.go, куда billing и crm ходят за validateEmail
+
+
+          // НАДО: у каждого контекста своя копия — биллингу вскоре понадобится
+
+          // RFC-строгость для инвойсов, CRM — терпимость к маркетинговым мусорным адресам.
+
+          // Общая функция заставила бы один из контекстов врать."

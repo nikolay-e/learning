@@ -1,0 +1,26 @@
+id: 13
+slug: coupling-cohesion
+title: Coupling / Cohesion
+nav_label: Coupling / Cohesion
+section: s2
+keywords: coupling cohesion afferent efferent instability archunit import-linter depguard
+blocks:
+  - type: lede
+    html:
+      "Единственная пара метрик дизайна, поддающаяся измерению (afferent/efferent coupling, instability).
+      Практика: направленные зависимости проверяются в CI, а не в head-каноне ревьюера."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java · ArchUnit
+        highlight: java
+        code:
+          "// правило зависимостей как тест\n@ArchTest\nstatic final ArchRule layering = layeredArchitecture().consideringAllDependencies()\n\
+          \    .layer(\"domain\").definedBy(\"..domain..\")\n    .layer(\"infra\").definedBy(\"..infra..\"\
+          )\n    .whereLayer(\"domain\").mayNotAccessAnyLayer(); // домен не знает про инфраструктуру"
+  - type: note
+    html:
+      <strong>Go</strong> — depguard / <code>go list -deps</code> в CI. <strong>Rust</strong> — крейты
+      в workspace (граф зависимостей = Cargo.toml, циклы невозможны). <strong>Python</strong> — import-linter
+      с контрактом слоёв.

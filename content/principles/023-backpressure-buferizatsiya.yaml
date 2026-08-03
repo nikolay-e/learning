@@ -1,0 +1,47 @@
+id: 23
+slug: backpressure-buferizatsiya
+title: Backpressure &gt; буферизация
+nav_label: Backpressure > буферизация
+section: s4
+keywords: backpressure little law load shedding bounded queue reactive streams
+blocks:
+  - type: lede
+    html:
+      "Неограниченная очередь превращает отказ в latency-коллапс (Little's law: <code>L = λW</code>;
+      растёт очередь — растёт время ответа при том же λ)."
+  - type: code
+    panes:
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// bounded channel + отказ вместо роста очереди\nselect {\ncase jobs <- j:\ncase <-time.After(50\
+          \ * time.Millisecond):\n    return ErrOverloaded          // load shedding: быстрый отказ дешевле\
+          \ медленного успеха\n}"
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// Reactive Streams — backpressure в контракте; либо bounded executor\nvar pool = new ThreadPoolExecutor(8,\
+          \ 8, 0, SECONDS,\n    new ArrayBlockingQueue<>(1_000),               // bounded!\n    new ThreadPoolExecutor.CallerRunsPolicy());\
+          \    // давление назад на продьюсера"
+      - lang: rust
+        tab: Rust
+        label: Rust · tokio
+        highlight: rust
+        code: "// bounded mpsc; send().await сам является backpressure
+
+          let (tx, rx) = tokio::sync::mpsc::channel::<Job>(1_000);
+
+          if tx.try_send(job).is_err() { return Err(Error::Overloaded) }"
+      - lang: python
+        tab: Python
+        label: Python · asyncio
+        highlight: python
+        code: "# bounded queue; put() приостанавливает продьюсера — это фича
+
+          queue: asyncio.Queue[Job] = asyncio.Queue(maxsize=1_000)
+
+          await queue.put(job)   # блокируется при заполнении — давление течёт вверх по конвейеру"

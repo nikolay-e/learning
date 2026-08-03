@@ -1,0 +1,52 @@
+id: 35
+slug: supply-chain-slsa-sbom-pinned-deps
+title: Supply chain (SLSA, SBOM, pinned deps)
+nav_label: Supply chain
+section: s6
+keywords: supply chain slsa sbom pinned dependencies lockfile cargo-deny govulncheck syft
+blocks:
+  - type: lede
+    html: Главный практический вектор атак последних лет — не ваш код.
+  - type: code
+    panes:
+      - lang: rust
+        tab: Rust
+        label: Rust · cargo-deny
+        highlight: toml
+        code: '# Cargo.lock коммитится + cargo-deny в CI
+
+          [bans]
+
+          deny = [{ name = "openssl" }]        # политика: только rustls
+
+
+          [advisories]
+
+          vulnerability = "deny"'
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// go.sum — криптографические хэши всех зависимостей; публичные модули
+
+          // дополнительно сверяются с checksum database (sum.golang.org).
+
+          //
+
+          // GOPRIVATE=git.example.com/*  — приватные префиксы мимо proxy и checksum DB
+
+          // GONOSUMDB / GONOSUMCHECK     — более узкие настройки и НЕ усиление:
+
+          //                                они ОТКЛЮЧАЮТ сверку, а не включают её
+
+          //
+
+          // govulncheck в CI — вызовной анализ: алертит только на реально достижимые уязвимости"
+      - lang: python
+        tab: Python / Java
+        label: Python / Java
+        highlight: bash
+        code: "# lock-файлы (uv.lock / gradle verification-metadata.xml),
+
+          # запрет плавающих версий, генерация SBOM (syft) на каждый релиз"

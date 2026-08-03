@@ -1,0 +1,33 @@
+id: 14
+slug: bounded-context-ddd
+title: Bounded Context (DDD)
+nav_label: Bounded Context
+section: s2
+keywords: ddd bounded context anti-corruption layer ubiquitous language
+blocks:
+  - type: lede
+    html:
+      Одна модель не бывает универсальной. «Customer» биллинга и «Customer» маркетинга — разные типы;
+      слияние порождает god-таблицу на 60 nullable-колонок.
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Rust
+        highlight: rust
+        code: "// Разные крейты — разные типы; трансляция на границе явная
+
+
+          // crates/billing/src/lib.rs
+
+          pub struct Customer { pub id: CustomerId, pub payment_methods: Vec<PaymentMethod> }
+
+
+          // crates/crm/src/lib.rs
+
+          pub struct Customer { pub id: CustomerId, pub segments: Vec<Segment> }
+
+
+          // Anti-corruption layer: From<crm::Customer> нет намеренно — маппинг только через
+
+          // явную функцию с бизнес-решениями, а не механический"

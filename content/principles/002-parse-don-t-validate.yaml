@@ -1,0 +1,51 @@
+id: 2
+slug: parse-don-t-validate
+title: Parse, don't validate
+nav_label: Parse, don't validate
+section: s1
+keywords: parse dont validate smart constructor newtype refinement type
+blocks:
+  - type: lede
+    html:
+      Функция возвращает тип, который конструктивно не может быть невалидным. Валидация выбрасывает
+      знание, парсинг сохраняет его в типе.
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// record + компактный конструктор = smart constructor\npublic record Email(String value) {\n\
+          \    public Email {\n        if (!value.matches(\".+@.+\\\\..+\")) throw new IllegalArgumentException(value);\n\
+          \    }\n    public static Optional<Email> parse(String raw) {\n        try { return Optional.of(new\
+          \ Email(raw)); }\n        catch (IllegalArgumentException e) { return Optional.empty(); }\n    }\n\
+          }\n// дальше по коду Email всегда валиден — повторных проверок нет"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// newtype с приватным полем — канонический вариант\npub struct Email(String);          //\
+          \ поле приватно, снаружи не сконструировать\n\nimpl Email {\n    pub fn parse(raw: &str) -> Result<Self,\
+          \ EmailError> {\n        raw.contains('@').then(|| Email(raw.to_owned())).ok_or(EmailError::Invalid)\n\
+          \    }\n    pub fn as_str(&self) -> &str { &self.0 }\n}"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// приватное поле + конструктор — единственная точка входа\ntype Email struct{ value string\
+          \ }   // zero value бесполезен — намеренно\n\nfunc ParseEmail(raw string) (Email, error) {\n   \
+          \ if !strings.Contains(raw, \"@\") {\n        return Email{}, fmt.Errorf(\"invalid email: %q\",\
+          \ raw)\n    }\n    return Email{value: raw}, nil\n}\n\nfunc (e Email) String() string { return e.value\
+          \ }"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# frozen dataclass + фабрика; NewType для дешёвых случаев\nfrom dataclasses import dataclass\n\
+          \n@dataclass(frozen=True, slots=True)\nclass Email:\n    value: str\n\n    def __post_init__(self):\n\
+          \        if \"@\" not in self.value:\n            raise ValueError(f\"invalid email: {self.value!r}\"\
+          )\n\n# или pydantic: class Email(BaseModel): value: EmailStr — то же самое, на стероидах"

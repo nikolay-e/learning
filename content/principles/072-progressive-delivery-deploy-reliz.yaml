@@ -1,0 +1,32 @@
+id: 72
+slug: progressive-delivery-deploy-reliz
+title: "Progressive delivery: деплой ≠ релиз"
+nav_label: Деплой ≠ релиз
+section: s3
+keywords: progressive delivery canary feature flag kill switch rollout деплой релиз
+blocks:
+  - type: lede
+    html:
+      'Выкладка кода и включение поведения — два разных события, разделённых флагом. Canary / percentage
+      rollout превращает релиз из бинарного события в управляемый эксперимент с метрикой отката. Kill switch
+      — отдельный вид флага: не эксперимент, а заранее построенный рубильник для деградации (см. <a href="#p55">55</a>),
+      живёт вечно и тестируется регулярно.'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Java
+        highlight: java
+        code:
+          "// флаг — типизированный, с владельцем и сроком жизни прямо в декларации\n@Flag(owner = \"\
+          team-payments\", removeBy = \"2026-10-01\", kind = RELEASE)\nstatic final BoolFlag NEW_SETTLEMENT\
+          \ = flags.bool(\"settlement.v2\", false);\n\nif (NEW_SETTLEMENT.on(ctx.customerId())) { ... } //\
+          \ percentage по стабильному hash id,\n                                                 // не random()\
+          \ — иначе пользователь\n                                                 // мигает между версиями"
+  - type: note
+    html:
+      '<strong>Честная оценка.</strong> Flag debt реален: каждый флаг — это 2<sup>n</sup> конфигураций,
+      из которых тестируются две. Removal date — часть definition of done; флаг старше двух кварталов без
+      решения — инцидент процесса. Следствие для схем: canary означает, что <strong>две версии кода живут
+      одновременно всегда</strong>, поэтому expand — migrate — contract (<a href="#p17">17</a>) из «хорошей
+      практики» становится единственно возможной.'

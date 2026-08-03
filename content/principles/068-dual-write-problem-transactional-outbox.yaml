@@ -1,0 +1,56 @@
+id: 68
+slug: dual-write-problem-transactional-outbox
+title: Dual-write problem → transactional outbox
+nav_label: Transactional outbox
+section: s11
+keywords: dual write transactional outbox cdc debezium kafka атомарность публикация события
+blocks:
+  - type: lede
+    html:
+      "«Записали в базу и опубликовали в Kafka» — это две системы без общей транзакции: упасть между
+      ними можно всегда, и одна из сторон соврёт. Корректных схем две: outbox (событие пишется в ту же БД-транзакцию,
+      relay / CDC доставляет) или CDC напрямую с WAL. «Сначала publish, потом commit» и наоборот — обе сломаны,
+      только фантомы разного знака."
+  - type: code
+    panes:
+      - lang: sql
+        tab: SQL
+        label: SQL
+        highlight: sql
+        code: "-- одна транзакция: бизнес-факт и событие атомарны
+
+          BEGIN;
+
+          INSERT INTO payments (id, amount_cents, status) VALUES ($1, $2, 'captured');
+
+          INSERT INTO outbox (event_id, aggregate_id, type, payload)
+
+          VALUES (gen_random_uuid(), $1, 'PaymentCaptured', $3);
+
+          COMMIT;
+
+
+          -- relay (Debezium / поллер) читает outbox → Kafka; доставка at-least-once,
+
+          -- поэтому дедупликация у потребителя по event_id обязательна (см. 21)"
+      - lang: go
+        tab: Go
+        label: Go · relay
+        highlight: go
+        code:
+          "// доставка и пометка — идемпотентная петля\nrows := tx.Query(`SELECT event_id, payload FROM\
+          \ outbox\n                  WHERE published_at IS NULL ORDER BY seq LIMIT 100 FOR UPDATE SKIP LOCKED`)\n\
+          \nfor _, e := range rows {\n    if err := producer.Send(ctx, e); err != nil { break } // не помечаем\
+          \ — придём снова\n    tx.Exec(`UPDATE outbox SET published_at = now() WHERE event_id = $1`, e.ID)\n\
+          }"
+  - type: note
+    html:
+      Outbox не даёт exactly-once — он даёт атомарность записи и at-least-once доставки; дедупликация
+      всё равно на конце (<a href="#p21">21</a>). Listen-to-yourself и «просто ретраить publish» — не эквиваленты,
+      а известные способы получить рассинхрон.
+  - type: note
+    html:
+      'Цикл relay не идемпотентен сам по себе — он <em>at-least-once</em>: пометка ставится только после
+      подтверждённой публикации, поэтому падение между send и update даёт повторную доставку, а не потерю.
+      Отсюда обязательные детали: захват строк через <code>FOR UPDATE SKIP LOCKED</code>, ограниченный батч,
+      таймаут на публикацию и дедупликация у потребителя (<a href="#p21">21</a>).'

@@ -1,0 +1,46 @@
+id: 8
+slug: design-by-contract
+title: Design by contract
+nav_label: Design by contract
+section: s1
+keywords: design by contract eiffel precondition postcondition invariant assertion
+blocks:
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// Objects.requireNonNull + явные инварианты в конструкторе; assert для внутренних\npublic\
+          \ record Transfer(Account from, Account to, Cents amount) {\n    public Transfer {\n        Objects.requireNonNull(from);\
+          \ Objects.requireNonNull(to);\n        if (amount.value() <= 0) throw new IllegalArgumentException(\"\
+          amount must be > 0\");\n        if (from.equals(to)) throw new IllegalArgumentException(\"self-transfer\"\
+          );\n    }\n}"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// debug_assert! на внутренних инвариантах — бесплатно в release\nfn apply(&mut self, entry:\
+          \ LedgerEntry) {\n    debug_assert!(self.is_balanced(), \"ledger invariant broken before apply\"\
+          );\n    // ...\n    debug_assert!(self.is_balanced(), \"apply broke double-entry invariant\");\n\
+          }"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// TigerBeetle-стиль — дешёвые проверки инвариантов остаются в production\nfunc (l *Ledger)\
+          \ Apply(e Entry) error {\n    if l.debits != l.credits { // инвариант двойной записи, всегда включён\n\
+          \        panic(\"ledger corrupted: unbalanced before apply\") // порча состояния = crash-only\n\
+          \    }\n    ...\n}"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# assert для инвариантов (вырезается -O), исключения для предусловий\ndef apply(self, entry:\
+          \ LedgerEntry) -> None:\n    if entry.amount <= 0:\n        raise ValueError(\"precondition: amount\
+          \ > 0\")   # ошибка вызывающего\n    assert self._is_balanced(), \"invariant broken\"     # моя\
+          \ ошибка"

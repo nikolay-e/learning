@@ -1,0 +1,15 @@
+id: 60
+slug: testy-i-tipy-spetsifikatsiya-dlya-generatora
+title: Тесты и типы — спецификация для генератора
+nav_label: Типы как спецификация
+section: s9
+keywords: types as specification strict mypy compiler feedback loop generated tests
+blocks:
+  - type: lede
+    html:
+      "Чем строже типы и контракты, тем меньше степеней свободы у генерации ошибиться: Rust / строгий
+      mypy дают ассистенту компилятор как немедленный фидбек-луп."
+  - type: text
+    html:
+      Тесты пишутся и ревьюятся человеком с особой тщательностью — сгенерированный тест, подогнанный
+      под сгенерированный баг, зелёный и бесполезен.

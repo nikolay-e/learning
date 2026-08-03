@@ -1,0 +1,47 @@
+id: 48
+slug: llm-vyhod-nedoverennyy-vhod-prompt-injection-tru
+title: LLM-выход — недоверенный вход (prompt injection = trust boundary)
+nav_label: LLM-выход — недоверенный вход
+section: s9
+keywords: prompt injection lethal trifecta indirect injection tool call untrusted output
+blocks:
+  - type: lede
+    html:
+      "Самый важный принцип раздела. Всё, что модель прочитала (web, документы, письма), может содержать
+      инструкции; следовательно, выход модели имеет уровень доверия своего наименее доверенного входа. Классическая
+      триада риска: доступ к приватным данным + недоверенный контент + канал наружу — никогда все три одновременно."
+  - type: code
+    panes:
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# Выход LLM парсится как недоверенный ввод — тот же parse-don't-validate.\n# Tagged union:\
+          \ tool и args связаны дискриминатором, иначе\n# {\"tool\": \"search_orders\", \"args\": <поля InvoiceArgs>}\
+          \ пройдёт валидацию\nclass SearchOrders(BaseModel):\n    model_config = ConfigDict(strict=True,\
+          \ extra=\"forbid\")\n    tool: Literal[\"search_orders\"]\n    args: SearchArgs\n\nclass GetInvoice(BaseModel):\n\
+          \    model_config = ConfigDict(strict=True, extra=\"forbid\")\n    tool: Literal[\"get_invoice\"\
+          ]\n    args: InvoiceArgs\n\nToolCall = Annotated[SearchOrders | GetInvoice, Field(discriminator=\"\
+          tool\")]\n\nraw = llm.complete(prompt)\ncall = TypeAdapter(ToolCall).validate_json(raw)  # не eval,\
+          \ не getattr(obj, raw_name)"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// Тот же принцип типом: LLM-текст входит в систему только через парсер
+
+          pub struct LlmRaw(String);                          // недоверенный
+
+
+          pub enum Action { SearchOrders(Query), GetInvoice(InvoiceId) }
+
+
+          impl LlmRaw { pub fn parse(self) -> Result<Action, Rejected> { ... } }"
+  - type: note
+    html:
+      "<strong>Схема — необходимое, но не достаточное.</strong> Валидный JSON всё ещё может содержать
+      полностью легальную и полностью нежелательную команду. После разбора идут детерминированные проверки,
+      которые модель не контролирует: авторизация от имени пользователя, а не агента; принадлежность объекта
+      тенанту; семантические лимиты (суммы, объёмы, диапазоны дат); rate limit; egress-политика."

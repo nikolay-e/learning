@@ -1,0 +1,63 @@
+id: 4
+slug: errors-as-values
+title: Errors as values
+nav_label: Errors as values
+section: s1
+keywords: result either error handling checked exceptions railway
+blocks:
+  - type: lede
+    html:
+      "Ошибка — часть сигнатуры, а не побочный канал управления. Исключения ломают локальность: любой
+      вызов может прыгнуть куда угодно."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code: "// чекед-исключения — исторически провалившаяся попытка того же;
+
+          // современный вариант — Result-подобный sealed тип для доменных ошибок
+
+          sealed interface ChargeResult permits Charged, Declined, GatewayDown {}
+
+          record Charged(String txId) implements ChargeResult {}
+
+          record Declined(String reason) implements ChargeResult {}
+
+          record GatewayDown(Duration retryAfter) implements ChargeResult {}
+
+
+          // исключения остаются для программных ошибок (NPE, IllegalState)
+
+          // — это корректное разделение"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// Result + оператор ? — эталон подхода\nfn charge(card: &Card, amount: Cents) -> Result<TxId,\
+          \ ChargeError> {\n    let token = tokenize(card)?;          // ранний возврат, тип честен\n    gateway::charge(token,\
+          \ amount)        // ChargeError — enum со всеми исходами\n}\n\n// thiserror для библиотек, anyhow\
+          \ для приложений — устоявшаяся граница"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// (T, error) — идиома языка; ключ — оборачивание с контекстом и errors.Is/As\nfunc (s *Svc)\
+          \ Charge(ctx context.Context, c Card, amt Cents) (TxID, error) {\n    tok, err := s.tokenize(ctx,\
+          \ c)\n    if err != nil {\n        return \"\", fmt.Errorf(\"tokenize card ****%s: %w\", c.Last4,\
+          \ err)\n    }\n    id, err := s.gw.Charge(ctx, tok, amt)\n    if err != nil {\n        if errors.Is(err,\
+          \ gateway.ErrDeclined) { return \"\", ErrDeclined }\n        return \"\", fmt.Errorf(\"gateway charge:\
+          \ %w\", err)\n    }\n    return id, nil\n}"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# исключения — идиома языка, бороться с ней дороже, чем принять.\n# Компромисс: доменные исходы\
+          \ — значениями, инфраструктурные сбои — исключениями\nfrom dataclasses import dataclass\n\n@dataclass(frozen=True)\n\
+          class Declined: reason: str\n\n@dataclass(frozen=True)\nclass Charged: tx_id: str\n\ndef charge(card:\
+          \ Card, amount: int) -> Charged | Declined:\n    ...  # Declined — не исключение: это ожидаемый\
+          \ бизнес-исход\n    # ConnectionError остаётся исключением — это сбой, а не исход"

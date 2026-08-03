@@ -1,0 +1,29 @@
+id: 78
+slug: stoimost-takaya-zhe-sli-kak-latentnost
+title: Стоимость — такая же SLI, как латентность
+nav_label: Стоимость как SLI
+section: s7
+keywords: cost sli finops cost per request egress unit economics стоимость бюджет
+blocks:
+  - type: lede
+    html:
+      "Cost-per-request / cost-per-tenant — инженерная метрика с бюджетом и алертом, а не квартальный
+      сюрприз из биллинга. Для multi-cloud egress — архитектурное ограничение первого порядка: cross-region
+      / cross-cloud трафик может стоить дороже compute, и топология данных проектируется от него."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Go
+        highlight: go
+        code:
+          "// стоимость атрибутируется в том же wide event (см. 28)\nlogger.Info(\"request_completed\"\
+          ,\n    \"tenant\", tid, \"compute_ms\", ms, \"bytes_egress\", n,\n    \"downstream_calls\", calls,\
+          \ \"est_cost_usd\", est) // → cost per tenant/endpoint\n                                       \
+          \             //   отвечается запросом, не финансами"
+  - type: note
+    html:
+      'Связка с <a href="#p55">55</a>: fallback-каскад LLM — это cost engineering в чистом виде. Связка
+      с <a href="#p38">38</a>: USL говорит, когда добавленная нода даёт отрицательный прирост, а cost SLI
+      — сколько вы за этот отрицательный прирост платите. Unit economics ломается молча: алерт на cost-per-request
+      важнее алерта на абсолютный счёт.'

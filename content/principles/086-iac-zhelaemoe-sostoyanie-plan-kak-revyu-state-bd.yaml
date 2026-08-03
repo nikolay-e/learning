@@ -1,0 +1,42 @@
+id: 86
+slug: iac-zhelaemoe-sostoyanie-plan-kak-revyu-state-bd
+title: "IaC: желаемое состояние + plan как ревью; state — БД с one-way doors"
+nav_label: "IaC: plan как ревью"
+section: s3
+keywords:
+  infrastructure as code terraform plan state drift detection moved block prevent_destroy immutable
+  infrastructure cattle pets
+blocks:
+  - type: lede
+    html:
+      'IaC — не «скрипты создания», а декларация желаемого состояния с обнаружимым дрифтом: ручное изменение
+      в консоли — это расхождение кода и реальности, которое <code>plan</code> обязан показать, а процесс
+      — запретить создавать. <code>terraform plan</code> — артефакт ревью наравне с диффом кода: ревьюится
+      не HCL, а <em>план изменений</em> («destroy and recreate» на базе данных — вот что ищет ревьюер).
+      State-файл — база данных со всеми последствиями: locking, бэкапы; переименование ресурса без <code>moved
+      {}</code> = destroy/create — one-way door (<a href="#p20">20</a>), замаскированная под рефакторинг.'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Terraform · HCL
+        highlight: plaintext
+        code:
+          "# рефакторинг без разрушения — moved-блок, а не «terraform понял по имени»\nmoved {\n  from\
+          \ = aws_msk_cluster.kafka\n  to   = module.streaming.aws_msk_cluster.kafka\n}\n\n# инвариант в коде,\
+          \ а не в голове ревьюера\nlifecycle {\n  prevent_destroy = true   # на stateful-ресурсах; plan с\
+          \ их destroy падает в CI\n}"
+  - type: note
+    html:
+      "<strong>Чего <code>prevent_destroy</code> не делает.</strong> Он защищает ресурс, пока тот описан
+      в конфигурации: удалите сам resource block — и защита уедет вместе с ним, а ресурс будет уничтожен.
+      Значит защита не может жить только в HCL. Нужны: policy-as-code, заваливающая plan с destroy на stateful-ресурсах;
+      CI, применяющий <em>сохранённый</em> plan, а не пересчитанный на apply; проверка на удаление resource
+      block в диффе; проверенные бэкапы и учения по восстановлению; и явная break-glass процедура. Отдельно:
+      drift виден только в пределах того, что провайдер умеет прочитать."
+  - type: note
+    html:
+      'Cattle, not pets — для compute; данные — всегда pet: immutable-инфраструктура означает «пересоздаём
+      машины, <em>мигрируем</em> данные», и путаница этих двух — стандартный сценарий потери стейта. Drift
+      detection — не аудит раз в квартал, а continuous (<code>plan</code> по крону с алертом на непустой
+      дифф): дрифт, найденный через месяц, уже оброс зависимостями — Hyrum (<a href="#p16">16</a>) для инфраструктуры.'

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>__TITLE__</title>
+    <meta name="description" content="__DESCRIPTION__" />
+    <meta
+      name="generator"
+      content="scripts/build.py — не редактируйте index.html вручную"
+    />
+    <meta property="og:title" content="__TITLE__" />
+    <meta property="og:description" content="__OG_DESCRIPTION__" />
+    <meta property="og:type" content="article" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230e1116'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='monospace' fill='%23e0a458'>&#8721;</text></svg>"
+    />
+  </head>
+  <body>
+    <a class="skiplink" href="#main">К содержанию</a>
+
+    <header class="topbar">
+      <button
+        type="button"
+        class="iconbtn railtoggle"
+        id="rail-toggle"
+        aria-label="Оглавление"
+        aria-expanded="false"
+        aria-controls="rail"
+      >
+        ☰
+      </button>
+      <div class="brand">__BRAND__</div>
+      <div class="topbar-spacer"></div>
+      <div class="search">
+        <input
+          id="search"
+          type="search"
+          placeholder="Фильтр — нажмите /"
+          aria-label="Фильтр принципов"
+          autocomplete="off"
+        />
+      </div>
+      <div id="langpick-slot-top">__LANGPICK__</div>
+      <button
+        type="button"
+        class="iconbtn"
+        id="theme-toggle"
+        aria-label="Включить светлую тему"
+        aria-pressed="false"
+      >
+        ◐
+      </button>
+    </header>
+
+    <p class="sr-only" id="search-status" role="status" aria-live="polite"></p>
+    <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+
+    <div class="shell">
+      <nav class="rail" id="rail" aria-label="Оглавление">
+        <div id="langpick-slot-rail"></div>
+        __RAIL__
+      </nav>
+
+      <main class="main" id="main">
+        <div class="hero">__HERO__</div>
+
+        <p class="empty" id="empty" hidden>Ничего не найдено.</p>
+
+        __SECTIONS__
+
+        <footer class="footer">__FOOTER__</footer>
+      </main>
+    </div>
+
+    <script src="assets/highlight.min.js"></script>
+    <script src="assets/hljs-protobuf.min.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

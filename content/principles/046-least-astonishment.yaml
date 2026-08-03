@@ -1,0 +1,24 @@
+id: 46
+slug: least-astonishment
+title: Least Astonishment
+nav_label: Least Astonishment
+section: s8
+keywords: principle of least astonishment surprise pola mutable default argument deref
+blocks:
+  - type: code
+    panes:
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# Классика нарушения — мутабельный дефолт\ndef add_item(item, bucket=[]): ...      # bucket\
+          \ разделяется между вызовами\n\ndef add_item(item, bucket=None):        # ожидаемое поведение\n\
+          \    bucket = bucket if bucket is not None else []"
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code: '// не implement Deref для "наследования" — это удивляет
+
+          // (Deref предназначен для указателей, не для is-a)'

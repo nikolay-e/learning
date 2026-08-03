@@ -1,0 +1,45 @@
+id: 11
+slug: ownership-upravlenie-resursami
+title: Ownership / управление ресурсами
+nav_label: Ownership и ресурсы
+section: s1
+keywords: raii ownership borrow lifetime resource leak defer context manager
+blocks:
+  - type: code
+    panes:
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code:
+          "// эталон — владение в типе, компилятор доказывает отсутствие use-after-free
+
+          fn process(conn: Connection) -> Report { ... }
+
+          // забрал владение: вызвавший больше не может использовать conn"
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code:
+          "// try-with-resources + AutoCloseable; Cleaner для нативных ресурсов\ntry (var conn = pool.acquire();\
+          \ var tx = conn.begin()) {\n    ...\n} // порядок закрытия обратный, гарантирован"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// defer сразу после acquire — идиома; забытый defer ловится линтером
+
+          conn, err := pool.Acquire(ctx)
+
+          if err != nil { return err }
+
+          defer conn.Release()"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code:
+          "# context manager; для нескольких ресурсов — ExitStack\nwith pool.acquire() as conn, conn.begin()\
+          \ as tx:\n    ..."

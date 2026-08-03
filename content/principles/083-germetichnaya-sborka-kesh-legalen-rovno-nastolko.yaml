@@ -1,0 +1,47 @@
+id: 83
+slug: germetichnaya-sborka-kesh-legalen-rovno-nastolko
+title: "Герметичная сборка: кэш легален ровно настолько, насколько задекларированы входы"
+nav_label: Герметичная сборка
+section: s13
+keywords: hermetic build reproducible build cache key bazel nix gradle build avoidance toolchain
+blocks:
+  - type: lede
+    html:
+      "Сборка — чистая функция от объявленных входов; всё незадекларированное (системный toolchain,
+      сеть, время, <code>latest</code>-теги) делает выход невоспроизводимым, а кэш — лотереей. Следствие,
+      ради которого всё затевается: агрессивное кэширование (локальное, remote, build avoidance) корректно
+      <em>только</em> при герметичности — cache hit по неполному ключу это тихая доставка stale-артефакта
+      в прод."
+  - type: code
+    panes:
+      - lang: kotlin
+        tab: Gradle
+        label: Gradle · Kotlin DSL
+        highlight: kotlin
+        code:
+          "// условия кэшируемости — те же условия герметичности\ntasks.register<Test>(\"integrationTest\"\
+          ) {\n    inputs.files(configurations.runtimeClasspath).withNormalizer(ClasspathNormalizer::class)\n\
+          \    inputs.property(\"jdk\", java.toolchain.languageVersion)  // toolchain — вход, не среда\n \
+          \   outputs.cacheIf { true }\n    // системное время, env-переменные, сеть — НЕ входы;\n    // тест,\
+          \ читающий их, либо декларирует, либо некэшируем\n}"
+      - lang: bash
+        tab: CI
+        label: CI
+        highlight: bash
+        code: "# проверка воспроизводимости — сама по себе тест в CI:
+
+          # два билда с чистым кэшем на разных агентах → диффа артефактов быть не должно
+
+          diff <(sha256sum build-a/*.jar) <(sha256sum build-b/*.jar)"
+  - type: note
+    html:
+      "<strong>Честная оценка.</strong> Полная герметичность в стиле Bazel/Nix дорога; прагматичная
+      граница — герметичность <em>ключа кэша</em>: всё, что влияет на выход, входит в ключ. Инцидент «работает
+      локально, падает в CI» — почти всегда незадекларированный вход, найденный эмпирически; каждый такой
+      — патч в декларацию, не в README."
+  - type: note
+    html:
+      "<code>outputs.cacheIf { true }</code> не делает задачу герметичной — оно только разрешает кэширование.
+      Корректность даёт полнота декларации: все входы, toolchain, переменные окружения, локаль и сетевые
+      зависимости либо объявлены, либо устранены. Для воспроизводимых архивов дополнительно нужны нормализованные
+      timestamps и порядок файлов."

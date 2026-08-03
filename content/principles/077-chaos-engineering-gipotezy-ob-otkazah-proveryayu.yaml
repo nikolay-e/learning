@@ -1,0 +1,35 @@
+id: 77
+slug: chaos-engineering-gipotezy-ob-otkazah-proveryayu
+title: "Chaos engineering: гипотезы об отказах проверяются экспериментом"
+nav_label: Chaos engineering
+section: s4
+keywords: chaos engineering fault injection game day steady state хаос эксперимент отказ
+blocks:
+  - type: lede
+    html:
+      '«Мы переживём падение реплики» — гипотеза; пока её не проверили инъекцией отказа, это мнение.
+      Метод: steady-state метрика → гипотеза («убийство пода не двигает p99») → минимальный blast radius
+      (<a href="#p27">27</a>) → инъекция → сравнение. Деталь, которую пропускают: конечная цель — прод,
+      потому что стейджинг не воспроизводит ни трафик, ни данные, ни конфигурацию.'
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Эксперимент как артефакт
+        highlight: yaml
+        code: '# эксперимент — версионируемый артефакт, как тест
+
+          experiment: kafka-broker-loss
+
+          steady_state: { metric: consumer_lag_p99, threshold: "< 30s" }
+
+          method: [{ action: kill-pod, selector: "app=kafka, broker=2" }]
+
+          rollback: automatic          # abort при выходе за threshold
+
+          blast_radius: cell-eu-1      # одна ячейка, не флот'
+  - type: note
+    html:
+      '<strong>Честная оценка.</strong> Chaos без <a href="#s5">наблюдаемости</a> — вандализм: если
+      не можете ответить «что сломалось», нечего и ломать. Порядок строгий: сначала SLO и трейсинг, потом
+      инъекции. Game days на стейджинге — легитимная первая ступень, но не конечная.'

@@ -1,0 +1,19 @@
+id: 58
+slug: dannye-i-ih-proishozhdenie-pod-versionnym-kontro
+title: Данные и их происхождение — под версионным контролем
+nav_label: Данные и lineage
+section: s9
+keywords: data versioning lineage dvc lakefs iceberg embedding reindex data-centric
+blocks:
+  - type: lede
+    html:
+      "Data-centric подход: качество системы чаще ограничено данными, чем моделью. Датасеты и эмбеддинг-индексы
+      версионируются (DVC / lakeFS / Iceberg snapshots), lineage прослеживается: какой индекс, из каких
+      документов, каким чанкером, какой моделью эмбеддингов."
+  - type: note
+    html: Смена embedding-модели = полная переиндексация = migration с expand-contract, не in-place.
+  - type: note
+    html:
+      "В git кладут не датасеты, а <em>неизменяемый манифест</em>: идентификаторы объектов и их хеши,
+      схема, версия парсера и чанкера, модель эмбеддингов, версия политики доступа. Сами данные живут в
+      объектном хранилище с версионированием."

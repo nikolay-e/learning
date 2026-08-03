@@ -1,0 +1,52 @@
+id: 80
+slug: design-for-replay-reprotsessing-shtatnaya-operat
+title: "Design for replay: репроцессинг — штатная операция, не аврал"
+nav_label: Design for replay
+section: s12
+keywords: replay reprocessing kappa architecture determinism temporal join retention backfill репроцессинг
+blocks:
+  - type: lede
+    html:
+      "Баг в трансформации, новая колонка, испорченный интервал — история будет проигрываться заново,
+      вопрос только в том, спроектировано это или будет изобретаться в 3 часа ночи. Требования по построению:
+      трансформации детерминированы (никаких <code>now()</code>, <code>random()</code>, lookup'ов в мутабельные
+      справочники без версии), sinks идемпотентны или транзакционны, позиция (offset / checkpoint) — first-class
+      управляемый артефакт, retention источника ≥ горизонта replay."
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code: "// враг replay — недетерминизм, спрятанный в трансформации
+
+
+          // ПЛОХО:  enrich(event, dict.current())        // replay через месяц даст другой результат
+
+          // ХОРОШО: enrich(event, dict.asOf(event.ts())) // temporal join по event time —
+
+          //                                              // replay воспроизводит прошлое побайтово"
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code:
+          "// replay-запрос как явный тип: границы, скорость, назначение\ntype ReplayJob struct {\n  \
+          \  Source    TopicRange   // {topic, partitions, fromOffset/fromTs, toTs}\n    Transform VersionedRef\
+          \ // sha трансформации — какой код проигрывает\n    Sink      SinkRef      // тот же прод-топик\
+          \ ИЛИ теневой — решение явное\n    RateLimit TokenBucket  // replay не должен вытеснить live-трафик\
+          \ (bulkhead, 24)\n}"
+  - type: note
+    html:
+      'Replay в <em>тот же</em> даунстрим требует, чтобы вся цепочка ниже была идемпотентна (<a href="#p22">22</a>,
+      дедуп по event_id — <a href="#p21">21</a>); иначе replay в теневой sink, сравнение, cutover. Kappa-архитектура
+      — это принцип replay, возведённый в архитектуру: batch = replay стрима. Следствие для retention: срок
+      хранения топика — не стоимость диска, а страховой горизонт репроцессинга; резать его — решение уровня
+      one-way door (<a href="#p20">20</a>).'
+  - type: note
+    html:
+      "«Побайтово» достижимо только если версионирована вся транзитивная зависимость: код трансформации,
+      схемы и парсеры, справочники, библиотеки, окружение с плавающей точкой. Практический ориентир скромнее
+      — воспроизводимость в пределах объявленного контракта данных, проверяемая сравнением, а не декларацией.
+      Сюда же: стратегия сверки, reconciliation, ограничения retention по закону и приватности, и разделение
+      ресурсов между replay и живым трафиком."

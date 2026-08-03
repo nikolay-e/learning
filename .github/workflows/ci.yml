@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  content:
+    name: content integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pyyaml
+      # Падает, если: index.html разошёлся с content/; у принципа нет
+      # классификации; битая якорная ссылка; дублирующийся id; button без type;
+      # счётчики в README и в шапке не совпали с числом принципов;
+      # python-фрагмент не разбирается.
+      - run: python scripts/validate.py
+
+  static:
+    name: html + format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:html
+      - run: npm run format:check
+
+  browser:
+    name: playwright + axe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Поведение (поиск, выбор языка, копирование, тема, мобильное меню)
+      # и axe-проверки в обеих темах, desktop + mobile.
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

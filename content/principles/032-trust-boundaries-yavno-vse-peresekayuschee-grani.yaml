@@ -1,0 +1,25 @@
+id: 32
+slug: trust-boundaries-yavno-vse-peresekayuschee-grani
+title: Trust boundaries явно; всё пересекающее границу — парсится
+nav_label: Trust boundaries
+section: s6
+keywords: trust boundary taint tracking sanitization untrusted input xss
+blocks:
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Rust
+        highlight: rust
+        code:
+          "// Тип фиксирует происхождение данных\npub struct Untrusted<T>(T);                      //\
+          \ сырое, пришло снаружи\npub struct Sanitized<T>(T);                      // прошло парсер\n\nimpl\
+          \ Untrusted<String> {\n    pub fn parse_html_fragment(self) -> Result<Sanitized<String>, Rejected>\
+          \ { ... }\n}\n\n// функция render(s: Sanitized<String>) физически не примет сырой ввод"
+  - type: note
+    html:
+      "<strong>Санитизация контекстна.</strong> Один тип <code>Sanitized&lt;String&gt;</code> создаёт
+      ложное ощущение универсальной безопасности: безопасное для HTML-текста опасно в атрибуте, в URL, в
+      SQL-идентификаторе и в аргументе shell. Типы должны называть приёмник — <code>SafeHtmlText</code>,
+      <code>SqlIdentifier</code>, <code>ShellArg</code>, <code>SafeUrl</code> — а экранирование выполняться
+      на границе конкретного sink."

@@ -1,0 +1,64 @@
+id: 21
+slug: end-to-end-argument-saltzer-reed-clark-1984
+title: End-to-End Argument (Saltzer / Reed / Clark, 1984)
+nav_label: End-to-End Argument
+section: s4
+keywords: end to end argument saltzer exactly once deduplication kafka eos
+blocks:
+  - type: lede
+    html:
+      "Корректность обеспечивается только на концах; промежуточные слои дают оптимизацию, не гарантию.
+      Следствие: exactly-once брокера кончается на границе брокера — дальше дедупликация обязана жить у
+      потребителя."
+  - type: note
+    html:
+      "<strong>Точная формулировка.</strong> Kafka-транзакции дают настоящий EOS в контуре read-process-write,
+      где и вход, и выход, и офсеты — внутри Kafka: коммит офсета и запись результата атомарны. Гарантия
+      исчезает ровно там, где появляется внешний sink (БД, платёжный шлюз, письмо): у него нет общей транзакции
+      с брокером. Поэтому «exactly-once» — не маркетинг, а область применимости, за пределами которой работает
+      только E2E-дедупликация."
+  - type: code
+    panes:
+      - lang: sql
+        tab: SQL
+        label: SQL · transactional inbox
+        highlight: sql
+        code:
+          "-- Маркер дедупликации и изменение бизнес-состояния — в ОДНОЙ транзакции.
+
+          -- Иначе два consumer'а проходят проверку одновременно, либо процесс падает
+
+          -- между эффектом и отметкой, и событие применяется дважды.
+
+          BEGIN;
+
+
+          INSERT INTO consumed_events (event_id) VALUES (:event_id)
+
+          ON CONFLICT DO NOTHING;
+
+          -- Ноль затронутых строк = событие уже применено: коммитим и выходим.
+
+
+          UPDATE accounts SET balance = balance + :amount WHERE id = :account_id;
+
+
+          COMMIT;"
+      - lang: java
+        tab: Java
+        label: Java · Kafka consumer
+        highlight: java
+        code:
+          "void handle(ConsumerRecord<String, OrderEvent> rec) {\n    // Дедупликация и эффект — внутри\
+          \ одной транзакции хранилища, а не двумя\n    // вызовами вокруг process(): между ними процесс может\
+          \ умереть.\n    tx.run(session -> {\n        if (!session.claimEvent(rec.value().eventId())) return;\
+          \ // INSERT .. ON CONFLICT\n        applyBusinessChange(session, rec.value());\n    });\n    //\
+          \ offset коммитится ПОСЛЕ транзакции: повтор безопасен, потеря — нет\n    consumer.commitSync();\n\
+          }"
+  - type: note
+    html:
+      '<strong>Где это перестаёт работать.</strong> Схема выше требует, чтобы эффект и маркер лежали
+      в одном транзакционном ресурсе. Если побочный эффект снаружи — платёжный шлюз, письмо, вызов чужого
+      API — общей транзакции нет, и остаются три варианта: idempotency key на стороне внешнего сервиса,
+      outbox (<a href="#p68">68</a>) с последующей сверкой, либо явная reconciliation-процедура. Дедупликация
+      в отдельном сторе с TTL — это оптимизация «не делать работу дважды», а не гарантия корректности.'

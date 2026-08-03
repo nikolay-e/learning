@@ -1,0 +1,28 @@
+id: 55
+slug: graceful-degradation-fallback-kaskad
+title: Graceful degradation / fallback-каскад
+nav_label: Fallback-каскад
+section: s9
+keywords: graceful degradation fallback cascade semantic cache budget circuit breaker llm
+blocks:
+  - type: lede
+    html:
+      "Модель — зависимость с нетривиальным SLA и стоимостью. Каскад: кэш → дешёвая модель → дорогая
+      модель → правило/шаблон → честный отказ. Circuit breaker и бюджеты (токены/латентность/деньги) — те
+      же принципы из раздела IV, применённые к новому виду зависимости."
+  - type: code
+    panes:
+      - lang: null
+        tab: null
+        label: Python
+        highlight: python
+        code:
+          "async def classify(ticket: Ticket) -> Category:\n    if (hit := semantic_cache.get(ticket.embedding,\
+          \ threshold=0.97)): return hit\n    try:\n        return await small_model.classify(ticket, timeout=1.5)\n\
+          \    except (Timeout, Overloaded):\n        return rules_fallback(ticket)          # деградация\
+          \ видима в метриках, не молчалива"
+  - type: note
+    html:
+      <strong>Риск семантического кэша.</strong> Похожесть эмбеддингов — не эквивалентность запросов,
+      а общий кэш — канал утечки между тенантами. Ключ обязан включать тенанта, права пользователя, модель,
+      версию промпта, версию индекса и состояние инструментов; доля ложных попаданий измеряется, а не предполагается.

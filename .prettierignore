@@ -1,9 +1,7 @@
-.DS_Store
-*.log
 node_modules/
-.venv/
-.playwright-mcp/
-node_modules/
+package-lock.json
+assets/*.min.js
 .venv/
 test-results/
 playwright-report/
+content/
