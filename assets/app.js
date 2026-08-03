@@ -32,7 +32,7 @@
     fig.classList.toggle("allmode", target === null && panes.length > 1);
     fig.querySelectorAll(".langtab").forEach((t) => {
       t.setAttribute(
-        "aria-selected",
+        "aria-pressed",
         String(target !== null && t.dataset.lang === target),
       );
     });
@@ -61,16 +61,28 @@
     LANGS.includes(savedLang) || savedLang === "all" ? savedLang : "all",
   );
 
+  /* ---------- language picker follows the viewport ---------- */
+
+  const langpick = document.querySelector(".langpick");
+  const slotTop = document.getElementById("langpick-slot-top");
+  const slotRail = document.getElementById("langpick-slot-rail");
+  const narrow = window.matchMedia("(max-width: 620px)");
+  const placeLangpick = () =>
+    (narrow.matches ? slotRail : slotTop).appendChild(langpick);
+  narrow.addEventListener("change", placeLangpick);
+  placeLangpick();
+
   /* ---------- copy ---------- */
 
   document.querySelectorAll(".copy").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const fig = btn.closest(".code");
-      const visible = [...fig.querySelectorAll(".codepane")].filter(
+      const panes = [...fig.querySelectorAll(".codepane")].filter(
         (p) => !p.hidden,
       );
-      const text = visible
-        .map((p) => p.querySelector("code").innerText)
+      const scopes = panes.length ? panes : [fig]; // фигуры без табов панелей не имеют
+      const text = scopes
+        .map((p) => p.querySelector("pre code").innerText)
         .join("\n\n");
       try {
         await navigator.clipboard.writeText(text);

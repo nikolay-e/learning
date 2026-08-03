@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Принципы программной инженерии: от SOLID до AI-эры</title>
-<meta name="description" content="Справочник принципов программной инженерии с примерами на Java 21+, Rust, Go и Python 3.12+ — от SOLID и parse-don't-validate до проектирования систем с LLM внутри.">
+<meta name="description" content="Справочник принципов программной инженерии с примерами на Java, Rust, Go и Python 3.12+ — от SOLID и parse-don't-validate до распределённых данных и систем с LLM внутри.">
 <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры">
-<meta property="og:description" content="62 принципа, сгруппированных по осям, с примерами на четырёх языках и таблицей конфликтов между ними.">
+<meta property="og:description" content="78 принципов, сгруппированных по осям, с примерами на четырёх языках и таблицей конфликтов между ними.">
 <meta property="og:type" content="article">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230e1116'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='monospace' fill='%23e0a458'>&#8721;</text></svg>">
@@ -18,12 +18,14 @@
   <div class="brand">Принципы <span>программной инженерии</span></div>
   <div class="topbar-spacer"></div>
   <div class="search"><input id="search" type="search" placeholder="Фильтр — нажмите /" aria-label="Фильтр принципов" autocomplete="off"></div>
-  <div class="langpick" role="group" aria-label="Язык примеров">
-    <button data-lang="all" aria-pressed="true">Все</button>
-    <button data-lang="java" aria-pressed="false">Java</button>
-    <button data-lang="rust" aria-pressed="false">Rust</button>
-    <button data-lang="go" aria-pressed="false">Go</button>
-    <button data-lang="python" aria-pressed="false">Python</button>
+  <div id="langpick-slot-top">
+    <div class="langpick" role="group" aria-label="Язык примеров">
+      <button data-lang="all" aria-pressed="true">Все</button>
+      <button data-lang="java" aria-pressed="false">Java</button>
+      <button data-lang="rust" aria-pressed="false">Rust</button>
+      <button data-lang="go" aria-pressed="false">Go</button>
+      <button data-lang="python" aria-pressed="false">Python</button>
+    </div>
   </div>
   <button class="iconbtn" id="theme-toggle" aria-label="Тема">◐</button>
 </header>
@@ -31,6 +33,7 @@
 <div class="shell">
 
 <nav class="rail" id="rail" aria-label="Оглавление">
+  <div id="langpick-slot-rail"></div>
   <div class="rail-group" data-for="s1">
     <a href="#s1">I · Код внутри процесса</a>
     <ol>
@@ -64,6 +67,9 @@
       <li data-for="p18"><a href="#p18"><span class="rail-num">18</span> Совместимость схем как тип</a></li>
       <li data-for="p19"><a href="#p19"><span class="rail-num">19</span> Postel's Law — отменена</a></li>
       <li data-for="p20"><a href="#p20"><span class="rail-num">20</span> Reversible vs irreversible</a></li>
+      <li data-for="p72"><a href="#p72"><span class="rail-num">72</span> Деплой ≠ релиз</a></li>
+      <li data-for="p73"><a href="#p73"><span class="rail-num">73</span> Strangler Fig</a></li>
+      <li data-for="p74"><a href="#p74"><span class="rail-num">74</span> Contract testing</a></li>
     </ol>
   </div>
   <div class="rail-group" data-for="s4">
@@ -76,10 +82,25 @@
       <li data-for="p25"><a href="#p25"><span class="rail-num">25</span> Crash-only software</a></li>
       <li data-for="p26"><a href="#p26"><span class="rail-num">26</span> Tail at Scale</a></li>
       <li data-for="p27"><a href="#p27"><span class="rail-num">27</span> Blast radius / cells</a></li>
+      <li data-for="p77"><a href="#p77"><span class="rail-num">77</span> Chaos engineering</a></li>
+    </ol>
+  </div>
+  <div class="rail-group" data-for="s11">
+    <a href="#s11">V · Распределённые данные</a>
+    <ol>
+      <li data-for="p63"><a href="#p63"><span class="rail-num">63</span> Fallacies of distributed computing</a></li>
+      <li data-for="p64"><a href="#p64"><span class="rail-num">64</span> CAP мёртв, PACELC жив</a></li>
+      <li data-for="p65"><a href="#p65"><span class="rail-num">65</span> Модели консистентности</a></li>
+      <li data-for="p66"><a href="#p66"><span class="rail-num">66</span> Fencing token</a></li>
+      <li data-for="p67"><a href="#p67"><span class="rail-num">67</span> Wall clock врёт</a></li>
+      <li data-for="p68"><a href="#p68"><span class="rail-num">68</span> Transactional outbox</a></li>
+      <li data-for="p69"><a href="#p69"><span class="rail-num">69</span> Saga</a></li>
+      <li data-for="p70"><a href="#p70"><span class="rail-num">70</span> Кэш и staleness budget</a></li>
+      <li data-for="p71"><a href="#p71"><span class="rail-num">71</span> Cache stampede</a></li>
     </ol>
   </div>
   <div class="rail-group" data-for="s5">
-    <a href="#s5">V · Наблюдаемость</a>
+    <a href="#s5">VI · Наблюдаемость</a>
     <ol>
       <li data-for="p28"><a href="#p28"><span class="rail-num">28</span> Observability ≠ мониторинг</a></li>
       <li data-for="p29"><a href="#p29"><span class="rail-num">29</span> Trace ID сквозь границы</a></li>
@@ -88,7 +109,7 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s6">
-    <a href="#s6">VI · Безопасность и доверие</a>
+    <a href="#s6">VII · Безопасность и доверие</a>
     <ol>
       <li data-for="p32"><a href="#p32"><span class="rail-num">32</span> Trust boundaries</a></li>
       <li data-for="p33"><a href="#p33"><span class="rail-num">33</span> Least privilege</a></li>
@@ -98,15 +119,16 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s7">
-    <a href="#s7">VII · Эмпирика вместо вкуса</a>
+    <a href="#s7">VIII · Эмпирика вместо вкуса</a>
     <ol>
       <li data-for="p37"><a href="#p37"><span class="rail-num">37</span> Измерь, потом оптимизируй</a></li>
       <li data-for="p38"><a href="#p38"><span class="rail-num">38</span> Amdahl / USL</a></li>
       <li data-for="p39"><a href="#p39"><span class="rail-num">39</span> Mechanical sympathy</a></li>
+      <li data-for="p78"><a href="#p78"><span class="rail-num">78</span> Стоимость как SLI</a></li>
     </ol>
   </div>
   <div class="rail-group" data-for="s8">
-    <a href="#s8">VIII · Простота и экономика</a>
+    <a href="#s8">IX · Простота и экономика</a>
     <ol>
       <li data-for="p40"><a href="#p40"><span class="rail-num">40</span> Essential vs accidental</a></li>
       <li data-for="p41"><a href="#p41"><span class="rail-num">41</span> Gall's Law</a></li>
@@ -116,10 +138,12 @@
       <li data-for="p45"><a href="#p45"><span class="rail-num">45</span> Lehman's Laws</a></li>
       <li data-for="p46"><a href="#p46"><span class="rail-num">46</span> Least Astonishment</a></li>
       <li data-for="p47"><a href="#p47"><span class="rail-num">47</span> Код читается чаще</a></li>
+      <li data-for="p75"><a href="#p75"><span class="rail-num">75</span> Choose boring technology</a></li>
+      <li data-for="p76"><a href="#p76"><span class="rail-num">76</span> Brooks's Law</a></li>
     </ol>
   </div>
   <div class="rail-group" data-for="s9">
-    <a href="#s9">IX · Принципы AI-эры</a>
+    <a href="#s9">X · Принципы AI-эры</a>
     <ol>
       <li data-for="p48"><a href="#p48"><span class="rail-num">48</span> LLM-выход — недоверенный вход</a></li>
       <li data-for="p49"><a href="#p49"><span class="rail-num">49</span> Least privilege для агентов</a></li>
@@ -139,19 +163,20 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s10">
-    <a href="#s10">X · Таблица конфликтов</a>
+    <a href="#s10">XI · Таблица конфликтов</a>
   </div>
 </nav>
 
 <main class="main">
 
 <div class="hero">
-  <div class="eyebrow">Справочник · 62 принципа · 4 языка</div>
+  <div class="eyebrow">Справочник · 78 принципов · 4 языка</div>
   <h1>Принципы программной инженерии: от SOLID до AI-эры</h1>
-  <p>Примеры на современной Java (21+), Rust, Go и Python (3.12+). Принципы сгруппированы по осям; для код-уровневых даны примеры на всех четырёх языках, для архитектурных — представительный пример.</p>
-  <p>Принципы — эвристики с областью применимости, а не аксиомы. Раздел X перечисляет известные пары, которые противоречат друг другу, и способ разрешения.</p>
+  <p>Примеры на современной Java, Rust, Go и Python (3.12+). Принципы сгруппированы по осям; для код-уровневых даны примеры на всех четырёх языках, для архитектурных — представительный пример. Версия рантайма указана на панели там, где API от неё зависит.</p>
+  <p>Принципы — эвристики с областью применимости, а не аксиомы. Раздел XI перечисляет известные пары, которые противоречат друг другу, и способ разрешения. Номера принципов — стабильные идентификаторы: новые дописываются в конец нумерации и встают в тематический раздел, поэтому внутри раздела порядок номеров не сплошной.</p>
+  <p>Скоуп — технические и инженерно-экономические принципы. Организационные практики (постмортемы, paved roads, политика депрекации) намеренно за рамками; исключение — те, что напрямую формируют архитектуру или скоуп: <a href="#p15">15</a> и <a href="#p76">76</a>.</p>
   <div class="chips">
-    <span class="chip">Java 21+</span>
+    <span class="chip">Java</span>
     <span class="chip">Rust</span>
     <span class="chip">Go</span>
     <span class="chip">Python 3.12+</span>
@@ -165,7 +190,7 @@
 <section class="section" id="s1">
   <div class="section-head"><span class="numeral">I</span><h2>Код внутри процесса</h2></div>
 
-  <article class="principle" id="p1">
+  <article class="principle" id="p1" data-keywords="solid srp ocp lsp isp dip liskov substitution single responsibility">
     <div class="p-head"><span class="p-num">01</span><h3>SOLID — кратко, с честной оценкой</h3><a class="anchor" href="#p1">#</a></div>
     <div class="tablewrap">
       <table>
@@ -224,7 +249,7 @@ def storage_contract_suite(impl: Storage):   # один набор тестов 
     </figure>
   </article>
 
-  <article class="principle" id="p2">
+  <article class="principle" id="p2" data-keywords="parse dont validate smart constructor newtype refinement type">
     <div class="p-head"><span class="p-num">02</span><h3>Parse, don't validate</h3><a class="anchor" href="#p2">#</a></div>
     <p class="lede">Функция возвращает тип, который конструктивно не может быть невалидным. Валидация выбрасывает знание, парсинг сохраняет его в типе.</p>
     <figure class="code" data-multi>
@@ -281,7 +306,7 @@ class Email:
     </figure>
   </article>
 
-  <article class="principle" id="p3">
+  <article class="principle" id="p3" data-keywords="sum type adt algebraic data type exhaustiveness illegal states">
     <div class="p-head"><span class="p-num">03</span><h3>Make illegal states unrepresentable</h3><a class="anchor" href="#p3">#</a></div>
     <p class="lede">Sum types вместо комбинаций флагов. <code>{isLoading, data, error}</code> имеет 4 невозможных состояния из 8; sum type — ноль.</p>
     <figure class="code" data-multi>
@@ -349,7 +374,7 @@ def render(s: FetchState) -&gt; str:
     </figure>
   </article>
 
-  <article class="principle" id="p4">
+  <article class="principle" id="p4" data-keywords="result either error handling checked exceptions railway">
     <div class="p-head"><span class="p-num">04</span><h3>Errors as values</h3><a class="anchor" href="#p4">#</a></div>
     <p class="lede">Ошибка — часть сигнатуры, а не побочный канал управления. Исключения ломают локальность: любой вызов может прыгнуть куда угодно.</p>
     <figure class="code" data-multi>
@@ -405,7 +430,7 @@ def charge(card: Card, amount: int) -&gt; Charged | Declined:
     </figure>
   </article>
 
-  <article class="principle" id="p5">
+  <article class="principle" id="p5" data-keywords="hexagonal ports and adapters mock hell pure function shell">
     <div class="p-head"><span class="p-num">05</span><h3>Functional core, imperative shell</h3><a class="anchor" href="#p5">#</a></div>
     <p class="lede">Логика — чистые функции без I/O; тонкая оболочка исполняет эффекты. Убивает мок-ад: если в тесте есть <code>when(repo.findById(...))</code>, логика перемешана с I/O.</p>
     <figure class="code" data-multi>
@@ -447,7 +472,7 @@ async def settle_daily(db: Db, fx: FxClient) -&gt; None:
     </figure>
   </article>
 
-  <article class="principle" id="p6">
+  <article class="principle" id="p6" data-keywords="immutable persistent data structure defensive copy value object">
     <div class="p-head"><span class="p-num">06</span><h3>Immutability по умолчанию</h3><a class="anchor" href="#p6">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -487,7 +512,7 @@ class Portfolio:
     </figure>
   </article>
 
-  <article class="principle" id="p7">
+  <article class="principle" id="p7" data-keywords="inline first abstraction navigation accept interfaces return structs">
     <div class="p-head"><span class="p-num">07</span><h3>Local reasoning / inline-first</h3><a class="anchor" href="#p7">#</a></div>
     <p class="lede">Метрика: сколько файлов надо открыть, чтобы понять фрагмент. Абстракция появляется на третьем повторении, не на первом. Интерфейс с одной реализацией — минус к навигации без плюса к гибкости.</p>
     <figure class="code">
@@ -502,7 +527,7 @@ type UserService interface{} // func (h *Handler) route(...) { h.db.QueryUser(..
     <p>Остальные языки — тот же принцип без синтаксиса: в Java не заводить <code>interface XService</code> + <code>XServiceImpl</code>; в Rust не прятать единственную реализацию за <code>dyn Trait</code>; в Python не строить иерархию ABC ради одного класса.</p>
   </article>
 
-  <article class="principle" id="p8">
+  <article class="principle" id="p8" data-keywords="design by contract eiffel precondition postcondition invariant assertion">
     <div class="p-head"><span class="p-num">08</span><h3>Design by contract</h3><a class="anchor" href="#p8">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -541,7 +566,7 @@ def apply(self, entry: LedgerEntry) -&gt; None:
     </figure>
   </article>
 
-  <article class="principle" id="p9">
+  <article class="principle" id="p9" data-keywords="property based testing quickcheck fuzzing invariant roundtrip">
     <div class="p-head"><span class="p-num">09</span><h3>Property-based / type-driven testing</h3><a class="anchor" href="#p9">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -583,7 +608,7 @@ def test_settlement_conserves_money(trades):
     </figure>
   </article>
 
-  <article class="principle" id="p10">
+  <article class="principle" id="p10" data-keywords="data oriented design soa aos struct of arrays cache locality simd">
     <div class="p-head"><span class="p-num">10</span><h3>Data-Oriented Design</h3><a class="anchor" href="#p10">#</a></div>
     <p class="lede">Дизайн от layout данных: SoA вместо AoS, cache lines, батчи вместо поэлементной обработки. Противоречит инкапсуляции — это осознанный трейдофф для hot path.</p>
     <figure class="code" data-multi>
@@ -626,7 +651,7 @@ class Particles:
     </figure>
   </article>
 
-  <article class="principle" id="p11">
+  <article class="principle" id="p11" data-keywords="raii ownership borrow lifetime resource leak defer context manager">
     <div class="p-head"><span class="p-num">11</span><h3>Ownership / управление ресурсами</h3><a class="anchor" href="#p11">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -658,7 +683,7 @@ with pool.acquire() as conn, conn.begin() as tx:
 <section class="section" id="s2">
   <div class="section-head"><span class="numeral">II</span><h2>Границы и связность</h2></div>
 
-  <article class="principle" id="p12">
+  <article class="principle" id="p12" data-keywords="information hiding parnas encapsulation module secret">
     <div class="p-head"><span class="p-num">12</span><h3>Information Hiding (Parnas, 1972)</h3><a class="anchor" href="#p12">#</a></div>
     <p class="lede">Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается, если это решение пересмотрят». SRP — размытый пересказ этого принципа.</p>
     <figure class="code" data-multi>
@@ -685,7 +710,7 @@ __all__ = ["RateLimiter"]   # публичный контракт задекла
     </figure>
   </article>
 
-  <article class="principle" id="p13">
+  <article class="principle" id="p13" data-keywords="coupling cohesion afferent efferent instability archunit import-linter depguard">
     <div class="p-head"><span class="p-num">13</span><h3>Coupling / Cohesion</h3><a class="anchor" href="#p13">#</a></div>
     <p class="lede">Единственная пара метрик дизайна, поддающаяся измерению (afferent/efferent coupling, instability). Практика: направленные зависимости проверяются в CI, а не в head-каноне ревьюера.</p>
     <figure class="code">
@@ -700,7 +725,7 @@ static final ArchRule layering = layeredArchitecture().consideringAllDependencie
     <p class="note"><strong>Go</strong> — depguard / <code>go list -deps</code> в CI. <strong>Rust</strong> — крейты в workspace (граф зависимостей = Cargo.toml, циклы невозможны). <strong>Python</strong> — import-linter с контрактом слоёв.</p>
   </article>
 
-  <article class="principle" id="p14">
+  <article class="principle" id="p14" data-keywords="ddd bounded context anti-corruption layer ubiquitous language">
     <div class="p-head"><span class="p-num">14</span><h3>Bounded Context (DDD)</h3><a class="anchor" href="#p14">#</a></div>
     <p class="lede">Одна модель не бывает универсальной. «Customer» биллинга и «Customer» маркетинга — разные типы; слияние порождает god-таблицу на 60 nullable-колонок.</p>
     <figure class="code">
@@ -718,7 +743,7 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
     </figure>
   </article>
 
-  <article class="principle" id="p15">
+  <article class="principle" id="p15" data-keywords="conway law inverse conway maneuver team topologies org chart">
     <div class="p-head"><span class="p-num">15</span><h3>Conway's Law</h3><a class="anchor" href="#p15">#</a></div>
     <p class="lede">Архитектура сойдётся к структуре коммуникаций организации. Не совет, а наблюдение: хотите другую архитектуру — сначала перестройте команды (inverse Conway maneuver).</p>
     <p class="note">Кодом не выражается; выражается орг-диаграммой.</p>
@@ -729,7 +754,7 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
 <section class="section" id="s3">
   <div class="section-head"><span class="numeral">III</span><h2>Эволюция во времени</h2></div>
 
-  <article class="principle" id="p16">
+  <article class="principle" id="p16" data-keywords="hyrum law implicit dependencies observable behavior">
     <div class="p-head"><span class="p-num">16</span><h3>Hyrum's Law</h3><a class="anchor" href="#p16">#</a></div>
     <p class="lede">При достаточном числе потребителей все наблюдаемые свойства API — контракт: порядок ключей JSON, латентность, текст сообщений об ошибках.</p>
     <figure class="code" data-multi>
@@ -746,7 +771,7 @@ for k := range m { ... } // порядок разный при каждом за
     </figure>
   </article>
 
-  <article class="principle" id="p17">
+  <article class="principle" id="p17" data-keywords="expand migrate contract parallel change zero downtime rename column">
     <div class="p-head"><span class="p-num">17</span><h3>Expand — Migrate — Contract</h3><a class="anchor" href="#p17">#</a></div>
     <p class="lede">Единственный корректный протокол изменения схемы/API при непрерывном деплое. Никогда «rename column» — всегда три деплоя.</p>
     <figure class="code" data-multi>
@@ -772,7 +797,7 @@ class UserOut(BaseModel):
     </figure>
   </article>
 
-  <article class="principle" id="p18">
+  <article class="principle" id="p18" data-keywords="schema compatibility avro protobuf backward forward reserved fields">
     <div class="p-head"><span class="p-num">18</span><h3>Совместимость схем как тип</h3><a class="anchor" href="#p18">#</a></div>
     <p class="lede">Protobuf/Avro-правила: additive-only, никогда не переиспользовать номера полей, <code>reserved</code> для удалённых.</p>
     <figure class="code" data-multi>
@@ -801,9 +826,10 @@ struct AdminCommand { ... }    // на межсервисном контракт
     </figure>
   </article>
 
-  <article class="principle" id="p19">
+  <article class="principle" id="p19" data-keywords="postel law robustness principle rfc 9413 be liberal ossification">
     <div class="p-head"><span class="p-num">19</span><h3>Postel's Law — отменена</h3><a class="anchor" href="#p19">#</a></div>
-    <p class="lede">«Будь либерален к входу» породила XSS, request smuggling и невозможность эволюции протоколов. Современная позиция (RFC 9413): строгая валидация на границе, отказ вместо угадывания.</p>
+    <p class="lede">«Будь либерален к входу» породила XSS, request smuggling и невозможность эволюции протоколов. Современная позиция: строгая валидация на границе, отказ вместо угадывания.</p>
+    <p class="note"><strong>Честно про заголовок.</strong> RFC 9413 называется «Maintaining Robust Protocols» и формально ничего не отменяет: он показывает, что либеральный приём сам по себе становится источником окостенения (ossification) и уязвимостей, и рекомендует активное управление допусками, а не их запрет. «Отменена» — редакционная позиция этой страницы, а не текст RFC.</p>
     <figure class="code" data-multi>
       <div class="langbar">
         <button class="langtab" data-lang="python">Python</button>
@@ -822,7 +848,7 @@ dec.DisallowUnknownFields()
     </figure>
   </article>
 
-  <article class="principle" id="p20">
+  <article class="principle" id="p20" data-keywords="one-way door two-way door adr architecture decision record reversible">
     <div class="p-head"><span class="p-num">20</span><h3>Reversible vs irreversible decisions</h3><a class="anchor" href="#p20">#</a></div>
     <p class="lede">Скорость решения обратно пропорциональна стоимости отката. Выбор библиотеки логирования — two-way door, решается за час. Выбор формата хранения / партиционирования / ID-схемы — one-way door, требует ADR.</p>
     <figure class="code">
@@ -840,15 +866,64 @@ Consequences: горячие ключи для крупных B2B-клиенто
               митигируем salted keys при &gt;5% skew</code></pre>
     </figure>
   </article>
+
+  <article class="principle" id="p72" data-keywords="progressive delivery canary feature flag kill switch rollout деплой релиз">
+    <div class="p-head"><span class="p-num">72</span><h3>Progressive delivery: деплой ≠ релиз</h3><a class="anchor" href="#p72">#</a></div>
+    <p class="lede">Выкладка кода и включение поведения — два разных события, разделённых флагом. Canary / percentage rollout превращает релиз из бинарного события в управляемый эксперимент с метрикой отката. Kill switch — отдельный вид флага: не эксперимент, а заранее построенный рубильник для деградации (см. <a href="#p55">55</a>), живёт вечно и тестируется регулярно.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Java</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-java">// флаг — типизированный, с владельцем и сроком жизни прямо в декларации
+@Flag(owner = "team-payments", removeBy = "2026-10-01", kind = RELEASE)
+static final BoolFlag NEW_SETTLEMENT = flags.bool("settlement.v2", false);
+
+if (NEW_SETTLEMENT.on(ctx.customerId())) { ... } // percentage по стабильному hash id,
+                                                 // не random() — иначе пользователь
+                                                 // мигает между версиями</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Flag debt реален: каждый флаг — это 2<sup>n</sup> конфигураций, из которых тестируются две. Removal date — часть definition of done; флаг старше двух кварталов без решения — инцидент процесса. Следствие для схем: canary означает, что <strong>две версии кода живут одновременно всегда</strong>, поэтому expand — migrate — contract (<a href="#p17">17</a>) из «хорошей практики» становится единственно возможной.</p>
+  </article>
+
+  <article class="principle" id="p73" data-keywords="strangler fig legacy migration rewrite удушение легаси">
+    <div class="p-head"><span class="p-num">73</span><h3>Strangler Fig: легаси душат по маршрутам, не переписывают</h3><a class="anchor" href="#p73">#</a></div>
+    <p class="lede">Big-bang rewrite нарушает Gall's Law (<a href="#p41">41</a>) в промышленном масштабе. Strangler fig: фасад перед легаси, маршруты переводятся на новую систему по одному, легаси умирает вытеснением. Каждый шаг обратим (роутинг назад), прогресс измерим (% трафика), система работает всё время.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Маршрутизация</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-yaml"># маршрутизация — и есть механизм миграции
+routes:
+  - match: { path: /invoices/* }   # мигрировано
+    backend: billing-v2
+  - match: { path: /* }            # всё остальное — пока легаси
+    backend: legacy-monolith</code></pre>
+    </figure>
+    <p class="note">Самая дорогая часть — не роутинг, а расщепление данных: пока обе системы пишут в одну базу, легаси не мёртв, а спрятан. Shared DB — промежуточная станция с датой выезда, иначе получили distributed monolith.</p>
+  </article>
+
+  <article class="principle" id="p74" data-keywords="contract testing pact consumer-driven contracts интеграция провайдер потребитель">
+    <div class="p-head"><span class="p-num">74</span><h3>Contract testing: интеграция проверяется без интеграционного стенда</h3><a class="anchor" href="#p74">#</a></div>
+    <p class="lede">E2E-стенд со всеми сервисами — самый дорогой и самый нестабильный способ проверить совместимость. Consumer-driven contracts: потребитель публикует свои ожидания (какие поля читает, какие статусы обрабатывает), провайдер проверяет их в своём CI. Ломающее изменение находится до деплоя, у провайдера, с именем пострадавшего потребителя. Это операционализация Hyrum's Law (<a href="#p16">16</a>): контракт — то, что потребители реально используют, записанное машинно.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Python · pact-style</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-python"># ожидание потребителя
+pact.given("invoice 42 exists") \
+    .upon_receiving("get invoice") \
+    .with_request("GET", "/invoices/42") \
+    .will_respond_with(200, body=Like({"number": "42", "total_cents": 12300}))
+
+# провайдер в своём CI прогоняет ВСЕ опубликованные контракты потребителей;
+# удаление поля, которое кто-то читает, — красный билд у провайдера</code></pre>
+    </figure>
+    <p class="note">Контракты проверяют структуру, не поведение — они дополняют, а не заменяют тесты провайдера. Схема-реестр (protobuf + compatibility checks, <a href="#p18">18</a>) — то же самое для событий; contract testing — для границ, где реестра нет (REST/JSON).</p>
+  </article>
 </section>
 
 <!-- ============================ IV ============================ -->
 <section class="section" id="s4">
   <div class="section-head"><span class="numeral">IV</span><h2>Отказ как нормальный режим</h2></div>
 
-  <article class="principle" id="p21">
+  <article class="principle" id="p21" data-keywords="end to end argument saltzer exactly once deduplication kafka eos">
     <div class="p-head"><span class="p-num">21</span><h3>End-to-End Argument (Saltzer / Reed / Clark, 1984)</h3><a class="anchor" href="#p21">#</a></div>
-    <p class="lede">Корректность обеспечивается только на концах; промежуточные слои дают оптимизацию, не гарантию. Следствие: «exactly-once» брокера — маркетинг; дедупликация обязана жить у потребителя.</p>
+    <p class="lede">Корректность обеспечивается только на концах; промежуточные слои дают оптимизацию, не гарантию. Следствие: exactly-once брокера кончается на границе брокера — дальше дедупликация обязана жить у потребителя.</p>
+    <p class="note"><strong>Точная формулировка.</strong> Kafka-транзакции дают настоящий EOS в контуре read-process-write, где и вход, и выход, и офсеты — внутри Kafka: коммит офсета и запись результата атомарны. Гарантия исчезает ровно там, где появляется внешний sink (БД, платёжный шлюз, письмо): у него нет общей транзакции с брокером. Поэтому «exactly-once» — не маркетинг, а область применимости, за пределами которой работает только E2E-дедупликация.</p>
     <figure class="code">
       <div class="langbar"><span class="langlabel">Java · Kafka consumer</span><span class="grow"></span><button class="copy">копировать</button></div>
       <pre><code class="language-java">void handle(ConsumerRecord&lt;String, OrderEvent&gt; rec) {
@@ -860,7 +935,7 @@ Consequences: горячие ключи для крупных B2B-клиенто
     </figure>
   </article>
 
-  <article class="principle" id="p22">
+  <article class="principle" id="p22" data-keywords="idempotency key retry safe replay">
     <div class="p-head"><span class="p-num">22</span><h3>Идемпотентность как проектное требование</h3><a class="anchor" href="#p22">#</a></div>
     <p class="lede">Идемпотентный ключ — в контракте API, а не retry-логика в клиенте.</p>
     <figure class="code" data-multi>
@@ -880,7 +955,7 @@ pub struct CreatePayment { pub idempotency_key: Uuid, pub amount: Cents }</code>
     </figure>
   </article>
 
-  <article class="principle" id="p23">
+  <article class="principle" id="p23" data-keywords="backpressure little law load shedding bounded queue reactive streams">
     <div class="p-head"><span class="p-num">23</span><h3>Backpressure &gt; буферизация</h3><a class="anchor" href="#p23">#</a></div>
     <p class="lede">Неограниченная очередь превращает отказ в latency-коллапс (Little's law: <code>L = λW</code>; растёт очередь — растёт время ответа при том же λ).</p>
     <figure class="code" data-multi>
@@ -910,7 +985,7 @@ await queue.put(job)   # блокируется при заполнении — 
     </figure>
   </article>
 
-  <article class="principle" id="p24">
+  <article class="principle" id="p24" data-keywords="retry jitter exponential backoff circuit breaker bulkhead timeout deadline">
     <div class="p-head"><span class="p-num">24</span><h3>Timeout + retry с jitter, circuit breaker, bulkhead</h3><a class="anchor" href="#p24">#</a></div>
     <p class="lede">Retry без jitter — распределённый метроном: синхронизированная толпа добивает восстанавливающийся сервис.</p>
     <figure class="code" data-multi>
@@ -955,7 +1030,7 @@ async def charge(req: PaymentReq) -&gt; Payment: ...</code></pre></div>
     </figure>
   </article>
 
-  <article class="principle" id="p25">
+  <article class="principle" id="p25" data-keywords="crash only recovery wal restart graceful shutdown">
     <div class="p-head"><span class="p-num">25</span><h3>Crash-only software</h3><a class="anchor" href="#p25">#</a></div>
     <p class="lede">Единственный путь остановки — падение; recovery тестируется каждым деплоем. Отдельный shutdown-код не исполняется годами и потому не работает.</p>
     <figure class="code">
@@ -970,32 +1045,264 @@ func main() {
     </figure>
   </article>
 
-  <article class="principle" id="p26">
+  <article class="principle" id="p26" data-keywords="tail at scale hedged requests p99 latency percentile fan-out dean barroso">
     <div class="p-head"><span class="p-num">26</span><h3>Tail at Scale (Dean &amp; Barroso)</h3><a class="anchor" href="#p26">#</a></div>
     <p class="lede">p99, а не среднее: при fan-out 100 ваш p99 — это медиана пользователя. Hedged requests: отправить дубль после p95-задержки, взять первый ответ.</p>
     <figure class="code">
-      <div class="langbar"><span class="langlabel">Java 21+ · structured concurrency</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <div class="langbar"><span class="langlabel">Java · JDK 25 (structured concurrency, JEP 505)</span><span class="grow"></span><button class="copy">копировать</button></div>
       <pre><code class="language-java">// hedged request на виртуальных потоках
 try (var scope = StructuredTaskScope.open(Joiner.&lt;Reply&gt;anySuccessfulResultOrThrow())) {
     scope.fork(() -&gt; replica1.get(key));
     scope.fork(() -&gt; { Thread.sleep(p95Latency); return replica2.get(key); }); // hedge
     return scope.join();  // первый успешный, второй отменяется
-}</code></pre>
+}
+
+// На JDK 21, где structured concurrency ещё preview (JEP 453), форма другая:
+// try (var scope = new StructuredTaskScope.ShutdownOnSuccess&lt;Reply&gt;()) {
+//     scope.fork(() -&gt; replica1.get(key));
+//     scope.fork(() -&gt; { Thread.sleep(p95Latency); return replica2.get(key); });
+//     scope.join();
+//     return scope.result();
+// }</code></pre>
     </figure>
   </article>
 
-  <article class="principle" id="p27">
+  <article class="principle" id="p27" data-keywords="blast radius cell based architecture shuffle sharding isolation">
     <div class="p-head"><span class="p-num">27</span><h3>Blast radius / cell-based architecture</h3><a class="anchor" href="#p27">#</a></div>
     <p class="lede">Единица отказа проектируется заранее: клиенты шардируются по ячейкам, инцидент задевает одну ячейку, а не всех. Shuffle sharding — вариант с комбинаторным снижением пересечения.</p>
     <p class="note">Выражается топологией деплоя, не кодом.</p>
   </article>
+
+  <article class="principle" id="p77" data-keywords="chaos engineering fault injection game day steady state хаос эксперимент отказ">
+    <div class="p-head"><span class="p-num">77</span><h3>Chaos engineering: гипотезы об отказах проверяются экспериментом</h3><a class="anchor" href="#p77">#</a></div>
+    <p class="lede">«Мы переживём падение реплики» — гипотеза; пока её не проверили инъекцией отказа, это мнение. Метод: steady-state метрика → гипотеза («убийство пода не двигает p99») → минимальный blast radius (<a href="#p27">27</a>) → инъекция → сравнение. Деталь, которую пропускают: конечная цель — прод, потому что стейджинг не воспроизводит ни трафик, ни данные, ни конфигурацию.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Эксперимент как артефакт</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-yaml"># эксперимент — версионируемый артефакт, как тест
+experiment: kafka-broker-loss
+steady_state: { metric: consumer_lag_p99, threshold: "&lt; 30s" }
+method: [{ action: kill-pod, selector: "app=kafka, broker=2" }]
+rollback: automatic          # abort при выходе за threshold
+blast_radius: cell-eu-1      # одна ячейка, не флот</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Chaos без наблюдаемости (раздел VI) — вандализм: если не можете ответить «что сломалось», нечего и ломать. Порядок строгий: сначала SLO и трейсинг, потом инъекции. Game days на стейджинге — легитимная первая ступень, но не конечная.</p>
+  </article>
 </section>
 
 <!-- ============================ V ============================ -->
-<section class="section" id="s5">
-  <div class="section-head"><span class="numeral">V</span><h2>Наблюдаемость</h2></div>
+<section class="section" id="s11">
+  <div class="section-head"><span class="numeral">V</span><h2>Распределённые данные и консистентность</h2></div>
 
-  <article class="principle" id="p28">
+  <article class="principle" id="p63" data-keywords="fallacies of distributed computing deutsch gosling заблуждения сеть надёжна">
+    <div class="p-head"><span class="p-num">63</span><h3>Fallacies of Distributed Computing</h3><a class="anchor" href="#p63">#</a></div>
+    <p class="lede">Восемь заблуждений (Deutsch / Gosling): сеть надёжна, латентность нулевая, полоса бесконечна, сеть безопасна, топология неизменна, администратор один, транспорт бесплатен, сеть однородна. Каждое «очевидно ложно» — и каждое регулярно закладывается в дизайн неявно.</p>
+    <p class="note"><strong>Проверяемая форма.</strong> Любой межсервисный вызов в коде обязан отвечать на три вопроса: таймаут? ретрай-политика? что при недоступности? Отсутствие ответа = заложенное заблуждение №1. Кодом не выражается; выражается чек-листом ревью для каждой сетевой границы.</p>
+  </article>
+
+  <article class="principle" id="p64" data-keywords="cap theorem pacelc partition consistency availability latency кворум">
+    <div class="p-head"><span class="p-num">64</span><h3>CAP мёртв, PACELC жив</h3><a class="anchor" href="#p64">#</a></div>
+    <p class="lede">CAP в популярной форме вырожден: P не выбирается — partition случается, выбор только между C и A <em>во время</em> partition. PACELC честнее: даже без partition (E) выбор между latency (L) и consistency (C) существует всегда — синхронная репликация стоит RTT на каждую запись.</p>
+    <p class="note"><strong>Честная оценка.</strong> «CP или AP» как ярлык базы данных — маркетинговая таксономия; реальные системы настраиваются per-operation (<code>quorum</code> vs <code>one</code> в Cassandra, <code>synchronous_commit</code> в Postgres). Принцип: уровень консистентности — свойство операции, не системы, и выбирается по инварианту, который операция защищает.</p>
+  </article>
+
+  <article class="principle" id="p65" data-keywords="consistency model linearizable causal session guarantees read your writes monotonic reads">
+    <div class="p-head"><span class="p-num">65</span><h3>Модели консистентности — часть контракта API</h3><a class="anchor" href="#p65">#</a></div>
+    <p class="lede">«Прочитал то, что записал» — не свойство базы, а гарантия, которую сервис либо даёт, либо нет, и это должно быть написано в контракте. Иерархия по цене: linearizable &gt; sequential &gt; causal &gt; read-your-writes / monotonic reads (session guarantees) &gt; eventual. Большинству фич хватает session guarantees — платить за linearizability по умолчанию значит платить за то, чем не пользуешься.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="java">Java</button>
+        <button class="langtab" data-lang="go">Go</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="java"><div class="paneflag">Java</div><pre><code class="language-java">// read-your-writes через версионный токен, без sticky sessions
+record WriteResult(OrderId id, long lsn) {}          // LSN/HLC записи возвращается клиенту
+
+Order read(OrderId id, long minLsn) {
+    var replica = pool.any();
+    replica.waitForLsn(minLsn, TIMEOUT);             // реплика догоняет или отдаём в primary
+    return replica.get(id);
+}
+// клиент носит lsn в cookie/header → его собственные записи видимы,
+// чужие — eventually; это и есть session guarantee, задекларированная явно</code></pre></div>
+      <div class="codepane" data-lang="go"><div class="paneflag">Go</div><pre><code class="language-go">// то же на уровне контракта: тип ответа содержит гарантию
+type ReadConsistency int
+
+const (
+    Eventual ReadConsistency = iota
+    ReadYourWrites
+    Linearizable // документированно дорого: идёт через лидера
+)
+
+func (s *Store) Get(ctx context.Context, id OrderID, c ReadConsistency) (Order, error)</code></pre></div>
+    </figure>
+    <p class="note">Тест-вопрос на дизайн-ревью: «какой аномалией пользователь заплатит за эту оптимизацию — и знает ли он об этом из контракта?»</p>
+  </article>
+
+  <article class="principle" id="p66" data-keywords="fencing token distributed lock redlock lease zookeeper блокировка зомби consensus">
+    <div class="p-head"><span class="p-num">66</span><h3>Распределённая блокировка без fencing token сломана</h3><a class="anchor" href="#p66">#</a></div>
+    <p class="lede">Любой lock с TTL (Redis, ZooKeeper lease, k8s lease) не защищает сам по себе: держатель может зависнуть (GC-пауза, сетевой delay), TTL истечёт, лок получит другой — и «мертвец» проснётся и запишет поверх. Единственная корректная схема: лок выдаёт монотонный token, а <strong>хранилище</strong> отвергает записи со stale token. Защита живёт на стороне ресурса, не на стороне лока — это E2E argument (<a href="#p21">21</a>), применённый к блокировкам.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="go">Go</button>
+        <button class="langtab" data-lang="rust">Rust</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="go"><div class="paneflag">Go</div><pre><code class="language-go">token, err := locker.Acquire(ctx, "settlement-2026-08-04") // token = 34
+if err != nil { return err }
+defer locker.Release(token)
+
+// хранилище проверяет: принятый max token = 33 → 34 проходит;
+// если зомби придёт с token = 33 после того, как видели 34 — отказ
+if err := store.Write(ctx, key, val, WithFenceToken(token)); err != nil { ... }</code></pre></div>
+      <div class="codepane" data-lang="rust"><div class="paneflag">Rust</div><pre><code class="language-rust">// токен в типе — запись без него не сконструировать
+pub struct Fenced&lt;T&gt; { token: FenceToken, payload: T }
+
+impl Store {
+    pub fn write(&amp;self, w: Fenced&lt;Write&gt;) -&gt; Result&lt;(), Stale&gt; { ... }
+}</code></pre></div>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Redlock без fencing — известный спор Kleppmann vs antirez; практический вывод: если ресурс не умеет проверять токен (S3 без precondition, внешний API), лок даёт <em>efficiency</em> (не делать работу дважды), но не <em>correctness</em>. Не путать эти два применения — вторая половина инцидентов с «distributed lock» именно отсюда. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; своей реализации ему не пишут, берут готовую.</p>
+  </article>
+
+  <article class="principle" id="p67" data-keywords="clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы">
+    <div class="p-head"><span class="p-num">67</span><h3>Wall clock врёт: упорядочивание — только логическими часами</h3><a class="anchor" href="#p67">#</a></div>
+    <p class="lede">NTP-дрейф, leap smearing, VM-паузы: <code>System.currentTimeMillis()</code> двух машин несравним, и «last write wins по timestamp» молча теряет записи. Упорядочивание — Lamport clock / HLC / версионные векторы; wall clock — только для людей (логи, метрики) и для TTL с запасом.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="python">Python</button>
+        <button class="langtab" data-lang="java">Java</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="python"><div class="paneflag">Python · HLC</div><pre><code class="language-python"># физическое время + логический счётчик, монотонность гарантирована
+@dataclass(frozen=True, order=True)
+class HLC:
+    wall_ms: int
+    logical: int
+
+    def tick(self, now_ms: int) -&gt; "HLC":
+        if now_ms &gt; self.wall_ms:
+            return HLC(now_ms, 0)
+        return HLC(self.wall_ms, self.logical + 1)   # часы ушли назад — растим счётчик
+
+    def recv(self, other: "HLC", now_ms: int) -&gt; "HLC":
+        m = max(self.wall_ms, other.wall_ms, now_ms)
+        l = max(self.logical if m == self.wall_ms else -1,
+                other.logical if m == other.wall_ms else -1) + 1
+        return HLC(m, l)</code></pre></div>
+      <div class="codepane" data-lang="java"><div class="paneflag">Java</div><pre><code class="language-java">// симптом для ревью: сравнение времён, записанных разными нодами
+if (eventA.timestamp().isBefore(eventB.timestamp())) { ... } // ← флаг, если A и B
+                                                             //   писались разными нодами</code></pre></div>
+    </figure>
+    <p class="note">Google TrueTime — исключение, подтверждающее правило: Spanner покупает сравнимость часов атомными часами и <em>явным интервалом неопределённости</em> (commit-wait). Если у вас нет атомных часов — у вас нет сравнимых timestamp'ов.</p>
+  </article>
+
+  <article class="principle" id="p68" data-keywords="dual write transactional outbox cdc debezium kafka атомарность публикация события">
+    <div class="p-head"><span class="p-num">68</span><h3>Dual-write problem → transactional outbox</h3><a class="anchor" href="#p68">#</a></div>
+    <p class="lede">«Записали в базу и опубликовали в Kafka» — это две системы без общей транзакции: упасть между ними можно всегда, и одна из сторон соврёт. Корректных схем две: outbox (событие пишется в ту же БД-транзакцию, relay / CDC доставляет) или CDC напрямую с WAL. «Сначала publish, потом commit» и наоборот — обе сломаны, только фантомы разного знака.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="sql">SQL</button>
+        <button class="langtab" data-lang="go">Go</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="sql"><div class="paneflag">SQL</div><pre><code class="language-sql">-- одна транзакция: бизнес-факт и событие атомарны
+BEGIN;
+INSERT INTO payments (id, amount_cents, status) VALUES ($1, $2, 'captured');
+INSERT INTO outbox (event_id, aggregate_id, type, payload)
+VALUES (gen_random_uuid(), $1, 'PaymentCaptured', $3);
+COMMIT;
+
+-- relay (Debezium / поллер) читает outbox → Kafka; доставка at-least-once,
+-- поэтому дедупликация у потребителя по event_id обязательна (см. 21)</code></pre></div>
+      <div class="codepane" data-lang="go"><div class="paneflag">Go · relay</div><pre><code class="language-go">// доставка и пометка — идемпотентная петля
+rows := tx.Query(`SELECT event_id, payload FROM outbox
+                  WHERE published_at IS NULL ORDER BY seq LIMIT 100 FOR UPDATE SKIP LOCKED`)
+
+for _, e := range rows {
+    if err := producer.Send(ctx, e); err != nil { break } // не помечаем — придём снова
+    tx.Exec(`UPDATE outbox SET published_at = now() WHERE event_id = $1`, e.ID)
+}</code></pre></div>
+    </figure>
+    <p class="note">Outbox не даёт exactly-once — он даёт атомарность записи и at-least-once доставки; дедупликация всё равно на конце (<a href="#p21">21</a>). Listen-to-yourself и «просто ретраить publish» — не эквиваленты, а известные способы получить рассинхрон.</p>
+  </article>
+
+  <article class="principle" id="p69" data-keywords="saga compensation orchestration choreography temporal workflow распределённая транзакция изоляция">
+    <div class="p-head"><span class="p-num">69</span><h3>Saga: распределённая транзакция = компенсации минус изоляция</h3><a class="anchor" href="#p69">#</a></div>
+    <p class="lede">Через границы сервисов ACID не существует; saga — цепочка локальных транзакций с компенсирующим действием на каждую. Главная цена, которую забывают: <strong>пропала изоляция</strong> — промежуточные состояния видимы другим участникам, и компенсация не «откатывает», а пишет новый факт (refund ≠ отмена charge).</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Java</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-java">// шаги и компенсации объявлены парой; состояние — явный persisted тип
+sealed interface SagaStep permits ReserveInventory, ChargeCard, BookShipment {}
+
+record ChargeCard(Cents amount) implements SagaStep {
+    Compensation compensation() { return new RefundCard(amount); } // новый факт, не rollback
+}
+
+// изоляция руками: семантический лок — заказ в статусе PENDING_PAYMENT
+// невидим для повторной продажи, пока saga не завершится или не компенсируется</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Оркестрация (явный state machine) почти всегда выигрывает у хореографии после третьего шага: «кто сейчас владеет процессом» становится вопросом отладки в 3 часа ночи. Хореография — для двух участников, не более. Долгие saga = workflow engine (Temporal и т. п.) — это не новая идея, а persisted saga-оркестратор.</p>
+  </article>
+
+  <h3 class="subhead">Кэширование</h3>
+
+  <article class="principle" id="p70" data-keywords="cache ttl staleness budget invalidation write-through write-behind cache-aside кэш инвалидация">
+    <div class="p-head"><span class="p-num">70</span><h3>Кэш — это реплика с задокументированным бюджетом staleness</h3><a class="anchor" href="#p70">#</a></div>
+    <p class="lede">Кэш — не «ускорение», а осознанное ослабление консистентности: TTL — это SLA на устаревание, и он должен быть выведен из бизнес-требования («цена может врать 60 секунд»), а не из «ну пусть 5 минут». Инвалидация по событию и TTL как страховочный пол — не «или», а «и»: событие теряется (at-least-once ≠ exactly-once), TTL ограничивает ущерб потери.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Go</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-go">// TTL как контракт, а не константа в глубине кода
+type CachePolicy struct {
+    TTL                  time.Duration // = задокументированный staleness budget
+    StaleWhileRevalidate time.Duration // отдаём протухшее, обновляем фоном
+}
+
+var pricePolicy = CachePolicy{TTL: 60 * time.Second, StaleWhileRevalidate: 10 * time.Second}
+// ревью-вопрос: "откуда 60?" должен иметь ответ со ссылкой на требование</code></pre>
+    </figure>
+    <p class="note">Cache-aside / read-through / write-through / write-behind — не вкусовщина: write-behind теряет данные при падении кэша и допустим только для восстановимого (счётчики, метрики). Ключ с двумя писателями (сервис и инвалидатор) — гонка по построению; версионируйте значение или пишите через одну точку.</p>
+  </article>
+
+  <article class="principle" id="p71" data-keywords="cache stampede thundering herd singleflight negative caching xfetch jitter">
+    <div class="p-head"><span class="p-num">71</span><h3>Cache stampede: singleflight, jitter, negative caching</h3><a class="anchor" href="#p71">#</a></div>
+    <p class="lede">Протухание горячего ключа = синхронный залп всех подписчиков в origin, self-DDoS по расписанию. Три обязательных механизма: коллапс одновременных промахов в один запрос (singleflight), рандомизация TTL (протухают не хором), кэширование отсутствия (иначе каждый запрос несуществующего id — удар в базу).</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="go">Go</button>
+        <button class="langtab" data-lang="python">Python</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="go"><div class="paneflag">Go · singleflight</div><pre><code class="language-go">var g singleflight.Group
+
+func (s *Svc) Product(ctx context.Context, id string) (Product, error) {
+    if p, ok := s.cache.Get(id); ok { return p, nil }
+    v, err, _ := g.Do(id, func() (any, error) {      // N промахов → 1 запрос в origin
+        p, err := s.db.Product(ctx, id)
+        if errors.Is(err, ErrNotFound) {
+            s.cache.SetNegative(id, 30*time.Second)  // negative cache, короткий TTL
+            return Product{}, err
+        }
+        s.cache.Set(id, p, jitterTTL(5*time.Minute)) // ±20% — рассинхрон протухания
+        return p, err
+    })
+    ...
+}</code></pre></div>
+      <div class="codepane" data-lang="python"><div class="paneflag">Python · XFetch</div><pre><code class="language-python"># вероятностное раннее обновление: горячие ключи обновляются ДО протухания,
+# вероятность растёт по мере приближения к TTL
+import math, random, time
+
+def should_refresh(expires_at: float, delta: float, beta: float = 1.0) -&gt; bool:
+    return time.time() - delta * beta * math.log(random.random()) &gt;= expires_at</code></pre></div>
+    </figure>
+    <p class="note">Negative caching без короткого TTL — способ закэшировать транзиентную ошибку навсегда; кэшируйте <em>отсутствие</em>, не <em>ошибку</em> (5xx origin'а в кэш не пишется никогда).</p>
+  </article>
+</section>
+
+<!-- ============================ VI ============================ -->
+<section class="section" id="s5">
+  <div class="section-head"><span class="numeral">VI</span><h2>Наблюдаемость</h2></div>
+
+  <article class="principle" id="p28" data-keywords="observability wide structured events high cardinality unknown unknowns">
     <div class="p-head"><span class="p-num">28</span><h3>Observability ≠ мониторинг</h3><a class="anchor" href="#p28">#</a></div>
     <p class="lede">Способность отвечать на вопросы, которые не были предвидены. Wide structured events с высокой кардинальностью вместо заранее агрегированных счётчиков.</p>
     <figure class="code" data-multi>
@@ -1018,7 +1325,7 @@ log.info("request_completed", duration_ms=ms, outcome="declined", reason=r)</cod
     </figure>
   </article>
 
-  <article class="principle" id="p29">
+  <article class="principle" id="p29" data-keywords="trace id opentelemetry propagation distributed tracing span context">
     <div class="p-head"><span class="p-num">29</span><h3>Trace ID сквозь границы — часть контракта</h3><a class="anchor" href="#p29">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -1038,7 +1345,7 @@ async fn process(payload: Order) -&gt; Result&lt;()&gt; { ... }</code></pre></di
     </figure>
   </article>
 
-  <article class="principle" id="p30">
+  <article class="principle" id="p30" data-keywords="slo sli error budget sre burn rate multiwindow sloth">
     <div class="p-head"><span class="p-num">30</span><h3>SLO и error budget</h3><a class="anchor" href="#p30">#</a></div>
     <p class="lede">Переводят надёжность из религии в бюджет: «99.9% за 30 дней = 43 минуты даунтайма; бюджет исчерпан → фичи стоп, релизы заморожены» — формализованный компромисс.</p>
     <figure class="code">
@@ -1055,7 +1362,7 @@ async fn process(payload: Order) -&gt; Result&lt;()&gt; { ... }</code></pre></di
     </figure>
   </article>
 
-  <article class="principle" id="p31">
+  <article class="principle" id="p31" data-keywords="debuggability deterministic simulation testing dst replay dry run mttr seed">
     <div class="p-head"><span class="p-num">31</span><h3>Debuggability как first-class требование</h3><a class="anchor" href="#p31">#</a></div>
     <p class="lede">Детерминированный replay, dry-run режимы, инспектируемое промежуточное состояние. Система без этого имеет неограниченный MTTR.</p>
     <figure class="code" data-multi>
@@ -1085,9 +1392,9 @@ class DryRunExecutor:            # печатает план; логика ВЫ�
 
 <!-- ============================ VI ============================ -->
 <section class="section" id="s6">
-  <div class="section-head"><span class="numeral">VI</span><h2>Безопасность и доверие</h2></div>
+  <div class="section-head"><span class="numeral">VII</span><h2>Безопасность и доверие</h2></div>
 
-  <article class="principle" id="p32">
+  <article class="principle" id="p32" data-keywords="trust boundary taint tracking sanitization untrusted input xss">
     <div class="p-head"><span class="p-num">32</span><h3>Trust boundaries явно; всё пересекающее границу — парсится</h3><a class="anchor" href="#p32">#</a></div>
     <figure class="code">
       <div class="langbar"><span class="langlabel">Rust</span><span class="grow"></span><button class="copy">копировать</button></div>
@@ -1103,7 +1410,7 @@ impl Untrusted&lt;String&gt; {
     </figure>
   </article>
 
-  <article class="principle" id="p33">
+  <article class="principle" id="p33" data-keywords="least privilege capability rbac securitycontext narrow interface">
     <div class="p-head"><span class="p-num">33</span><h3>Least privilege</h3><a class="anchor" href="#p33">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -1124,7 +1431,7 @@ type OrderWriter interface{ PutOrder(ctx context.Context, o Order) error }
     </figure>
   </article>
 
-  <article class="principle" id="p34">
+  <article class="principle" id="p34" data-keywords="sql injection prepared statement parameterized query owasp secrets">
     <div class="p-head"><span class="p-num">34</span><h3>Секреты и инъекции: параметризация, не конкатенация</h3><a class="anchor" href="#p34">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -1139,7 +1446,7 @@ ps.setString(1, email);</code></pre></div>
     </figure>
   </article>
 
-  <article class="principle" id="p35">
+  <article class="principle" id="p35" data-keywords="supply chain slsa sbom pinned dependencies lockfile cargo-deny govulncheck syft">
     <div class="p-head"><span class="p-num">35</span><h3>Supply chain (SLSA, SBOM, pinned deps)</h3><a class="anchor" href="#p35">#</a></div>
     <p class="lede">Главный практический вектор атак последних лет — не ваш код.</p>
     <figure class="code" data-multi>
@@ -1163,7 +1470,7 @@ vulnerability = "deny"</code></pre></div>
     </figure>
   </article>
 
-  <article class="principle" id="p36">
+  <article class="principle" id="p36" data-keywords="privacy by design gdpr crypto shredding right to be forgotten pii retention">
     <div class="p-head"><span class="p-num">36</span><h3>Privacy by design</h3><a class="anchor" href="#p36">#</a></div>
     <p class="lede">Retention и удаление — свойство схемы, а не скрипт. Прямой конфликт с event sourcing разрешается crypto-shredding: PII шифруется per-subject ключом; удаление субъекта = удаление ключа, лог остаётся неизменным.</p>
     <figure class="code">
@@ -1178,9 +1485,9 @@ vulnerability = "deny"</code></pre></div>
 
 <!-- ============================ VII ============================ -->
 <section class="section" id="s7">
-  <div class="section-head"><span class="numeral">VII</span><h2>Эмпирика вместо вкуса</h2></div>
+  <div class="section-head"><span class="numeral">VIII</span><h2>Эмпирика вместо вкуса</h2></div>
 
-  <article class="principle" id="p37">
+  <article class="principle" id="p37" data-keywords="premature optimization knuth jmh criterion pprof py-spy profiling benchmark">
     <div class="p-head"><span class="p-num">37</span><h3>Измерь, потом оптимизируй</h3><a class="anchor" href="#p37">#</a></div>
     <p class="lede">Кнут в оригинале: не «оптимизация — зло», а «без измерения — зло».</p>
     <figure class="code" data-multi>
@@ -1210,13 +1517,13 @@ $ py-spy record --pid 4711 --format speedscope</code></pre></div>
     </figure>
   </article>
 
-  <article class="principle" id="p38">
+  <article class="principle" id="p38" data-keywords="amdahl universal scalability law usl gunther coherency contention crosstalk">
     <div class="p-head"><span class="p-num">38</span><h3>Amdahl / Universal Scalability Law</h3><a class="anchor" href="#p38">#</a></div>
     <p class="lede">USL: пропускная способность <code>C(N) = λN / (1 + σ(N−1) + κN(N−1))</code>. Второй член (когерентность κ) объясняет, почему добавление узлов даёт отрицательный прирост: crosstalk растёт квадратично.</p>
     <p class="note">Практический вывод для Kafka/Flink: перед горизонтальным скейлом измерь σ и κ на нагрузочном стенде — иначе платишь за ноды, снижающие throughput.</p>
   </article>
 
-  <article class="principle" id="p39">
+  <article class="principle" id="p39" data-keywords="mechanical sympathy false sharing cache line numa syscall padding">
     <div class="p-head"><span class="p-num">39</span><h3>Mechanical sympathy</h3><a class="anchor" href="#p39">#</a></div>
     <p class="lede">Cache line 64B, false sharing, NUMA, стоимость syscall. Смежно с DOD, но шире — включает знание рантайма.</p>
     <figure class="code" data-multi>
@@ -1235,30 +1542,44 @@ struct PaddedCounter(AtomicU64);</code></pre></div>
 type shard struct { n atomic.Uint64; _ [56]byte } // добивка до 64B</code></pre></div>
     </figure>
   </article>
+
+  <article class="principle" id="p78" data-keywords="cost sli finops cost per request egress unit economics стоимость бюджет">
+    <div class="p-head"><span class="p-num">78</span><h3>Стоимость — такая же SLI, как латентность</h3><a class="anchor" href="#p78">#</a></div>
+    <p class="lede">Cost-per-request / cost-per-tenant — инженерная метрика с бюджетом и алертом, а не квартальный сюрприз из биллинга. Для multi-cloud egress — архитектурное ограничение первого порядка: cross-region / cross-cloud трафик может стоить дороже compute, и топология данных проектируется от него.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Go</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-go">// стоимость атрибутируется в том же wide event (см. 28)
+logger.Info("request_completed",
+    "tenant", tid, "compute_ms", ms, "bytes_egress", n,
+    "downstream_calls", calls, "est_cost_usd", est) // → cost per tenant/endpoint
+                                                    //   отвечается запросом, не финансами</code></pre>
+    </figure>
+    <p class="note">Связка с <a href="#p55">55</a>: fallback-каскад LLM — это cost engineering в чистом виде. Связка с <a href="#p38">38</a>: USL говорит, когда добавленная нода даёт отрицательный прирост, а cost SLI — сколько вы за этот отрицательный прирост платите. Unit economics ломается молча: алерт на cost-per-request важнее алерта на абсолютный счёт.</p>
+  </article>
 </section>
 
 <!-- ============================ VIII ============================ -->
 <section class="section" id="s8">
-  <div class="section-head"><span class="numeral">VIII</span><h2>Простота и экономика</h2></div>
+  <div class="section-head"><span class="numeral">IX</span><h2>Простота и экономика</h2></div>
 
-  <article class="principle" id="p40">
+  <article class="principle" id="p40" data-keywords="essential accidental complexity brooks no silver bullet">
     <div class="p-head"><span class="p-num">40</span><h3>Essential vs accidental complexity (Brooks)</h3><a class="anchor" href="#p40">#</a></div>
     <p class="lede">Рамка любого спора о «чистоте»: сложность предметной области неустранима; сложность, привнесённая инструментами и абстракциями, — устранима и подлежит атаке.</p>
     <p class="note">Вопрос на ревью: <strong>«какую essential-сложность выражает этот слой?»</strong> Нет ответа — слой accidental.</p>
   </article>
 
-  <article class="principle" id="p41">
+  <article class="principle" id="p41" data-keywords="gall law walking skeleton incremental big bang">
     <div class="p-head"><span class="p-num">41</span><h3>Gall's Law</h3><a class="anchor" href="#p41">#</a></div>
     <p class="lede">Работающая сложная система всегда эволюционировала из работающей простой. Спроектированная сложной с нуля — не работает и не чинится.</p>
     <p class="note">Практика: walking skeleton → инкременты, никогда big-bang.</p>
   </article>
 
-  <article class="principle" id="p42">
+  <article class="principle" id="p42" data-keywords="yagni rule of three aha avoid hasty abstraction duplication">
     <div class="p-head"><span class="p-num">42</span><h3>YAGNI + Rule of Three (AHA)</h3><a class="anchor" href="#p42">#</a></div>
     <p class="lede">Абстракция появляется на третьем повторении. Первое дублирование дешевле неверной абстракции: неверная абстракция заставляет все будущие случаи врать о своей природе.</p>
   </article>
 
-  <article class="principle" id="p43">
+  <article class="principle" id="p43" data-keywords="dry dont repeat yourself knowledge duplication shared code">
     <div class="p-head"><span class="p-num">43</span><h3>DRY — про знание, не про текст</h3><a class="anchor" href="#p43">#</a></div>
     <p class="lede">Одинаковые пять строк в двух bounded contexts — не дублирование: они меняются по разным причинам. Их «устранение» связывает то, что обязано меняться независимо.</p>
     <figure class="code">
@@ -1271,17 +1592,17 @@ type shard struct { n atomic.Uint64; _ [56]byte } // добивка до 64B</co
     </figure>
   </article>
 
-  <article class="principle" id="p44">
+  <article class="principle" id="p44" data-keywords="chesterton fence code removal git log refactoring">
     <div class="p-head"><span class="p-num">44</span><h3>Chesterton's Fence</h3><a class="anchor" href="#p44">#</a></div>
     <p class="lede">Не удаляй код, назначения которого не понял. <code>git log -S"strange_condition"</code> перед удалением — минимальная процедура. Контрмера к рефакторинг-энтузиазму.</p>
   </article>
 
-  <article class="principle" id="p45">
+  <article class="principle" id="p45" data-keywords="lehman laws technical debt entropy software evolution">
     <div class="p-head"><span class="p-num">45</span><h3>Lehman's Laws / технический долг как термодинамика</h3><a class="anchor" href="#p45">#</a></div>
     <p class="lede">Используемая система обязана меняться; её сложность растёт, пока в неё не вкладывают работу специально. Бюджет на снижение энтропии — регулярная статья, а не «когда-нибудь потом».</p>
   </article>
 
-  <article class="principle" id="p46">
+  <article class="principle" id="p46" data-keywords="principle of least astonishment surprise pola mutable default argument deref">
     <div class="p-head"><span class="p-num">46</span><h3>Least Astonishment</h3><a class="anchor" href="#p46">#</a></div>
     <figure class="code" data-multi>
       <div class="langbar">
@@ -1299,20 +1620,32 @@ def add_item(item, bucket=None):        # ожидаемое поведение
     </figure>
   </article>
 
-  <article class="principle" id="p47">
+  <article class="principle" id="p47" data-keywords="readability explicit over implicit zen of python magic reflection">
     <div class="p-head"><span class="p-num">47</span><h3>Код читается на порядок чаще, чем пишется</h3><a class="anchor" href="#p47">#</a></div>
     <p class="lede">Обоснование явности над магией: в Java — меньше рефлексии и аннотационной магии; в Rust — меньше макро-DSL; в Go — это философия языка целиком; в Python — «explicit is better than implicit» из <code>import this</code>.</p>
+  </article>
+
+  <article class="principle" id="p75" data-keywords="choose boring technology innovation tokens скучные технологии постгрес выбор стека">
+    <div class="p-head"><span class="p-num">75</span><h3>Choose boring technology: инновационные токены</h3><a class="anchor" href="#p75">#</a></div>
+    <p class="lede">У команды примерно три innovation tokens; каждая «интересная» технология тратит один — на операционку, найм, неизвестные failure modes. Boring ≠ плохое: boring = failure modes известны и загуглены. Postgres, пока не доказано обратное, — не консерватизм, а экономика.</p>
+    <p class="note"><strong>Проверяемая форма.</strong> Новая технология в стеке требует ADR с ответом «какую essential-сложность (<a href="#p40">40</a>) не решает скучный вариант» плюс измерение (<a href="#p37">37</a>), а не бенчмарк из блога вендора. Токен тратится по профилю нагрузки, не по конференц-докладу.</p>
+  </article>
+
+  <article class="principle" id="p76" data-keywords="brooks law mythical man-month second-system effect найм скоуп переписывание">
+    <div class="p-head"><span class="p-num">76</span><h3>Brooks's Law и second-system effect</h3><a class="anchor" href="#p76">#</a></div>
+    <p class="lede">Добавление людей в опаздывающий проект замедляет его: коммуникация растёт квадратично, онбординг отбирает самых знающих. Second-system effect: вторая версия — самая опасная, в неё сгружают всё, что «не влезло» в первую, — прямое нарушение Gall's Law (<a href="#p41">41</a>) изнутри команды-автора.</p>
+    <p class="note">Кодом не выражается; выражается решением «резать скоуп, а не нанимать» и требованием к rewrite-предложениям проходить через strangler fig (<a href="#p73">73</a>), а не через «на этот раз сделаем правильно».</p>
   </article>
 </section>
 
 <!-- ============================ IX ============================ -->
 <section class="section" id="s9">
-  <div class="section-head"><span class="numeral">IX</span><h2>Принципы AI-эры</h2></div>
+  <div class="section-head"><span class="numeral">X</span><h2>Принципы AI-эры</h2></div>
   <p class="note">Два разных множества: <strong>(a)</strong> инженерия систем, содержащих LLM; <strong>(b)</strong> инженерия с помощью AI-ассистентов. Смешивать их — категориальная ошибка.</p>
 
   <h3 class="subhead">A · Системы с LLM внутри</h3>
 
-  <article class="principle" id="p48">
+  <article class="principle" id="p48" data-keywords="prompt injection lethal trifecta indirect injection tool call untrusted output">
     <div class="p-head"><span class="p-num">48</span><h3>LLM-выход — недоверенный вход (prompt injection = trust boundary)</h3><a class="anchor" href="#p48">#</a></div>
     <p class="lede">Самый важный принцип раздела. Всё, что модель прочитала (web, документы, письма), может содержать инструкции; следовательно, выход модели имеет уровень доверия своего наименее доверенного входа. Классическая триада риска: доступ к приватным данным + недоверенный контент + канал наружу — никогда все три одновременно.</p>
     <figure class="code" data-multi>
@@ -1321,15 +1654,23 @@ def add_item(item, bucket=None):        # ожидаемое поведение
         <button class="langtab" data-lang="rust">Rust</button>
         <span class="grow"></span><button class="copy">копировать</button>
       </div>
-      <div class="codepane" data-lang="python"><div class="paneflag">Python</div><pre><code class="language-python"># Выход LLM парсится как недоверенный ввод — тот же parse-don't-validate
-class ToolCall(BaseModel):
+      <div class="codepane" data-lang="python"><div class="paneflag">Python</div><pre><code class="language-python"># Выход LLM парсится как недоверенный ввод — тот же parse-don't-validate.
+# Tagged union: tool и args связаны дискриминатором, иначе
+# {"tool": "search_orders", "args": &lt;поля InvoiceArgs&gt;} пройдёт валидацию
+class SearchOrders(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid")
+    tool: Literal["search_orders"]
+    args: SearchArgs
 
-    tool: Literal["search_orders", "get_invoice"]   # closed set, не произвольная строка
-    args: SearchArgs | InvoiceArgs
+class GetInvoice(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+    tool: Literal["get_invoice"]
+    args: InvoiceArgs
+
+ToolCall = Annotated[SearchOrders | GetInvoice, Field(discriminator="tool")]
 
 raw = llm.complete(prompt)
-call = ToolCall.model_validate_json(raw)   # не eval, не getattr(obj, raw_name)</code></pre></div>
+call = TypeAdapter(ToolCall).validate_json(raw)  # не eval, не getattr(obj, raw_name)</code></pre></div>
       <div class="codepane" data-lang="rust"><div class="paneflag">Rust</div><pre><code class="language-rust">// Тот же принцип типом: LLM-текст входит в систему только через парсер
 pub struct LlmRaw(String);                          // недоверенный
 
@@ -1339,7 +1680,7 @@ impl LlmRaw { pub fn parse(self) -&gt; Result&lt;Action, Rejected&gt; { ... } }<
     </figure>
   </article>
 
-  <article class="principle" id="p49">
+  <article class="principle" id="p49" data-keywords="agent least privilege tool use sandbox capability code execution">
     <div class="p-head"><span class="p-num">49</span><h3>Least privilege для агентов / sandbox для tool use</h3><a class="anchor" href="#p49">#</a></div>
     <p class="lede">Агент получает узкий набор инструментов под задачу, а не «весь API». Инструменты с побочными эффектами разделены по уровням риска.</p>
     <figure class="code" data-multi>
@@ -1358,7 +1699,7 @@ sandbox: { network: none, fs: readonly-except:/tmp, timeout: 30s, memory: 512Mi 
     </figure>
   </article>
 
-  <article class="principle" id="p50">
+  <article class="principle" id="p50" data-keywords="human in the loop approval irreversible action one way door agent">
     <div class="p-head"><span class="p-num">50</span><h3>Human-in-the-loop для необратимых действий</h3><a class="anchor" href="#p50">#</a></div>
     <p class="lede">One-way doors (платёж, удаление, отправка письма клиенту) требуют подтверждения; two-way doors (черновик, поиск) — нет. Это принцип reversible/irreversible decisions, применённый к агентам.</p>
     <figure class="code">
@@ -1370,7 +1711,7 @@ record Irreversible(Action a, Justification j) implements AgentAction {}
     </figure>
   </article>
 
-  <article class="principle" id="p51">
+  <article class="principle" id="p51" data-keywords="eval driven development golden set llm as judge regression prompt ci">
     <div class="p-head"><span class="p-num">51</span><h3>Eval-driven development</h3><a class="anchor" href="#p51">#</a></div>
     <p class="lede">Evals — это тесты для недетерминированного компонента. Без evals замена промпта/модели — вслепую. Иерархия по цене: assertion-based → golden set + метрики → LLM-as-judge (сам нуждается в калибровке против человеческой разметки).</p>
     <figure class="code">
@@ -1391,20 +1732,21 @@ def eval_extraction(case: Case) -&gt; Score:
     </figure>
   </article>
 
-  <article class="principle" id="p52">
+  <article class="principle" id="p52" data-keywords="prompt versioning model pinning alias snapshot changelog rollback">
     <div class="p-head"><span class="p-num">52</span><h3>Промпты, схемы и конфиг модели — версионируемые артефакты</h3><a class="anchor" href="#p52">#</a></div>
     <p class="lede">Промпт = код: ревью, версия, changelog, откат. Модель пиннится точной версией — <code>gpt-x-latest</code> в проде — это unpinned dependency (Hyrum's law для моделей: поведение любой версии — наблюдаемый контракт, смена версии — breaking change до доказательства обратного).</p>
     <figure class="code">
       <div class="langbar"><span class="langlabel">prompts/invoice_extract/v3.yaml</span><span class="grow"></span><button class="copy">копировать</button></div>
       <pre><code class="language-yaml"># рядом golden set и eval-результаты
-model: claude-sonnet-4-6            # точная версия, не alias
+model: claude-haiku-4-5-20251001    # датированный snapshot; claude-haiku-4-5 —
+                                    # алиас семейства, то есть unpinned dependency
 temperature: 0
 prompt_sha: 8f3ab2
 eval_baseline: { schema_ok: 0.998, amounts_ok: 0.974 }   # ниже — деплой блокируется</code></pre>
     </figure>
   </article>
 
-  <article class="principle" id="p53">
+  <article class="principle" id="p53" data-keywords="structured output json schema constrained decoding function calling stringly typed">
     <div class="p-head"><span class="p-num">53</span><h3>Structured outputs / schema-constrained generation</h3><a class="anchor" href="#p53">#</a></div>
     <p class="lede">Свободный текст между машинными компонентами — это stringly-typed интерфейс. Схема задаётся генерации, выход валидируется всё равно (двойной контроль).</p>
     <figure class="code" data-multi>
@@ -1428,7 +1770,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
     </figure>
   </article>
 
-  <article class="principle" id="p54">
+  <article class="principle" id="p54" data-keywords="determinism golden traces fixtures llm boundary side effect">
     <div class="p-head"><span class="p-num">54</span><h3>Недетерминизм огорожен, не размазан</h3><a class="anchor" href="#p54">#</a></div>
     <p class="lede">Тот же functional core, imperative shell: LLM-вызов — это I/O-эффект оболочки. Ядро (парсинг, маршрутизация, бизнес-правила) остаётся детерминированным и тестируется без модели.</p>
     <figure class="code">
@@ -1440,7 +1782,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
     </figure>
   </article>
 
-  <article class="principle" id="p55">
+  <article class="principle" id="p55" data-keywords="graceful degradation fallback cascade semantic cache budget circuit breaker llm">
     <div class="p-head"><span class="p-num">55</span><h3>Graceful degradation / fallback-каскад</h3><a class="anchor" href="#p55">#</a></div>
     <p class="lede">Модель — зависимость с нетривиальным SLA и стоимостью. Каскад: кэш → дешёвая модель → дорогая модель → правило/шаблон → честный отказ. Circuit breaker и бюджеты (токены/латентность/деньги) — те же принципы из раздела IV, применённые к новому виду зависимости.</p>
     <figure class="code">
@@ -1454,7 +1796,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
     </figure>
   </article>
 
-  <article class="principle" id="p56">
+  <article class="principle" id="p56" data-keywords="grounding rag citation retrieved chunk hallucination uncited">
     <div class="p-head"><span class="p-num">56</span><h3>Grounding: утверждения привязаны к источникам</h3><a class="anchor" href="#p56">#</a></div>
     <p class="lede">RAG-ответ без ссылки на извлечённый фрагмент — непроверяемое утверждение. Контракт: каждый факт цитирует retrieved chunk; отсутствие поддержки → «не знаю» дешевле галлюцинации.</p>
     <figure class="code">
@@ -1470,13 +1812,13 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
     </figure>
   </article>
 
-  <article class="principle" id="p57">
+  <article class="principle" id="p57" data-keywords="llm observability tokens cost latency prompt sha drift span">
     <div class="p-head"><span class="p-num">57</span><h3>Наблюдаемость LLM-пайплайнов</h3><a class="anchor" href="#p57">#</a></div>
     <p class="lede">Токены, стоимость, латентность, версия промпта и модели — в каждом trace-span; полные вход/выход сэмплируются в хранилище для отладки (с учётом PII-политики). Дрейф качества ловится непрерывными evals на проде, не жалобами пользователей.</p>
     <figure class="code">
       <div class="langbar"><span class="langlabel">Go · OpenTelemetry</span><span class="grow"></span><button class="copy">копировать</button></div>
       <pre><code class="language-go">span.SetAttributes(
-    attribute.String("llm.model", "claude-sonnet-4-6"),
+    attribute.String("llm.model", "claude-haiku-4-5-20251001"),
     attribute.String("llm.prompt_sha", promptSHA),
     attribute.Int("llm.tokens_in", usage.In), attribute.Int("llm.tokens_out", usage.Out),
     attribute.Float64("llm.cost_usd", cost), attribute.Bool("llm.cache_hit", hit),
@@ -1484,7 +1826,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
     </figure>
   </article>
 
-  <article class="principle" id="p58">
+  <article class="principle" id="p58" data-keywords="data versioning lineage dvc lakefs iceberg embedding reindex data-centric">
     <div class="p-head"><span class="p-num">58</span><h3>Данные и их происхождение — под версионным контролем</h3><a class="anchor" href="#p58">#</a></div>
     <p class="lede">Data-centric подход: качество системы чаще ограничено данными, чем моделью. Датасеты и эмбеддинг-индексы версионируются (DVC / lakeFS / Iceberg snapshots), lineage прослеживается: какой индекс, из каких документов, каким чанкером, какой моделью эмбеддингов.</p>
     <p class="note">Смена embedding-модели = полная переиндексация = migration с expand-contract, не in-place.</p>
@@ -1492,24 +1834,24 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
 
   <h3 class="subhead">B · Инженерия с AI-ассистентами</h3>
 
-  <article class="principle" id="p59">
+  <article class="principle" id="p59" data-keywords="code review bottleneck verification generation diff size accountability">
     <div class="p-head"><span class="p-num">59</span><h3>Ревью — узкое место; генерация дешева, верификация дорога</h3><a class="anchor" href="#p59">#</a></div>
     <p class="lede">Стоимость сместилась: написать код почти бесплатно, проверить — нет.</p>
     <p>Следствия: маленькие диффы (ревьюабельность важнее скорости генерации), запрет на PR больше, чем ревьюер способен честно прочитать, и ответственность автора не делегируется — «модель написала» не оправдание в постмортеме.</p>
   </article>
 
-  <article class="principle" id="p60">
+  <article class="principle" id="p60" data-keywords="types as specification strict mypy compiler feedback loop generated tests">
     <div class="p-head"><span class="p-num">60</span><h3>Тесты и типы — спецификация для генератора</h3><a class="anchor" href="#p60">#</a></div>
     <p class="lede">Чем строже типы и контракты, тем меньше степеней свободы у генерации ошибиться: Rust / строгий mypy дают ассистенту компилятор как немедленный фидбек-луп.</p>
     <p>Тесты пишутся и ревьюятся человеком с особой тщательностью — сгенерированный тест, подогнанный под сгенерированный баг, зелёный и бесполезен.</p>
   </article>
 
-  <article class="principle" id="p61">
+  <article class="principle" id="p61" data-keywords="chesterton fence ai generated code understanding debt">
     <div class="p-head"><span class="p-num">61</span><h3>Chesterton's Fence в обе стороны</h3><a class="anchor" href="#p61">#</a></div>
     <p class="lede">Ассистент не удаляет непонятый код — и человек не принимает непонятый сгенерированный код. «Работает, но не знаю почему» — это накопление кода, у которого никогда не было понимавшего его автора; долг нового типа.</p>
   </article>
 
-  <article class="principle" id="p62">
+  <article class="principle" id="p62" data-keywords="context engineering claude.md conventions repo structure readme retrieval">
     <div class="p-head"><span class="p-num">62</span><h3>Контекст — управляемый ресурс</h3><a class="anchor" href="#p62">#</a></div>
     <p class="lede">Качество генерации = качество контекста.</p>
     <p>Практики: <code>CLAUDE.md</code> / conventions-файлы в репозитории (соглашения проекта как машиночитаемый артефакт), структура репо, дружественная извлечению (маленькие файлы, говорящие имена), актуальные README у модулей. Документация впервые получила потребителя, который её реально читает.</p>
@@ -1518,7 +1860,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
 
 <!-- ============================ X ============================ -->
 <section class="section" id="s10" data-always="1">
-  <div class="section-head"><span class="numeral">X</span><h2>Сводная таблица конфликтов</h2></div>
+  <div class="section-head"><span class="numeral">XI</span><h2>Сводная таблица конфликтов</h2></div>
   <p class="section-lede">Принципы — эвристики с областью применимости, не аксиомы. Известные пары противоречий:</p>
   <div class="tablewrap">
     <table>
@@ -1532,6 +1874,15 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
         <tr><td>Postel ↔ эволюция схем</td><td>Строгость на внешней границе, толерантность к новым полям на внутренних контрактах</td></tr>
         <tr><td>Backpressure ↔ availability</td><td>Load shedding — тоже availability, но честная</td></tr>
         <tr><td>HITL ↔ автономность агентов</td><td>Порог по обратимости действия, не по «уверенности» модели</td></tr>
+        <tr><td>Linearizability ↔ latency/availability (PACELC)</td><td>Линеаризуемость только для инвариантов (деньги, уникальность); остальное — session guarantees</td></tr>
+        <tr><td>Кэш ↔ консистентность</td><td>TTL = задокументированный staleness budget, выведенный из бизнес-требования</td></tr>
+        <tr><td>Saga ↔ изоляция</td><td>Семантические локи и pending-состояния; компенсация — новый факт, не rollback</td></tr>
+        <tr><td>Feature flags ↔ local reasoning</td><td>Removal date в декларации флага; удаление — часть DoD</td></tr>
+        <tr><td>Canary ↔ миграции схем</td><td>Expand — migrate — contract обязателен: две версии кода живут одновременно всегда</td></tr>
+        <tr><td>Outbox ↔ latency записи</td><td>Outbox добавляет строку в транзакцию — это цена корректности; CDC с WAL, если и она велика</td></tr>
+        <tr><td>Chaos engineering ↔ error budget</td><td>Chaos тратит бюджет осознанно и останавливается при его исчерпании</td></tr>
+        <tr><td>Boring technology ↔ mechanical sympathy</td><td>Innovation token тратится по измеренному профилю, не по докладу</td></tr>
+        <tr><td>Contract testing ↔ скорость провайдера</td><td>Провайдер получает право ломать то, что ни один контракт не использует, — это ускорение, не тормоз</td></tr>
       </tbody>
     </table>
   </div>
@@ -1540,8 +1891,8 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
 </section>
 
 <footer class="footer">
-  <span>Справочник · 62 принципа</span>
-  <span>Java 21+ · Rust · Go · Python 3.12+</span>
+  <span>Справочник · 78 принципов</span>
+  <span>Java · Rust · Go · Python 3.12+</span>
   <span><a href="https://github.com/nikolay-e/learning">Исходники на GitHub</a></span>
 </footer>
 
