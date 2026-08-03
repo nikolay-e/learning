@@ -6,7 +6,7 @@
 <title>Принципы программной инженерии: от SOLID до AI-эры</title>
 <meta name="description" content="Справочник принципов программной инженерии с примерами на Java, Rust, Go и Python 3.12+ — от SOLID и parse-don't-validate до распределённых данных и систем с LLM внутри.">
 <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры">
-<meta property="og:description" content="78 принципов, сгруппированных по осям, с примерами на четырёх языках и таблицей конфликтов между ними.">
+<meta property="og:description" content="87 принципов, сгруппированных по осям, с примерами на четырёх языках и таблицей конфликтов между ними.">
 <meta property="og:type" content="article">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230e1116'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='monospace' fill='%23e0a458'>&#8721;</text></svg>">
@@ -70,6 +70,8 @@
       <li data-for="p72"><a href="#p72"><span class="rail-num">72</span> Деплой ≠ релиз</a></li>
       <li data-for="p73"><a href="#p73"><span class="rail-num">73</span> Strangler Fig</a></li>
       <li data-for="p74"><a href="#p74"><span class="rail-num">74</span> Contract testing</a></li>
+      <li data-for="p86"><a href="#p86"><span class="rail-num">86</span> IaC: plan как ревью</a></li>
+      <li data-for="p87"><a href="#p87"><span class="rail-num">87</span> Миграция как продукт</a></li>
     </ol>
   </div>
   <div class="rail-group" data-for="s4">
@@ -99,8 +101,17 @@
       <li data-for="p71"><a href="#p71"><span class="rail-num">71</span> Cache stampede</a></li>
     </ol>
   </div>
+  <div class="rail-group" data-for="s12">
+    <a href="#s12">VI · Стриминг и пайплайны</a>
+    <ol>
+      <li data-for="p79"><a href="#p79"><span class="rail-num">79</span> Event time и watermark</a></li>
+      <li data-for="p80"><a href="#p80"><span class="rail-num">80</span> Design for replay</a></li>
+      <li data-for="p81"><a href="#p81"><span class="rail-num">81</span> Poison pill и DLQ</a></li>
+      <li data-for="p82"><a href="#p82"><span class="rail-num">82</span> State и его эволюция</a></li>
+    </ol>
+  </div>
   <div class="rail-group" data-for="s5">
-    <a href="#s5">VI · Наблюдаемость</a>
+    <a href="#s5">VII · Наблюдаемость</a>
     <ol>
       <li data-for="p28"><a href="#p28"><span class="rail-num">28</span> Observability ≠ мониторинг</a></li>
       <li data-for="p29"><a href="#p29"><span class="rail-num">29</span> Trace ID сквозь границы</a></li>
@@ -109,7 +120,7 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s6">
-    <a href="#s6">VII · Безопасность и доверие</a>
+    <a href="#s6">VIII · Безопасность и доверие</a>
     <ol>
       <li data-for="p32"><a href="#p32"><span class="rail-num">32</span> Trust boundaries</a></li>
       <li data-for="p33"><a href="#p33"><span class="rail-num">33</span> Least privilege</a></li>
@@ -119,7 +130,7 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s7">
-    <a href="#s7">VIII · Эмпирика вместо вкуса</a>
+    <a href="#s7">IX · Эмпирика вместо вкуса</a>
     <ol>
       <li data-for="p37"><a href="#p37"><span class="rail-num">37</span> Измерь, потом оптимизируй</a></li>
       <li data-for="p38"><a href="#p38"><span class="rail-num">38</span> Amdahl / USL</a></li>
@@ -128,7 +139,7 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s8">
-    <a href="#s8">IX · Простота и экономика</a>
+    <a href="#s8">X · Простота и экономика</a>
     <ol>
       <li data-for="p40"><a href="#p40"><span class="rail-num">40</span> Essential vs accidental</a></li>
       <li data-for="p41"><a href="#p41"><span class="rail-num">41</span> Gall's Law</a></li>
@@ -142,8 +153,16 @@
       <li data-for="p76"><a href="#p76"><span class="rail-num">76</span> Brooks's Law</a></li>
     </ol>
   </div>
+  <div class="rail-group" data-for="s13">
+    <a href="#s13">XI · Платформа как продукт</a>
+    <ol>
+      <li data-for="p83"><a href="#p83"><span class="rail-num">83</span> Герметичная сборка</a></li>
+      <li data-for="p84"><a href="#p84"><span class="rail-num">84</span> Trunk-based</a></li>
+      <li data-for="p85"><a href="#p85"><span class="rail-num">85</span> Paved road</a></li>
+    </ol>
+  </div>
   <div class="rail-group" data-for="s9">
-    <a href="#s9">X · Принципы AI-эры</a>
+    <a href="#s9">XII · Принципы AI-эры</a>
     <ol>
       <li data-for="p48"><a href="#p48"><span class="rail-num">48</span> LLM-выход — недоверенный вход</a></li>
       <li data-for="p49"><a href="#p49"><span class="rail-num">49</span> Least privilege для агентов</a></li>
@@ -163,17 +182,17 @@
     </ol>
   </div>
   <div class="rail-group" data-for="s10">
-    <a href="#s10">XI · Таблица конфликтов</a>
+    <a href="#s10">XIII · Таблица конфликтов</a>
   </div>
 </nav>
 
 <main class="main">
 
 <div class="hero">
-  <div class="eyebrow">Справочник · 78 принципов · 4 языка</div>
+  <div class="eyebrow">Справочник · 87 принципов · 4 языка</div>
   <h1>Принципы программной инженерии: от SOLID до AI-эры</h1>
   <p>Примеры на современной Java, Rust, Go и Python (3.12+). Принципы сгруппированы по осям; для код-уровневых даны примеры на всех четырёх языках, для архитектурных — представительный пример. Версия рантайма указана на панели там, где API от неё зависит.</p>
-  <p>Принципы — эвристики с областью применимости, а не аксиомы. Раздел XI перечисляет известные пары, которые противоречат друг другу, и способ разрешения. Номера принципов — стабильные идентификаторы: новые дописываются в конец нумерации и встают в тематический раздел, поэтому внутри раздела порядок номеров не сплошной.</p>
+  <p>Принципы — эвристики с областью применимости, а не аксиомы. <a href="#s10">Раздел XIII</a> перечисляет известные пары, которые противоречат друг другу, и способ разрешения. Номера принципов — стабильные идентификаторы: новые дописываются в конец нумерации и встают в тематический раздел, поэтому внутри раздела порядок номеров не сплошной.</p>
   <p>Скоуп — технические и инженерно-экономические принципы. Организационные практики (постмортемы, paved roads, политика депрекации) намеренно за рамками; исключение — те, что напрямую формируют архитектуру или скоуп: <a href="#p15">15</a> и <a href="#p76">76</a>.</p>
   <div class="chips">
     <span class="chip">Java</span>
@@ -914,6 +933,44 @@ pact.given("invoice 42 exists") \
     </figure>
     <p class="note">Контракты проверяют структуру, не поведение — они дополняют, а не заменяют тесты провайдера. Схема-реестр (protobuf + compatibility checks, <a href="#p18">18</a>) — то же самое для событий; contract testing — для границ, где реестра нет (REST/JSON).</p>
   </article>
+
+  <article class="principle" id="p86" data-keywords="infrastructure as code terraform plan state drift detection moved block prevent_destroy immutable infrastructure cattle pets">
+    <div class="p-head"><span class="p-num">86</span><h3>IaC: желаемое состояние + plan как ревью; state — БД с one-way doors</h3><a class="anchor" href="#p86">#</a></div>
+    <p class="lede">IaC — не «скрипты создания», а декларация желаемого состояния с обнаружимым дрифтом: ручное изменение в консоли — это расхождение кода и реальности, которое <code>plan</code> обязан показать, а процесс — запретить создавать. <code>terraform plan</code> — артефакт ревью наравне с диффом кода: ревьюится не HCL, а <em>план изменений</em> («destroy and recreate» на базе данных — вот что ищет ревьюер). State-файл — база данных со всеми последствиями: locking, бэкапы; переименование ресурса без <code>moved {}</code> = destroy/create — one-way door (<a href="#p20">20</a>), замаскированная под рефакторинг.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Terraform · HCL</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-plaintext"># рефакторинг без разрушения — moved-блок, а не «terraform понял по имени»
+moved {
+  from = aws_msk_cluster.kafka
+  to   = module.streaming.aws_msk_cluster.kafka
+}
+
+# инвариант в коде, а не в голове ревьюера
+lifecycle {
+  prevent_destroy = true   # на stateful-ресурсах; plan с их destroy падает в CI
+}</code></pre>
+    </figure>
+    <p class="note">Cattle, not pets — для compute; данные — всегда pet: immutable-инфраструктура означает «пересоздаём машины, <em>мигрируем</em> данные», и путаница этих двух — стандартный сценарий потери стейта. Drift detection — не аудит раз в квартал, а continuous (<code>plan</code> по крону с алертом на непустой дифф): дрифт, найденный через месяц, уже оброс зависимостями — Hyrum (<a href="#p16">16</a>) для инфраструктуры.</p>
+  </article>
+
+  <article class="principle" id="p87" data-keywords="migration dual run shadow compare cutover diff rate sunk cost миграция владелец отмена">
+    <div class="p-head"><span class="p-num">87</span><h3>Миграция — продукт с метриками, а не задача со сроком</h3><a class="anchor" href="#p87">#</a></div>
+    <p class="lede">Zero-downtime миграция (ID-схема, формат хранения, gitflow → trunk, платформа) — не «переключение», а конвейер: dual-run (обе системы работают) → shadow/compare (новая получает копию трафика, расхождения меряются) → постепенный cutover с обратимым роутингом → период соседства → contract (снос старого). Метрика прогресса публична (% трафика / сервисов / записей на новом пути), и — самое игнорируемое — у миграции есть <em>владелец до конца</em>: миграция, законченная на 90%, хуже неначатой, потому что теперь систем две навсегда.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Go · shadow-compare</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-go">// новая реализация получает трафик, но не право голоса
+func (m *Migrator) Get(ctx context.Context, id UserID) (User, error) {
+    old, err := m.legacy.Get(ctx, id)
+    go func() { // теневой вызов вне критического пути
+        nu, nerr := m.next.Get(shadowCtx(ctx), id)
+        m.compare.Record(id, old, err, nu, nerr) // расхождения → метрика, не паника
+    }()
+    return old, err // источник правды пока старый; cutover — когда diff-rate &lt; порога
+                    // N дней подряд, и это число записано ДО начала
+}</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Организационные миграции (gitflow → trunk, monorepo, платформа) подчиняются той же механике, что и технические: dual-run = обе модели разрешены, cutover = новые сервисы только на новой, contract = старая выключена <em>датой</em>, объявленной заранее. «Добровольно и бессрочно» — это не миграция, а вечное удвоение поддержки. Критерий отмены тоже пишется до старта: миграция без условия «когда мы откатываемся» — ловушка sunk cost в производственном масштабе.</p>
+  </article>
 </section>
 
 <!-- ============================ IV ============================ -->
@@ -1085,7 +1142,7 @@ method: [{ action: kill-pod, selector: "app=kafka, broker=2" }]
 rollback: automatic          # abort при выходе за threshold
 blast_radius: cell-eu-1      # одна ячейка, не флот</code></pre>
     </figure>
-    <p class="note"><strong>Честная оценка.</strong> Chaos без наблюдаемости (раздел VI) — вандализм: если не можете ответить «что сломалось», нечего и ломать. Порядок строгий: сначала SLO и трейсинг, потом инъекции. Game days на стейджинге — легитимная первая ступень, но не конечная.</p>
+    <p class="note"><strong>Честная оценка.</strong> Chaos без <a href="#s5">наблюдаемости</a> — вандализм: если не можете ответить «что сломалось», нечего и ломать. Порядок строгий: сначала SLO и трейсинг, потом инъекции. Game days на стейджинге — легитимная первая ступень, но не конечная.</p>
   </article>
 </section>
 
@@ -1299,8 +1356,101 @@ def should_refresh(expires_at: float, delta: float, beta: float = 1.0) -&gt; boo
 </section>
 
 <!-- ============================ VI ============================ -->
+<section class="section" id="s12">
+  <div class="section-head"><span class="numeral">VI</span><h2>Стриминг и пайплайны данных</h2></div>
+
+  <article class="principle" id="p79" data-keywords="event time processing time watermark late data flink windowing allowed lateness retract">
+    <div class="p-head"><span class="p-num">79</span><h3>Event time ≠ processing time; watermark — компромисс, а не техническая деталь</h3><a class="anchor" href="#p79">#</a></div>
+    <p class="lede">Время события и время обработки расходятся всегда: сеть, ретраи, офлайн-клиенты, replay. Watermark — это явное заявление «данные старше T считаем прибывшими», то есть выбор между полнотой и латентностью, который делает бизнес, а не фреймворк. Late data — нормальный режим, не ошибка: у каждого окна должна быть политика (drop / side output / retract-and-update), выбранная осознанно.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Java · Flink</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-java">// каждая константа здесь — бизнес-решение, не конфиг «по умолчанию»
+WatermarkStrategy.&lt;Event&gt;forBoundedOutOfOrderness(Duration.ofSeconds(30)) // латентность,
+    .withIdleness(Duration.ofMinutes(1));         // купленная за полноту: события,
+                                                  // опоздавшие &gt;30s, — «late»
+
+stream.keyBy(Event::customerId)
+    .window(TumblingEventTimeWindows.of(Time.minutes(5)))
+    .allowedLateness(Time.minutes(10))            // retract-and-update: даунстрим
+    .sideOutputLateData(lateTag)                  // ОБЯЗАН уметь принять исправление
+    .aggregate(new Revenue());
+
+// late data в side output — измеряется; рост % late = сдвиг реальности,
+// а не «шум»: чинить источник или пересматривать 30s</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> «Exactly-once event-time aggregation» не отменяет проблему: окно, закрытое watermark'ом, всё равно закрыто <em>по заявленному компромиссу</em>, и опоздавшее событие либо потеряно, либо порождает исправление. Даунстрим, не умеющий принимать retract'ы (append-only отчёт), молча фиксирует ложь — политика late data сквозная, до последнего потребителя.</p>
+  </article>
+
+  <article class="principle" id="p80" data-keywords="replay reprocessing kappa architecture determinism temporal join retention backfill репроцессинг">
+    <div class="p-head"><span class="p-num">80</span><h3>Design for replay: репроцессинг — штатная операция, не аврал</h3><a class="anchor" href="#p80">#</a></div>
+    <p class="lede">Баг в трансформации, новая колонка, испорченный интервал — история будет проигрываться заново, вопрос только в том, спроектировано это или будет изобретаться в 3 часа ночи. Требования по построению: трансформации детерминированы (никаких <code>now()</code>, <code>random()</code>, lookup'ов в мутабельные справочники без версии), sinks идемпотентны или транзакционны, позиция (offset / checkpoint) — first-class управляемый артефакт, retention источника ≥ горизонта replay.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="java">Java</button>
+        <button class="langtab" data-lang="go">Go</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="java"><div class="paneflag">Java</div><pre><code class="language-java">// враг replay — недетерминизм, спрятанный в трансформации
+
+// ПЛОХО:  enrich(event, dict.current())        // replay через месяц даст другой результат
+// ХОРОШО: enrich(event, dict.asOf(event.ts())) // temporal join по event time —
+//                                              // replay воспроизводит прошлое побайтово</code></pre></div>
+      <div class="codepane" data-lang="go"><div class="paneflag">Go</div><pre><code class="language-go">// replay-запрос как явный тип: границы, скорость, назначение
+type ReplayJob struct {
+    Source    TopicRange   // {topic, partitions, fromOffset/fromTs, toTs}
+    Transform VersionedRef // sha трансформации — какой код проигрывает
+    Sink      SinkRef      // тот же прод-топик ИЛИ теневой — решение явное
+    RateLimit TokenBucket  // replay не должен вытеснить live-трафик (bulkhead, 24)
+}</code></pre></div>
+    </figure>
+    <p class="note">Replay в <em>тот же</em> даунстрим требует, чтобы вся цепочка ниже была идемпотентна (<a href="#p22">22</a>, дедуп по event_id — <a href="#p21">21</a>); иначе replay в теневой sink, сравнение, cutover. Kappa-архитектура — это принцип replay, возведённый в архитектуру: batch = replay стрима. Следствие для retention: срок хранения топика — не стоимость диска, а страховой горизонт репроцессинга; резать его — решение уровня one-way door (<a href="#p20">20</a>).</p>
+  </article>
+
+  <article class="principle" id="p81" data-keywords="poison pill dead letter queue dlq re-drive partition stuck ordering отравленное сообщение">
+    <div class="p-head"><span class="p-num">81</span><h3>Poison pill не останавливает партицию; DLQ — обязательство, не мусорка</h3><a class="anchor" href="#p81">#</a></div>
+    <p class="lede">Один непарсящийся message в партиции при наивном consumer'е останавливает всю партицию навсегда (crash-loop на одном offset'е). Политика по построению: N попыток → dead letter с полным контекстом (исходный message, ошибка, offset, стектрейс, версия схемы) → партиция едет дальше. Но DLQ — очередь <em>необработанных обязательств</em>: у неё есть владелец, алерт на рост и процедура re-drive; DLQ без потребителя — это <code>/dev/null</code> с чистой совестью.</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Go</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-go">if err := process(msg); err != nil {
+    if !errors.Is(err, ErrTransient) || attempts(msg) &gt;= 3 {
+        dlq.Send(ctx, DeadLetter{
+            Original: msg.Raw, Topic: msg.Topic, Offset: msg.Offset,
+            Error: err.Error(), SchemaVer: msg.Header("schema"), FirstSeen: now,
+        })
+        consumer.Commit(msg) // партиция разблокирована — это и была цель
+        return nil
+    }
+    return err // transient → retry с backoff (24), offset не двигаем
+}</code></pre>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> DLQ ломает per-key ordering: если message N ушёл в DLQ, а N+1 того же ключа обработан, re-drive применит N <em>после</em> N+1. Для ordering-чувствительных ключей (балансы, статусы) корректная альтернатива — парковка всего ключа (pause key, не партицию) либо re-drive через полный replay ключа (<a href="#p80">80</a>). Выбор — по инварианту, и он должен быть записан.</p>
+  </article>
+
+  <article class="principle" id="p82" data-keywords="stateful streaming savepoint checkpoint state ttl operator uid schema evolution kryo rocksdb">
+    <div class="p-head"><span class="p-num">82</span><h3>State — самая дорогая часть стриминга; его схема планируется как схема БД</h3><a class="anchor" href="#p82">#</a></div>
+    <p class="lede">Stateless-оператор перезапускается бесплатно; stateful тащит за собой чекпойнты, savepoint-совместимость и миграции. State — это база данных, размазанная по джобу: у каждого оператора стабильный uid (иначе savepoint не восстановится после рефакторинга), у каждого state-типа — эволюционируемая сериализация (POJO/Avro, не Kryo по умолчанию), у каждого ключа — TTL или явное решение «живёт вечно» (иначе state растёт монотонно до OOM — Lehman, <a href="#p45">45</a>, в одном джобе).</p>
+    <figure class="code">
+      <div class="langbar"><span class="langlabel">Java · Flink</span><span class="grow"></span><button class="copy">копировать</button></div>
+      <pre><code class="language-java">// три решения, которые нельзя принять «потом»
+stream.keyBy(...)
+    .process(new Dedupe())
+    .uid("dedupe-v1");                      // 1. стабильный uid: переименование класса
+                                            //    не должно терять state
+
+StateTtlConfig ttl = StateTtlConfig         // 2. TTL — из бизнес-горизонта
+    .newBuilder(Duration.ofDays(7))         //    (дедуп-окно), не «пока влезает»
+    .cleanupInRocksdbCompactFilter(1000).build();
+
+// 3. тип state'а — POJO/Avro с явной эволюцией; Kryo generic = state,
+//    который нельзя изменить без полной пересборки из источника (= 80)</code></pre>
+    </figure>
+    <p class="note">Проверка перед каждым релизом джоба: «восстановится ли этот код из прошлого savepoint'а?» — это contract test (<a href="#p74">74</a>) между версиями самого себя. Если ответ «нет» — это миграция state'а со своим expand — migrate — contract, а не деплой.</p>
+  </article>
+</section>
+
+<!-- ============================ VII ============================ -->
 <section class="section" id="s5">
-  <div class="section-head"><span class="numeral">VI</span><h2>Наблюдаемость</h2></div>
+  <div class="section-head"><span class="numeral">VII</span><h2>Наблюдаемость</h2></div>
 
   <article class="principle" id="p28" data-keywords="observability wide structured events high cardinality unknown unknowns">
     <div class="p-head"><span class="p-num">28</span><h3>Observability ≠ мониторинг</h3><a class="anchor" href="#p28">#</a></div>
@@ -1392,7 +1542,7 @@ class DryRunExecutor:            # печатает план; логика ВЫ�
 
 <!-- ============================ VI ============================ -->
 <section class="section" id="s6">
-  <div class="section-head"><span class="numeral">VII</span><h2>Безопасность и доверие</h2></div>
+  <div class="section-head"><span class="numeral">VIII</span><h2>Безопасность и доверие</h2></div>
 
   <article class="principle" id="p32" data-keywords="trust boundary taint tracking sanitization untrusted input xss">
     <div class="p-head"><span class="p-num">32</span><h3>Trust boundaries явно; всё пересекающее границу — парсится</h3><a class="anchor" href="#p32">#</a></div>
@@ -1485,7 +1635,7 @@ vulnerability = "deny"</code></pre></div>
 
 <!-- ============================ VII ============================ -->
 <section class="section" id="s7">
-  <div class="section-head"><span class="numeral">VIII</span><h2>Эмпирика вместо вкуса</h2></div>
+  <div class="section-head"><span class="numeral">IX</span><h2>Эмпирика вместо вкуса</h2></div>
 
   <article class="principle" id="p37" data-keywords="premature optimization knuth jmh criterion pprof py-spy profiling benchmark">
     <div class="p-head"><span class="p-num">37</span><h3>Измерь, потом оптимизируй</h3><a class="anchor" href="#p37">#</a></div>
@@ -1560,7 +1710,7 @@ logger.Info("request_completed",
 
 <!-- ============================ VIII ============================ -->
 <section class="section" id="s8">
-  <div class="section-head"><span class="numeral">IX</span><h2>Простота и экономика</h2></div>
+  <div class="section-head"><span class="numeral">X</span><h2>Простота и экономика</h2></div>
 
   <article class="principle" id="p40" data-keywords="essential accidental complexity brooks no silver bullet">
     <div class="p-head"><span class="p-num">40</span><h3>Essential vs accidental complexity (Brooks)</h3><a class="anchor" href="#p40">#</a></div>
@@ -1638,9 +1788,52 @@ def add_item(item, bucket=None):        # ожидаемое поведение
   </article>
 </section>
 
-<!-- ============================ IX ============================ -->
+<!-- ============================ XI ============================ -->
+<section class="section" id="s13">
+  <div class="section-head"><span class="numeral">XI</span><h2>Платформа как продукт</h2></div>
+
+  <article class="principle" id="p83" data-keywords="hermetic build reproducible build cache key bazel nix gradle build avoidance toolchain">
+    <div class="p-head"><span class="p-num">83</span><h3>Герметичная сборка: кэш легален ровно настолько, насколько задекларированы входы</h3><a class="anchor" href="#p83">#</a></div>
+    <p class="lede">Сборка — чистая функция от объявленных входов; всё незадекларированное (системный toolchain, сеть, время, <code>latest</code>-теги) делает выход невоспроизводимым, а кэш — лотереей. Следствие, ради которого всё затевается: агрессивное кэширование (локальное, remote, build avoidance) корректно <em>только</em> при герметичности — cache hit по неполному ключу это тихая доставка stale-артефакта в прод.</p>
+    <figure class="code" data-multi>
+      <div class="langbar">
+        <button class="langtab" data-lang="kotlin">Gradle</button>
+        <button class="langtab" data-lang="bash">CI</button>
+        <span class="grow"></span><button class="copy">копировать</button>
+      </div>
+      <div class="codepane" data-lang="kotlin"><div class="paneflag">Gradle · Kotlin DSL</div><pre><code class="language-kotlin">// условия кэшируемости — те же условия герметичности
+tasks.register&lt;Test&gt;("integrationTest") {
+    inputs.files(configurations.runtimeClasspath).withNormalizer(ClasspathNormalizer::class)
+    inputs.property("jdk", java.toolchain.languageVersion)  // toolchain — вход, не среда
+    outputs.cacheIf { true }
+    // системное время, env-переменные, сеть — НЕ входы;
+    // тест, читающий их, либо декларирует, либо некэшируем
+}</code></pre></div>
+      <div class="codepane" data-lang="bash"><div class="paneflag">CI</div><pre><code class="language-bash"># проверка воспроизводимости — сама по себе тест в CI:
+# два билда с чистым кэшем на разных агентах → диффа артефактов быть не должно
+diff &lt;(sha256sum build-a/*.jar) &lt;(sha256sum build-b/*.jar)</code></pre></div>
+    </figure>
+    <p class="note"><strong>Честная оценка.</strong> Полная герметичность в стиле Bazel/Nix дорога; прагматичная граница — герметичность <em>ключа кэша</em>: всё, что влияет на выход, входит в ключ. Инцидент «работает локально, падает в CI» — почти всегда незадекларированный вход, найденный эмпирически; каждый такой — патч в декларацию, не в README.</p>
+  </article>
+
+  <article class="principle" id="p84" data-keywords="trunk based development long lived branch merge queue gitflow continuous integration feature flags ci speed">
+    <div class="p-head"><span class="p-num">84</span><h3>Trunk-based: долгоживущая ветка — это отложенная интеграция с процентами</h3><a class="anchor" href="#p84">#</a></div>
+    <p class="lede">Merge-конфликт не создаётся слиянием — он создаётся расхождением и лишь <em>обнаруживается</em> слиянием; сотни долгоживущих веток = организация, месяцами копящая необнаруженные конфликты. Trunk-based переворачивает: интеграция непрерывна, незавершённая работа прячется за флагами (<a href="#p72">72</a>), а не за ветками. Ветка живёт дни, не спринты.</p>
+    <p class="note">Механика, без которой trunk-based на 80+ сервисах разваливается: merge queue (батчи PR тестируются <em>в порядке будущего merge</em>, не против устаревшего main — иначе «зелёный PR, красный main» ежедневно) плюс required checks быстрее 10–15 минут: медленный CI воссоздаёт долгоживущие ветки экономически, потому что людям дорого интегрироваться часто. Флаги вместо веток переносят риск из «конфликт при merge» в flag debt (<a href="#p72">72</a>) — осознанный обмен, второе дешевле, потому что видимо.</p>
+    <p class="note">Кодом не выражается; выражается политикой репозитория и, главное, скоростью CI — trunk-based это в первую очередь SLO на билд.</p>
+  </article>
+
+  <article class="principle" id="p85" data-keywords="paved road platform engineering internal developer platform golden path adoption time to first deploy monoculture">
+    <div class="p-head"><span class="p-num">85</span><h3>Paved road: платформа — продукт с добровольным принятием</h3><a class="anchor" href="#p85">#</a></div>
+    <p class="lede">Внутренняя платформа, навязанная мандатом, получает malicious compliance; платформа-продукт выигрывает тем, что paved road <em>дешевле</em> обходного пути: онбординг за час, миграции — забота платформы, не команды. Отклонение легально, но с явной ценой: съехал с paved road — владеешь своим стеком сам, включая on-call и апгрейды. Метрика платформы — adoption и time-to-first-deploy, не количество фич.</p>
+    <p class="note"><strong>Честная оценка.</strong> Тёмная сторона paved road — платформа становится монокультурой: её баг — всеобщий баг (blast radius, <a href="#p27">27</a>; версионируйте платформу и раскатывайте её саму canary, <a href="#p72">72</a>, по командам-потребителям). И Conway (<a href="#p15">15</a>) во весь рост: платформенная команда, до которой нельзя дойти с вопросом, порождает обходные пути независимо от качества кода. Платформа без поддержки — это библиотека, а не продукт.</p>
+    <p class="note">Выражается структурой владения и SLA платформенной команды; в коде видна как «шаблон нового сервиса = один командный вызов».</p>
+  </article>
+</section>
+
+<!-- ============================ XII ============================ -->
 <section class="section" id="s9">
-  <div class="section-head"><span class="numeral">X</span><h2>Принципы AI-эры</h2></div>
+  <div class="section-head"><span class="numeral">XII</span><h2>Принципы AI-эры</h2></div>
   <p class="note">Два разных множества: <strong>(a)</strong> инженерия систем, содержащих LLM; <strong>(b)</strong> инженерия с помощью AI-ассистентов. Смешивать их — категориальная ошибка.</p>
 
   <h3 class="subhead">A · Системы с LLM внутри</h3>
@@ -1860,7 +2053,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
 
 <!-- ============================ X ============================ -->
 <section class="section" id="s10" data-always="1">
-  <div class="section-head"><span class="numeral">XI</span><h2>Сводная таблица конфликтов</h2></div>
+  <div class="section-head"><span class="numeral">XIII</span><h2>Сводная таблица конфликтов</h2></div>
   <p class="section-lede">Принципы — эвристики с областью применимости, не аксиомы. Известные пары противоречий:</p>
   <div class="tablewrap">
     <table>
@@ -1883,6 +2076,16 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
         <tr><td>Chaos engineering ↔ error budget</td><td>Chaos тратит бюджет осознанно и останавливается при его исчерпании</td></tr>
         <tr><td>Boring technology ↔ mechanical sympathy</td><td>Innovation token тратится по измеренному профилю, не по докладу</td></tr>
         <tr><td>Contract testing ↔ скорость провайдера</td><td>Провайдер получает право ломать то, что ни один контракт не использует, — это ускорение, не тормоз</td></tr>
+        <tr><td>Watermark: полнота ↔ латентность</td><td>Bounded out-of-orderness — из бизнес-требования; late data меряется и имеет политику до последнего потребителя</td></tr>
+        <tr><td>Replay ↔ побочные эффекты</td><td>Эффекты только за идемпотентным/транзакционным sink; иначе replay в теневой sink + сравнение</td></tr>
+        <tr><td>DLQ ↔ per-key ordering</td><td>Для ordering-чувствительных ключей — парковка ключа или re-drive через replay ключа, не сообщением</td></tr>
+        <tr><td>Retention как стоимость ↔ replay-горизонт</td><td>Retention = страховой горизонт репроцессинга; сокращение — one-way door с ADR</td></tr>
+        <tr><td>Кэш сборки ↔ корректность</td><td>Cache hit легален только при герметичном ключе; невоспроизводимость — баг, не особенность</td></tr>
+        <tr><td>Trunk-based ↔ незавершённые фичи</td><td>Флаги вместо веток: конфликт merge меняется на flag debt — видимый долг дешевле скрытого</td></tr>
+        <tr><td>Paved road ↔ автономия команд</td><td>Отклонение легально с полной ценой владения; платформа конкурирует удобством, не мандатом</td></tr>
+        <tr><td>Paved road ↔ blast radius</td><td>Монокультура платформы: версионирование и canary самой платформы по командам</td></tr>
+        <tr><td>Immutable infra ↔ stateful-системы</td><td>Машины — cattle, данные — pet: пересоздаём compute, мигрируем данные, не путаем</td></tr>
+        <tr><td>Shadow-run ↔ стоимость</td><td>Двойной прогон — временный, с датой cutover и порогом diff-rate, записанными до старта</td></tr>
       </tbody>
     </table>
   </div>
@@ -1891,7 +2094,7 @@ var invoice = mapper.readValue(llm.completeWithSchema(prompt, schemaOf(Invoice.c
 </section>
 
 <footer class="footer">
-  <span>Справочник · 78 принципов</span>
+  <span>Справочник · 87 принципов</span>
   <span>Java · Rust · Go · Python 3.12+</span>
   <span><a href="https://github.com/nikolay-e/learning">Исходники на GitHub</a></span>
 </footer>
