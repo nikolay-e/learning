@@ -37,6 +37,18 @@ gh api repos/nikolay-e/learning/pages/builds/latest --jq '{status,commit,error:.
 `commit` must equal `git rev-parse HEAD`. Two workflows fire per push — `ci` (ours) and
 `pages-build-deployment` (GitHub's). A green `ci` does not mean the page shipped; check both.
 
+That API endpoint lags: it kept reporting the previous SHA for minutes after
+`pages-build-deployment` had already finished green for the new one. The workflow run is the
+authoritative signal, the endpoint is not — cross-check with
+
+```bash
+gh run list --workflow=pages-build-deployment --limit 3 \
+  --json status,conclusion,headSha --jq '.[]|"\(.status) \(.conclusion) \(.headSha[0:7])"'
+```
+
+and confirm against the served bytes (`curl` the page and grep for something the new commit
+introduced) before concluding the deploy is stuck.
+
 ## Production verification
 
 Anything asserting against production must use the **trailing slash**:
