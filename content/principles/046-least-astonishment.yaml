@@ -3,7 +3,8 @@ slug: least-astonishment
 title: Least Astonishment
 nav_label: Least Astonishment
 section: s8
-keywords: principle of least astonishment surprise pola mutable default argument deref
+keywords: principle of least astonishment surprise pola mutable default argument deref typed nil
+  equals hashcode
 blocks:
   - type: lede
     html: 'Мера удивления — не вкус автора, а сложившаяся идиома языка и окружающего кода: удивляет
@@ -20,6 +21,35 @@ blocks:
           "# Классика нарушения — мутабельный дефолт\ndef add_item(item, bucket=[]): ...      # bucket\
           \ разделяется между вызовами\n\ndef add_item(item, bucket=None):        # ожидаемое поведение\n\
           \    bucket = bucket if bucket is not None else []"
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code: |-
+          // equals без hashCode: объект кладётся в HashSet и «пропадает» из него
+          class Money {
+              @Override public boolean equals(Object o) { ... } // hashCode — от Object
+          }
+          // set.add(new Money(5)); set.contains(new Money(5)) → false
+
+          // record генерирует equals и hashCode вместе и не даёт им разойтись
+          record Money(long cents, Currency currency) {}
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: |-
+          // nil-указатель в интерфейсе — не nil-интерфейс: у интерфейса два поля,
+          // тип и значение, и непустой тип делает его непустым целиком
+          func find() *MyErr { return nil }
+
+          var err error = find() // тип *MyErr, значение nil
+          if err != nil {        // истина — и это удивляет каждого второго
+              log.Print("ошибка, которой нет")
+          }
+
+          // НОРМА: наружу возвращается error, а не конкретный тип ошибки
+          func find() error { return nil } // здесь err == nil, как и ожидается
       - lang: rust
         tab: Rust
         label: Rust

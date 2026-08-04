@@ -46,3 +46,18 @@ blocks:
         code: "// Идиома: per-P шардированные счётчики + padding
 
           type shard struct { n atomic.Uint64; _ [56]byte } // добивка до 64B"
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code: |-
+          # В CPython доминирует не строка кэша, а сам интерпретаторный цикл,
+          # поэтому механическая симпатия здесь — унести цикл из Python в C
+          total = sum(row.price for row in rows)        # ~10**6 шагов интерпретатора
+
+          prices = np.frombuffer(buf, dtype=np.int64)   # тот же расчёт одним вызовом:
+          total = int(prices.sum())                     # цикл и векторизация внутри C
+
+          # без зависимостей то же делает memoryview:
+          # срез bytes копирует, срез memoryview — нет
+          window = memoryview(buf)[offset:offset + size]

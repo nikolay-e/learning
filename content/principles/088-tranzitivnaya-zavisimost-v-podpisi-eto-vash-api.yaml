@@ -1,0 +1,98 @@
+id: 88
+slug: tranzitivnaya-zavisimost-v-podpisi-eto-vash-api
+title: Транзитивная зависимость в подписи — это ваш API
+nav_label: Транзитивные зависимости в API
+section: s2
+keywords: transitive dependency re-export requires transitive pub use module-info opens services
+  serviceloader api surface leaky abstraction newtype
+blocks:
+  - type: lede
+    html: 'Тип из чужой библиотеки, попавший в вашу публичную сигнатуру, становится вашим контрактом:
+      потребитель компилируется против него, и ваш апгрейд этой библиотеки — его breaking change.
+      Утечка бесшумна, потому что ни один компилятор не спрашивает «вы правда хотите предъявить это
+      наружу» — по закону Хайрама (<a href="#p16">16</a>) ответ выясняется, когда ломать уже поздно.'
+  - type: text
+    html: 'Проверка механическая: выпишите все типы, упомянутые в публичной поверхности модуля. Всё,
+      чего нет в вашем коде, — чужой контракт, который вы молча взяли на поддержку. Дальше выбор
+      из трёх, и он должен быть осознанным: обернуть чужой тип в свой (тогда зависимость остаётся
+      секретом, <a href="#p12">12</a>), объявить транзитивность явно и признать её частью API, либо
+      убрать тип из сигнатуры. Худший вариант — четвёртый, по умолчанию: не выбрать ничего.'
+  - type: code
+    panes:
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code: |-
+          module billing.api {
+              // нужна мне, невидима потребителю: деталь реализации
+              requires com.fasterxml.jackson.databind;
+
+              // тип из billing.model встречается в моих публичных сигнатурах,
+              // поэтому потребитель обязан его видеть. transitive — это признание:
+              // «совместимость billing.model теперь моя забота»
+              requires transitive billing.model;
+
+              exports com.acme.billing.api;
+              exports com.acme.billing.spi to billing.plugins;  // адресный экспорт
+
+              // рефлексия выдаётся точечно и поимённо, а не всем желающим
+              opens com.acme.billing.dto to com.fasterxml.jackson.databind;
+
+              // точка расширения объявлена, а не найдена сканированием classpath
+              uses com.acme.billing.spi.TaxProvider;
+              provides com.acme.billing.spi.TaxProvider with com.acme.billing.tax.DeTaxProvider;
+          }
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code: |-
+          // pub use — тот же приём и та же цена: чужой тип становится вашим API,
+          // и major-бамп chrono превращается в major-бамп вашего крейта
+          pub use chrono::NaiveDate;
+
+          // граница вместо утечки: newtype оставляет chrono деталью реализации
+          pub struct SettlementDate(NaiveDate);
+
+          // pub-поле pub-структуры — тоже контракт; non_exhaustive сохраняет
+          // право добавлять поля, не ломая потребителей
+          #[non_exhaustive]
+          pub struct Settlement { pub date: SettlementDate }
+      - lang: go
+        tab: Go
+        label: Go
+        highlight: go
+        code: |-
+          // в Go нет ни requires transitive, ни re-export: транзитивность
+          // утекает через подпись — единственное место, где её вообще видно
+          func Charge(ctx context.Context, id string) (*pq.Error, error) // потребитель
+                                    // обязан импортировать lib/pq, чтобы разобрать ошибку
+
+          // граница: чужая ошибка заворачивается в свою, контракт — errors.Is
+          var ErrDuplicate = errors.New("billing: duplicate charge")
+
+          func Charge(ctx context.Context, id string) error {
+              if err := insert(ctx, id); isUniqueViolation(err) {
+                  return fmt.Errorf("charge %s: %w", id, ErrDuplicate) // lib/pq внутри
+              }
+              return nil
+          }
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code: |-
+          # то же обязательство, только объявляется соглашением, а не компилятором
+          from ._settlement import Settlement
+          from ._vendor_client import Client as Client  # избыточный алиас = «это API» (PEP 484)
+
+          # второй, более явный слой того же заявления: Client обещан наружу,
+          # значит апгрейд вендора — наш breaking change, а не его
+          __all__ = ["Settlement", "Client"]
+  - type: note
+    html: 'Обратная сторона того же принципа — точки расширения. <code>uses</code>/<code>provides</code>
+      объявляют услугу в контракте модуля вместо сканирования classpath на старте: реализация
+      подставляется поздно, но сам факт расширяемости объявлен рано и виден в артефакте. Тот же выбор
+      возникает везде, где есть плагины: набор точек расширения — часть публичной поверхности,
+      и добавить их дешевле, чем убрать.'

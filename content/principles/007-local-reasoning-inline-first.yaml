@@ -11,23 +11,62 @@ blocks:
       повторении, не на первом. Интерфейс с одной реализацией — минус к навигации без плюса к гибкости."
   - type: code
     panes:
-      - lang: null
-        tab: null
+      - lang: go
+        tab: Go
         label: Go
         highlight: go
-        code:
-          '// Go-сообщество формулирует это явно: "accept interfaces, return structs",
-
+        code: |-
+          // Go-сообщество формулирует это явно: "accept interfaces, return structs" —
           // интерфейс объявляется у потребителя и только когда реализаций >= 2
 
+          // АНТИПАТТЕРН: интерфейс с единственной реализацией — две точки чтения
+          type UserService interface {
+              QueryUser(ctx context.Context, id UserID) (User, error)
+          }
+          type userServiceImpl struct{ db *sql.DB }
 
-          // АНТИПАТТЕРН:              // НОРМА:
+          // НОРМА: прямой вызов, одна точка чтения
+          func (h *Handler) route(ctx context.Context, id UserID) (User, error) {
+              return h.db.QueryUser(ctx, id)
+          }
+      - lang: java
+        tab: Java
+        label: Java
+        highlight: java
+        code: |-
+          // АНТИПАТТЕРН: интерфейс с ровно одной реализацией и одним вызывающим —
+          // +1 файл, +1 прыжок при чтении, ноль подменяемости на практике
+          public interface UserService { User find(UserId id); }
+          public final class UserServiceImpl implements UserService { ... }
 
-          type UserService interface{} // func (h *Handler) route(...) { h.db.QueryUser(...) }
+          // НОРМА: класс вызывается напрямую. Интерфейс появится, когда появится
+          // вторая реализация — или на границе I/O, где его требует тест (5)
+          public final class UserService { public User find(UserId id) { ... } }
+      - lang: rust
+        tab: Rust
+        label: Rust
+        highlight: rust
+        code: |-
+          // АНТИПАТТЕРН: dyn ради единственной реализации — косвенный вызов
+          // в рантайме и прыжок по файлам при чтении
+          struct Handler { store: Box<dyn Store> }
 
-          // + UserServiceImpl         // прямой вызов, одна точка чтения'
-  - type: text
-    html:
-      "Остальные языки — тот же принцип без синтаксиса: в Java не заводить <code>interface XService</code>
-      + <code>XServiceImpl</code>; в Rust не прятать единственную реализацию за <code>dyn Trait</code>;
-      в Python не строить иерархию ABC ради одного класса."
+          // НОРМА: конкретный тип, пока реализация одна. Появится вторая —
+          // generic: мономорфизация даёт гибкость, не беря за неё в рантайме
+          struct Handler { store: PostgresStore }
+      - lang: python
+        tab: Python
+        label: Python
+        highlight: python
+        code: |-
+          # АНТИПАТТЕРН: иерархия ABC ради одного наследника
+          class Store(ABC):
+              @abstractmethod
+              def get(self, key: str) -> bytes | None: ...
+
+          class PostgresStore(Store): ...     # единственная реализация
+
+          # НОРМА: класс напрямую. Станет две — Protocol: он не требует
+          # наследования и объявляется у потребителя, а не у реализации (12)
+          class PostgresStore:
+              def get(self, key: str) -> bytes | None: ...

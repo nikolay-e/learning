@@ -45,7 +45,7 @@ principles:
   7:
     kind: heuristic
     confidence: opinionated
-    example_status: pseudocode
+    example_status: fragment
     caveat: «Интерфейс только при двух реализациях» механистично. Единственная реализация оправданна,
       когда есть настоящий consumer-owned port, plugin boundary, security capability или стабильный
       внешний API. Критерий — доказанная ось изменения, а не число классов.
@@ -77,6 +77,19 @@ principles:
         url: https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Module.html
       - title: 'JEP 403 — Strongly Encapsulate JDK Internals'
         url: https://openjdk.org/jeps/403
+  88:
+    kind: heuristic
+    confidence: established
+    example_status: fragment
+    caveat: Не всякий чужой тип в сигнатуре — ошибка. Типы стандартной библиотеки и де-факто
+      общие типы экосистемы (context.Context, java.time, UUID) дешевле пропускать, чем оборачивать
+      — обёртка над ними сама становится тем, что потребитель обязан выучить. Принцип про зависимости,
+      чью версию вы меняете, а не про фундамент, который меняете не вы.
+    sources:
+      - title: 'Cargo Book — SemVer Compatibility (что считается ломающим изменением)'
+        url: https://doc.rust-lang.org/cargo/reference/semver.html
+      - title: 'JLS SE 25 — Modules (requires transitive, exports to, opens, uses/provides)'
+        url: https://docs.oracle.com/javase/specs/jls/se25/html/jls-7.html
   13:
     kind: heuristic
     confidence: established

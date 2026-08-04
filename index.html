@@ -10,7 +10,7 @@
       content="scripts/build.py — не редактируйте index.html вручную"
     />
     <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры" />
-    <meta property="og:description" content="87 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
+    <meta property="og:description" content="88 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
     <meta property="og:type" content="article" />
     <!-- Единственный инлайновый скрипт на странице, и он обязан быть здесь:
          тема, выставленная из assets/app.js в конце body, успевает моргнуть
@@ -102,6 +102,7 @@
 <li data-for="p13"><a href="#p13"><span class="rail-num">13</span> Coupling / Cohesion</a></li>
 <li data-for="p14"><a href="#p14"><span class="rail-num">14</span> Bounded Context</a></li>
 <li data-for="p15"><a href="#p15"><span class="rail-num">15</span> Conway&#x27;s Law</a></li>
+<li data-for="p88"><a href="#p88"><span class="rail-num">88</span> Транзитивные зависимости в API</a></li>
 </ol>
 </div>
 <div class="rail-group" data-for="s3">
@@ -232,7 +233,7 @@
       </nav>
 
       <main class="main" id="main">
-        <div class="hero"><div class="eyebrow">Справочник · 87 принципов · 4 языка</div>
+        <div class="hero"><div class="eyebrow">Справочник · 88 принципов · 4 языка</div>
 <h1>Принципы программной инженерии: от SOLID до AI-эры</h1>
 <p>Примеры на современной Java, Rust, Go и Python (3.12+). Принципы сгруппированы по осям; для код-уровневых даны примеры на всех четырёх языках, для архитектурных — представительный пример. Версия рантайма указана на карточке там, где API от неё зависит.</p>
 <p>У каждого принципа проставлен <strong>тип утверждения</strong> — теорема, эмпирический закон, эвристика, паттерн, практика или редакционная позиция — и уровень уверенности. Это главное, что отличает справочник от списка «лучших практик»: закон Амдала и «выбирай скучные технологии» не одного сорта, и страница не делает вид, что одного.</p>
@@ -618,27 +619,64 @@ class Portfolio:
 
 <article class="principle" id="p7" data-keywords="inline first abstraction navigation accept interfaces return structs" data-kind="heuristic" data-confidence="opinionated">
 <div class="p-head"><span class="p-num">07</span><h3>Local reasoning / inline-first</h3><a class="anchor" href="#p7" aria-label="Ссылка на принцип 7">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Иллюстрация формы; синтаксис не гарантирован">псевдокод</span></li></ul>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="caveat"><strong>Область применимости.</strong> «Интерфейс только при двух реализациях» механистично. Единственная реализация оправданна, когда есть настоящий consumer-owned port, plugin boundary, security capability или стабильный внешний API. Критерий — доказанная ось изменения, а не число классов.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Local reasoning ↔ dataflow</a>, <a href="#s10">Feature flags ↔ local reasoning</a></p>
 <p class="lede">Метрика: сколько файлов надо открыть, чтобы понять фрагмент. Абстракция появляется на третьем повторении, не на первом. Интерфейс с одной реализацией — минус к навигации без плюса к гибкости.</p>
-<figure class="code">
-<figcaption class="sr-only">Пример кода (псевдокод)</figcaption>
+<figure class="code" data-multi data-available="go,java,rust,python">
+<figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
-<span class="langlabel">Go</span>
+<div class="langtabs" role="tablist" aria-label="Язык примера">
+<button type="button" class="langtab" role="tab" id="p7f1-tab-go" data-lang="go" aria-selected="false" tabindex="-1" aria-controls="p7f1-pane-go">Go</button>
+<button type="button" class="langtab" role="tab" id="p7f1-tab-java" data-lang="java" aria-selected="false" tabindex="-1" aria-controls="p7f1-pane-java">Java</button>
+<button type="button" class="langtab" role="tab" id="p7f1-tab-rust" data-lang="rust" aria-selected="false" tabindex="-1" aria-controls="p7f1-pane-rust">Rust</button>
+<button type="button" class="langtab" role="tab" id="p7f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p7f1-pane-python">Python</button>
+</div>
 <span class="grow"></span>
-<span class="status" title="Иллюстрация формы; синтаксис не гарантирован">псевдокод</span>
+<span class="status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span>
 <button type="button" class="copy">копировать</button>
 </div>
 <p class="fallback-note" hidden></p>
-<pre tabindex="0"><code class="language-go">// Go-сообщество формулирует это явно: &quot;accept interfaces, return structs&quot;,
+<div class="codepane" role="tabpanel" id="p7f1-pane-go" aria-labelledby="p7f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// Go-сообщество формулирует это явно: &quot;accept interfaces, return structs&quot; —
 // интерфейс объявляется у потребителя и только когда реализаций &gt;= 2
 
-// АНТИПАТТЕРН:              // НОРМА:
-type UserService interface{} // func (h *Handler) route(...) { h.db.QueryUser(...) }
-// + UserServiceImpl         // прямой вызов, одна точка чтения</code></pre>
+// АНТИПАТТЕРН: интерфейс с единственной реализацией — две точки чтения
+type UserService interface {
+    QueryUser(ctx context.Context, id UserID) (User, error)
+}
+type userServiceImpl struct{ db *sql.DB }
+
+// НОРМА: прямой вызов, одна точка чтения
+func (h *Handler) route(ctx context.Context, id UserID) (User, error) {
+    return h.db.QueryUser(ctx, id)
+}</code></pre></div>
+<div class="codepane" role="tabpanel" id="p7f1-pane-java" aria-labelledby="p7f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">// АНТИПАТТЕРН: интерфейс с ровно одной реализацией и одним вызывающим —
+// +1 файл, +1 прыжок при чтении, ноль подменяемости на практике
+public interface UserService { User find(UserId id); }
+public final class UserServiceImpl implements UserService { ... }
+
+// НОРМА: класс вызывается напрямую. Интерфейс появится, когда появится
+// вторая реализация — или на границе I/O, где его требует тест (5)
+public final class UserService { public User find(UserId id) { ... } }</code></pre></div>
+<div class="codepane" role="tabpanel" id="p7f1-pane-rust" aria-labelledby="p7f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// АНТИПАТТЕРН: dyn ради единственной реализации — косвенный вызов
+// в рантайме и прыжок по файлам при чтении
+struct Handler { store: Box&lt;dyn Store&gt; }
+
+// НОРМА: конкретный тип, пока реализация одна. Появится вторая —
+// generic: мономорфизация даёт гибкость, не беря за неё в рантайме
+struct Handler { store: PostgresStore }</code></pre></div>
+<div class="codepane" role="tabpanel" id="p7f1-pane-python" aria-labelledby="p7f1-tab-python" data-lang="python"><div class="paneflag">Python</div><pre tabindex="0"><code class="language-python"># АНТИПАТТЕРН: иерархия ABC ради одного наследника
+class Store(ABC):
+    @abstractmethod
+    def get(self, key: str) -&gt; bytes | None: ...
+
+class PostgresStore(Store): ...     # единственная реализация
+
+# НОРМА: класс напрямую. Станет две — Protocol: он не требует
+# наследования и объявляется у потребителя, а не у реализации (12)
+class PostgresStore:
+    def get(self, key: str) -&gt; bytes | None: ...</code></pre></div>
 </figure>
-<p>Остальные языки — тот же принцип без синтаксиса: в Java не заводить <code>interface XService</code> + <code>XServiceImpl</code>; в Rust не прятать единственную реализацию за <code>dyn Trait</code>; в Python не строить иерархию ABC ради одного класса.</p>
 </article>
 
 <article class="principle" id="p8" data-keywords="design by contract eiffel precondition postcondition invariant assertion" data-kind="practice" data-confidence="established">
@@ -932,6 +970,82 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
 <p class="lede">Архитектура сойдётся к структуре коммуникаций организации. Не совет, а наблюдение: хотите другую архитектуру — сначала перестройте команды (inverse Conway maneuver).</p>
 <p class="note">Кодом не выражается; выражается орг-диаграммой.</p>
+</article>
+
+<article class="principle" id="p88" data-keywords="transitive dependency re-export requires transitive pub use module-info opens services serviceloader api surface leaky abstraction newtype" data-kind="heuristic" data-confidence="established">
+<div class="p-head"><span class="p-num">88</span><h3>Транзитивная зависимость в подписи — это ваш API</h3><a class="anchor" href="#p88" aria-label="Ссылка на принцип 88">#</a></div>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Не всякий чужой тип в сигнатуре — ошибка. Типы стандартной библиотеки и де-факто общие типы экосистемы (context.Context, java.time, UUID) дешевле пропускать, чем оборачивать — обёртка над ними сама становится тем, что потребитель обязан выучить. Принцип про зависимости, чью версию вы меняете, а не про фундамент, который меняете не вы.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://doc.rust-lang.org/cargo/reference/semver.html" rel="noopener noreferrer">Cargo Book — SemVer Compatibility (что считается ломающим изменением)</a>, <a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-7.html" rel="noopener noreferrer">JLS SE 25 — Modules (requires transitive, exports to, opens, uses/provides)</a></p>
+<p class="lede">Тип из чужой библиотеки, попавший в вашу публичную сигнатуру, становится вашим контрактом: потребитель компилируется против него, и ваш апгрейд этой библиотеки — его breaking change. Утечка бесшумна, потому что ни один компилятор не спрашивает «вы правда хотите предъявить это наружу» — по закону Хайрама (<a href="#p16">16</a>) ответ выясняется, когда ломать уже поздно.</p>
+<p>Проверка механическая: выпишите все типы, упомянутые в публичной поверхности модуля. Всё, чего нет в вашем коде, — чужой контракт, который вы молча взяли на поддержку. Дальше выбор из трёх, и он должен быть осознанным: обернуть чужой тип в свой (тогда зависимость остаётся секретом, <a href="#p12">12</a>), объявить транзитивность явно и признать её частью API, либо убрать тип из сигнатуры. Худший вариант — четвёртый, по умолчанию: не выбрать ничего.</p>
+<figure class="code" data-multi data-available="java,rust,go,python">
+<figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
+<div class="langbar">
+<div class="langtabs" role="tablist" aria-label="Язык примера">
+<button type="button" class="langtab" role="tab" id="p88f1-tab-java" data-lang="java" aria-selected="false" tabindex="-1" aria-controls="p88f1-pane-java">Java</button>
+<button type="button" class="langtab" role="tab" id="p88f1-tab-rust" data-lang="rust" aria-selected="false" tabindex="-1" aria-controls="p88f1-pane-rust">Rust</button>
+<button type="button" class="langtab" role="tab" id="p88f1-tab-go" data-lang="go" aria-selected="false" tabindex="-1" aria-controls="p88f1-pane-go">Go</button>
+<button type="button" class="langtab" role="tab" id="p88f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p88f1-pane-python">Python</button>
+</div>
+<span class="grow"></span>
+<span class="status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span>
+<button type="button" class="copy">копировать</button>
+</div>
+<p class="fallback-note" hidden></p>
+<div class="codepane" role="tabpanel" id="p88f1-pane-java" aria-labelledby="p88f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">module billing.api {
+    // нужна мне, невидима потребителю: деталь реализации
+    requires com.fasterxml.jackson.databind;
+
+    // тип из billing.model встречается в моих публичных сигнатурах,
+    // поэтому потребитель обязан его видеть. transitive — это признание:
+    // «совместимость billing.model теперь моя забота»
+    requires transitive billing.model;
+
+    exports com.acme.billing.api;
+    exports com.acme.billing.spi to billing.plugins;  // адресный экспорт
+
+    // рефлексия выдаётся точечно и поимённо, а не всем желающим
+    opens com.acme.billing.dto to com.fasterxml.jackson.databind;
+
+    // точка расширения объявлена, а не найдена сканированием classpath
+    uses com.acme.billing.spi.TaxProvider;
+    provides com.acme.billing.spi.TaxProvider with com.acme.billing.tax.DeTaxProvider;
+}</code></pre></div>
+<div class="codepane" role="tabpanel" id="p88f1-pane-rust" aria-labelledby="p88f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// pub use — тот же приём и та же цена: чужой тип становится вашим API,
+// и major-бамп chrono превращается в major-бамп вашего крейта
+pub use chrono::NaiveDate;
+
+// граница вместо утечки: newtype оставляет chrono деталью реализации
+pub struct SettlementDate(NaiveDate);
+
+// pub-поле pub-структуры — тоже контракт; non_exhaustive сохраняет
+// право добавлять поля, не ломая потребителей
+#[non_exhaustive]
+pub struct Settlement { pub date: SettlementDate }</code></pre></div>
+<div class="codepane" role="tabpanel" id="p88f1-pane-go" aria-labelledby="p88f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// в Go нет ни requires transitive, ни re-export: транзитивность
+// утекает через подпись — единственное место, где её вообще видно
+func Charge(ctx context.Context, id string) (*pq.Error, error) // потребитель
+                          // обязан импортировать lib/pq, чтобы разобрать ошибку
+
+// граница: чужая ошибка заворачивается в свою, контракт — errors.Is
+var ErrDuplicate = errors.New(&quot;billing: duplicate charge&quot;)
+
+func Charge(ctx context.Context, id string) error {
+    if err := insert(ctx, id); isUniqueViolation(err) {
+        return fmt.Errorf(&quot;charge %s: %w&quot;, id, ErrDuplicate) // lib/pq внутри
+    }
+    return nil
+}</code></pre></div>
+<div class="codepane" role="tabpanel" id="p88f1-pane-python" aria-labelledby="p88f1-tab-python" data-lang="python"><div class="paneflag">Python</div><pre tabindex="0"><code class="language-python"># то же обязательство, только объявляется соглашением, а не компилятором
+from ._settlement import Settlement
+from ._vendor_client import Client as Client  # избыточный алиас = «это API» (PEP 484)
+
+# второй, более явный слой того же заявления: Client обещан наружу,
+# значит апгрейд вендора — наш breaking change, а не его
+__all__ = [&quot;Settlement&quot;, &quot;Client&quot;]</code></pre></div>
+</figure>
+<p class="note">Обратная сторона того же принципа — точки расширения. <code>uses</code>/<code>provides</code> объявляют услугу в контракте модуля вместо сканирования classpath на старте: реализация подставляется поздно, но сам факт расширяемости объявлен рано и виден в артефакте. Тот же выбор возникает везде, где есть плагины: набор точек расширения — часть публичной поверхности, и добавить их дешевле, чем убрать.</p>
 </article>
 
 </section>
@@ -2266,13 +2380,14 @@ $ py-spy record --pid 4711 --format speedscope</code></pre></div>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Boring technology ↔ mechanical sympathy</a></p>
 <p class="lede">Cache line 64B, false sharing, NUMA, стоимость syscall. Смежно с DOD, но шире — включает знание рантайма.</p>
 <p>Ключ ко всему списку один: процессор работает не с байтами, а со строками кэша по 64 байта. False sharing — два потока пишут в разные переменные, случайно попавшие в одну строку: логически конкуренции нет, физически строка мечется между ядрами, и код тормозит без единого лока (лечится паддингом до размера строки). NUMA — на многосокетной машине у памяти есть «свой» и «чужой» сокет, обращение к чужому дороже, поэтому важно, где поток запущен относительно своих данных. Syscall дорог не переключением как таковым, а тем, что после него кэши и предсказатель переходов работают уже не на вас, — отсюда батчинг вместо поштучных вызовов. Общее у всех четырёх: стоимость невидима в исходнике и проявляется только измерением (<a href="#p37">37</a>).</p>
-<figure class="code" data-multi data-available="java,rust,go">
+<figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
 <div class="langtabs" role="tablist" aria-label="Язык примера">
 <button type="button" class="langtab" role="tab" id="p39f1-tab-java" data-lang="java" aria-selected="false" tabindex="-1" aria-controls="p39f1-pane-java">Java</button>
 <button type="button" class="langtab" role="tab" id="p39f1-tab-rust" data-lang="rust" aria-selected="false" tabindex="-1" aria-controls="p39f1-pane-rust">Rust</button>
 <button type="button" class="langtab" role="tab" id="p39f1-tab-go" data-lang="go" aria-selected="false" tabindex="-1" aria-controls="p39f1-pane-go">Go</button>
+<button type="button" class="langtab" role="tab" id="p39f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p39f1-pane-python">Python</button>
 </div>
 <span class="grow"></span>
 <span class="status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span>
@@ -2286,6 +2401,16 @@ volatile long producerIdx;</code></pre></div>
 struct PaddedCounter(AtomicU64);</code></pre></div>
 <div class="codepane" role="tabpanel" id="p39f1-pane-go" aria-labelledby="p39f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// Идиома: per-P шардированные счётчики + padding
 type shard struct { n atomic.Uint64; _ [56]byte } // добивка до 64B</code></pre></div>
+<div class="codepane" role="tabpanel" id="p39f1-pane-python" aria-labelledby="p39f1-tab-python" data-lang="python"><div class="paneflag">Python</div><pre tabindex="0"><code class="language-python"># В CPython доминирует не строка кэша, а сам интерпретаторный цикл,
+# поэтому механическая симпатия здесь — унести цикл из Python в C
+total = sum(row.price for row in rows)        # ~10**6 шагов интерпретатора
+
+prices = np.frombuffer(buf, dtype=np.int64)   # тот же расчёт одним вызовом:
+total = int(prices.sum())                     # цикл и векторизация внутри C
+
+# без зависимостей то же делает memoryview:
+# срез bytes копирует, срез memoryview — нет
+window = memoryview(buf)[offset:offset + size]</code></pre></div>
 </figure>
 </article>
 
@@ -2375,15 +2500,17 @@ logger.Info(&quot;request_completed&quot;,
 <p class="lede">Используемая система обязана меняться; её сложность растёт, пока в неё не вкладывают работу специально. Бюджет на снижение энтропии — регулярная статья, а не «когда-нибудь потом».</p>
 </article>
 
-<article class="principle" id="p46" data-keywords="principle of least astonishment surprise pola mutable default argument deref" data-kind="heuristic" data-confidence="established">
+<article class="principle" id="p46" data-keywords="principle of least astonishment surprise pola mutable default argument deref typed nil equals hashcode" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">46</span><h3>Least Astonishment</h3><a class="anchor" href="#p46" aria-label="Ссылка на принцип 46">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="lede">Мера удивления — не вкус автора, а сложившаяся идиома языка и окружающего кода: удивляет то, что ведёт себя иначе, чем девяносто девять похожих мест. Практическое правило: если поведение приходится объяснять комментарием, дешевле убрать поведение, чем написать комментарий — читатель, не заглянувший в него, всё равно ошибётся (<a href="#p47">47</a>).</p>
-<figure class="code" data-multi data-available="python,rust">
+<figure class="code" data-multi data-available="python,java,go,rust">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
 <div class="langtabs" role="tablist" aria-label="Язык примера">
 <button type="button" class="langtab" role="tab" id="p46f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p46f1-pane-python">Python</button>
+<button type="button" class="langtab" role="tab" id="p46f1-tab-java" data-lang="java" aria-selected="false" tabindex="-1" aria-controls="p46f1-pane-java">Java</button>
+<button type="button" class="langtab" role="tab" id="p46f1-tab-go" data-lang="go" aria-selected="false" tabindex="-1" aria-controls="p46f1-pane-go">Go</button>
 <button type="button" class="langtab" role="tab" id="p46f1-tab-rust" data-lang="rust" aria-selected="false" tabindex="-1" aria-controls="p46f1-pane-rust">Rust</button>
 </div>
 <span class="grow"></span>
@@ -2396,6 +2523,25 @@ def add_item(item, bucket=[]): ...      # bucket разделяется межд
 
 def add_item(item, bucket=None):        # ожидаемое поведение
     bucket = bucket if bucket is not None else []</code></pre></div>
+<div class="codepane" role="tabpanel" id="p46f1-pane-java" aria-labelledby="p46f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">// equals без hashCode: объект кладётся в HashSet и «пропадает» из него
+class Money {
+    @Override public boolean equals(Object o) { ... } // hashCode — от Object
+}
+// set.add(new Money(5)); set.contains(new Money(5)) → false
+
+// record генерирует equals и hashCode вместе и не даёт им разойтись
+record Money(long cents, Currency currency) {}</code></pre></div>
+<div class="codepane" role="tabpanel" id="p46f1-pane-go" aria-labelledby="p46f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// nil-указатель в интерфейсе — не nil-интерфейс: у интерфейса два поля,
+// тип и значение, и непустой тип делает его непустым целиком
+func find() *MyErr { return nil }
+
+var err error = find() // тип *MyErr, значение nil
+if err != nil {        // истина — и это удивляет каждого второго
+    log.Print(&quot;ошибка, которой нет&quot;)
+}
+
+// НОРМА: наружу возвращается error, а не конкретный тип ошибки
+func find() error { return nil } // здесь err == nil, как и ожидается</code></pre></div>
 <div class="codepane" role="tabpanel" id="p46f1-pane-rust" aria-labelledby="p46f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// не implement Deref для &quot;наследования&quot; — это удивляет
 // (Deref предназначен для указателей, не для is-a)</code></pre></div>
 </figure>
@@ -2864,7 +3010,7 @@ class GroundedAnswer(BaseModel):
 
 </section>
 
-        <footer class="footer"><span>Справочник · 87 принципов</span>
+        <footer class="footer"><span>Справочник · 88 принципов</span>
 <span>Java · Rust · Go · Python 3.12+</span>
 <span>Технический пересмотр: 2026-08-04</span>
 <span><a href="https://github.com/nikolay-e/learning" rel="noopener noreferrer">Исходники и правки — на GitHub</a></span></footer>

@@ -8,7 +8,7 @@ Reference notes published as a static site.
 
 | Page                       | What it is                                                                                                                                                                   |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.html`](index.html) | Принципы программной инженерии: от SOLID до AI-эры — 87 principles grouped by axis, with examples in Java, Rust, Go and Python 3.12+, plus a table of conflicts between them |
+| [`index.html`](index.html) | Принципы программной инженерии: от SOLID до AI-эры — 88 principles grouped by axis, with examples in Java, Rust, Go and Python 3.12+, plus a table of conflicts between them |
 
 Every entry is classified: `theorem`, `empirical-law`, `heuristic`, `pattern`, `practice` or
 `editorial`, with a confidence level next to it. Amdahl's law and "choose boring technology"
