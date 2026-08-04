@@ -1,0 +1,39 @@
+name: links
+
+# Не гейт на PR: протухшая внешняя ссылка не имеет отношения к коммиту, который
+# её не трогал. Раз в неделю — и в issue, а не в красный билд.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  external:
+    name: sources still resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Ссылки в content/metadata.yaml — единственное, что валидатор проверить
+      # не может: он видит, что ссылка есть, но не то, что она куда-то ведёт.
+      - uses: lycheeverse/lychee-action@v2
+        id: lychee
+        with:
+          args: >-
+            --no-progress
+            --max-retries 3
+            --accept 200..=299,429
+            content/metadata.yaml
+            README.md
+            CONTRIBUTING.md
+            THIRD_PARTY.md
+          fail: false
+      - uses: peter-evans/create-issue-from-file@v5
+        if: steps.lychee.outputs.exit_code != 0
+        with:
+          title: Битые ссылки в источниках
+          content-filepath: ./lychee/out.md
+          labels: sources

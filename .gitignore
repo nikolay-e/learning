@@ -3,7 +3,5 @@
 node_modules/
 .venv/
 .playwright-mcp/
-node_modules/
-.venv/
 test-results/
 playwright-report/

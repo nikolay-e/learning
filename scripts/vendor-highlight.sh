@@ -23,8 +23,17 @@ done
 mv "$tmp/highlight.min.js" "$root/assets/highlight.min.js"
 mv "$tmp/protobuf.min.js" "$root/assets/hljs-protobuf.min.js"
 
-sha_main="$(shasum -a 256 "$root/assets/highlight.min.js" | cut -d' ' -f1)"
-sha_proto="$(shasum -a 256 "$root/assets/hljs-protobuf.min.js" | cut -d' ' -f1)"
+# sha256sum на Linux, shasum на macOS — скрипт должен идти в CI без правок
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d' ' -f1
+  else
+    shasum -a 256 "$1" | cut -d' ' -f1
+  fi
+}
+
+sha_main="$(sha256 "$root/assets/highlight.min.js")"
+sha_proto="$(sha256 "$root/assets/hljs-protobuf.min.js")"
 
 python3 - "$root/THIRD_PARTY.md" "$version" "$sha_main" "$sha_proto" <<'PY'
 import re, sys

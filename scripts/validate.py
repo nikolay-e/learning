@@ -1,15 +1,18 @@
 """Проверки целостности источника и собранной страницы. Возвращает 1 при любой ошибке."""
 
 import ast
+import datetime
 import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
+STALE_AFTER_DAYS = 180
 
 errors = []
 warnings = []
@@ -23,27 +26,75 @@ def warn(msg):
     warnings.append(msg)
 
 
+class DuplicateKey(Exception):
+    pass
+
+
+class StrictLoader(yaml.SafeLoader):
+    pass
+
+
+def _mapping_without_duplicates(loader, node, deep=False):
+    loader.flatten_mapping(node)
+    result = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in result:
+            raise DuplicateKey(f"«{key}», строка {key_node.start_mark.line + 1}")
+        result[key] = loader.construct_object(value_node, deep=deep)
+    return result
+
+
+StrictLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _mapping_without_duplicates
+)
+
+
+def read(path):
+    text = path.read_text(encoding="utf-8")
+    try:
+        return yaml.load(text, Loader=StrictLoader)
+    except DuplicateKey as exc:
+        # PyYAML молча берёт последнее значение — так теряется целая карточка
+        fail(f"{path.name}: дублирующийся ключ {exc}")
+        return yaml.safe_load(text)
+
+
 def load(name):
-    return yaml.safe_load((CONTENT / name).read_text(encoding="utf-8"))
+    return read(CONTENT / name)
 
 
 site = load("site.yaml")
 meta = load("metadata.yaml")
-sections = load("sections.yaml")["sections"]
+sections_doc = load("sections.yaml")
+sections = sections_doc["sections"]
+retired = sections_doc.get("retired") or []
 conflicts = load("conflicts.yaml")["conflicts"]
 
 principles = {}
 for path in sorted((CONTENT / "principles").glob("*.yaml")):
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data = read(path)
     if data["id"] in principles:
         fail(f"дублирующийся id принципа: {data['id']} ({path.name})")
     principles[data["id"]] = (path, data)
 
 ids = sorted(principles)
-expected = list(range(1, len(ids) + 1))
-if ids != expected:
+
+# Номер — вечный идентификатор: удалённый принцип уходит в sections.yaml:retired,
+# и его номер больше никому не достаётся. Сплошность проверяется по объединению,
+# иначе «номера не переиспользуются» и «нумерация без дыр» несовместимы.
+if len(set(retired)) != len(retired):
+    fail(f"дубли в retired: {retired}")
+reused = sorted(set(retired) & set(ids))
+if reused:
+    fail(f"номера из retired переиспользованы: {reused}")
+allocated = sorted(set(ids) | set(retired))
+expected = list(range(1, len(allocated) + 1))
+if allocated != expected:
     fail(
-        f"нумерация принципов не сплошная: пропуски {sorted(set(expected) - set(ids))}"
+        "нумерация принципов не сплошная: пропуски "
+        f"{sorted(set(expected) - set(allocated))} "
+        "(удалённый номер должен быть в sections.yaml:retired)"
     )
 
 # --- метаданные -------------------------------------------------------------
@@ -73,7 +124,28 @@ for pid, (path, data) in principles.items():
 
 for pid in meta["principles"]:
     if pid not in principles:
-        fail(f"metadata.yaml описывает несуществующий принцип {pid}")
+        why = " (номер в retired)" if pid in retired else ""
+        fail(f"metadata.yaml описывает несуществующий принцип {pid}{why}")
+
+# --- свежесть версионных утверждений ---------------------------------------
+
+today = datetime.date.today()
+default_reviewed = meta.get("defaults", {}).get("last_reviewed")
+for pid in sorted(principles):
+    m = meta["principles"].get(pid) or {}
+    if not m.get("versions"):
+        continue
+    stamp = m.get("last_reviewed") or default_reviewed
+    if not stamp:
+        warn(f"p{pid}: есть versions, но нет last_reviewed — свежесть непроверяема")
+        continue
+    reviewed = datetime.date.fromisoformat(str(stamp))
+    age = (today - reviewed).days
+    if age > STALE_AFTER_DAYS:
+        warn(
+            f"p{pid}: утверждение о версиях не пересматривали {age} дней "
+            f"(с {reviewed}) — перепроверьте и обновите last_reviewed"
+        )
 
 # --- разделы ----------------------------------------------------------------
 
@@ -81,7 +153,8 @@ seen = []
 for sec in sections:
     for pid in sec["principles"]:
         if pid not in principles:
-            fail(f"раздел {sec['id']} ссылается на несуществующий принцип {pid}")
+            why = " (номер в retired)" if pid in retired else ""
+            fail(f"раздел {sec['id']} ссылается на несуществующий принцип {pid}{why}")
         seen.append(pid)
 dupes = {p for p in seen if seen.count(p) > 1}
 if dupes:
@@ -99,28 +172,40 @@ if len(set(numerals)) != len(numerals):
 for row in conflicts:
     for pid in row["refs"]:
         if pid not in principles:
-            fail(f"конфликт «{row['left']}» ссылается на несуществующий принцип {pid}")
+            why = " (номер в retired)" if pid in retired else ""
+            fail(
+                f"конфликт «{row['left']}» ссылается на несуществующий принцип {pid}{why}"
+            )
     if not row["refs"]:
         warn(f"конфликт «{row['left']}» ни на что не ссылается")
 
 # --- сборка актуальна -------------------------------------------------------
 
-built = ROOT / "index.html"
-before = built.read_text(encoding="utf-8") if built.exists() else ""
-subprocess.run(
-    [sys.executable, str(ROOT / "scripts" / "build.py")],
-    check=True,
-    capture_output=True,
-)
-after = built.read_text(encoding="utf-8")
-if before != after:
-    fail(
-        "index.html не соответствует content/ — запустите scripts/build.py и закоммитьте результат"
+# Проверка не имеет права чинить то, что проверяет: сборка идёт во временный
+# файл, иначе упавший pre-commit молча оставляет рабочее дерево «исправленным».
+committed = ROOT / "index.html"
+with tempfile.TemporaryDirectory() as tmp:
+    fresh = pathlib.Path(tmp) / "index.html"
+    build = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "build.py"), "--out", str(fresh)],
+        capture_output=True,
+        text=True,
     )
+    if build.returncode != 0:
+        fail(f"build.py упал (код {build.returncode}):\n{build.stderr.strip()}")
+        page = committed.read_text(encoding="utf-8") if committed.exists() else ""
+    else:
+        page = fresh.read_text(encoding="utf-8")
+        if not committed.exists():
+            fail("index.html не собран — запустите scripts/build.py")
+        elif committed.read_text(encoding="utf-8") != page:
+            fail(
+                "index.html не соответствует content/ — запустите scripts/build.py "
+                "и закоммитьте результат"
+            )
 
 # --- собранная страница -----------------------------------------------------
 
-page = after
 anchors = set(re.findall(r'\sid="([^"]+)"', page))
 for href in set(re.findall(r'href="#([^"]+)"', page)):
     if href not in anchors:

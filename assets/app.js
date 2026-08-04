@@ -17,12 +17,10 @@
 
   /* ---------- theme ---------- */
 
+  // начальная тема выставляется инлайновым скриптом в <head> — иначе светлая
+  // тема получает вспышку тёмной на каждой загрузке; здесь только переключение
   const root = document.documentElement;
   const themeBtn = document.getElementById("theme-toggle");
-  const storedTheme = localStorage.getItem(THEME_KEY);
-  if (storedTheme) root.dataset.theme = storedTheme;
-  else if (window.matchMedia("(prefers-color-scheme: light)").matches)
-    root.dataset.theme = "light";
 
   function syncTheme() {
     const light = root.dataset.theme === "light";
@@ -129,7 +127,18 @@
 
   /* ---------- copy ---------- */
 
+  // один live-region на все кнопки: чужой таймер не должен стирать свежий
+  // статус, поэтому уборку делает только тот клик, чьё сообщение ещё висит
+  let copyTicket = 0;
+  const announceCopy = (message) => {
+    copyStatus.textContent = message;
+    copyTicket += 1;
+    return copyTicket;
+  };
+
   document.querySelectorAll(".copy").forEach((btn) => {
+    const original = btn.textContent;
+    let timer;
     btn.addEventListener("click", async () => {
       const fig = btn.closest(".code");
       const panes = [...fig.querySelectorAll(".codepane")].filter(
@@ -150,19 +159,22 @@
           return `// --- ${label} ---\n${code}`;
         })
         .join("\n\n");
+      let ticket;
       try {
         await navigator.clipboard.writeText(text);
-        const was = btn.textContent;
         btn.textContent = "скопировано";
-        copyStatus.textContent = "Код скопирован в буфер обмена";
-        setTimeout(() => {
-          btn.textContent = was;
-          copyStatus.textContent = "";
-        }, 1400);
+        ticket = announceCopy("Код скопирован в буфер обмена");
       } catch {
         btn.textContent = "не вышло";
-        copyStatus.textContent = "Не удалось скопировать";
+        ticket = announceCopy("Не удалось скопировать");
       }
+      // исходный ярлык взят до первого клика: второй клик подряд иначе
+      // «запоминает» слово «скопировано» и кнопка залипает навсегда
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        btn.textContent = original;
+        if (copyTicket === ticket) copyStatus.textContent = "";
+      }, 1400);
     });
   });
 

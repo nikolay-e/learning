@@ -12,7 +12,7 @@ from `main` at the repository root. `index.html` is **generated** from `content/
 
 | Checklist item           | Applies | Why                                                         |
 | ------------------------ | ------- | ----------------------------------------------------------- |
-| Forge / CI               | yes     | GitHub, Actions (`.github/workflows/ci.yml`) — not Forgejo  |
+| Forge / CI               | yes     | GitHub, Actions (`ci.yml` per push, `links.yml` weekly)     |
 | CD / ArgoCD / K8s / pods | no      | GitHub Pages, no cluster                                    |
 | Backend smoke / DB       | no      | no backend                                                  |
 | Client-error telemetry   | no      | no ingest endpoint; a beacon would need a backend           |
@@ -58,18 +58,22 @@ different page that returns 200 and zero principles. This looks exactly like a c
 regression and is not one. The repo's own config points at localhost, where `/` is correct.
 
 Production smoke worth re-running by hand: 87 articles, every `pre code` carrying `hljs`,
-zero axe violations at WCAG 2.1 AA in light + dark + mobile, zero console errors.
+zero axe violations at WCAG 2.1 AA in light + dark + mobile, zero console errors, and no dark
+flash on load with the light theme stored (the theme script lives in `<head>` for that reason).
 
 ## Content checks that are not in the test suite
 
-`scripts/validate.py` covers structure. Two things it cannot check, so check them by hand:
+`scripts/validate.py` covers structure. Two things it cannot check on its own:
 
-- **External source links.** ~12 links in `content/metadata.yaml` under `sources`. Nothing
-  in CI fetches them; curl the list each pass. An invented or rotted citation is worse than
-  no citation, and the validator cannot tell the difference.
+- **External source links.** Links in `content/metadata.yaml` under `sources` are fetched
+  weekly by `.github/workflows/links.yml` (lychee, cron + `workflow_dispatch`), which opens
+  an issue instead of failing an unrelated PR. Rot is caught; a citation that resolves but
+  never said what the card claims is not — that still needs a human opening the page.
 - **Whether a claim is still true.** API surfaces move (Flink `Time`→`Duration`, Java preview
   APIs, Go stdlib). `versions` on a card is a promise about a specific runtime; when a
-  release moves, that card is stale even though every check is green.
+  release moves, that card is stale even though every check is green. `validate.py` narrows
+  the manual pass to a list: it warns (does not fail) for every card carrying `versions`
+  whose `last_reviewed` is older than 180 days. Re-read those, then bump the date.
 
 ## Known-good states that look like problems
 

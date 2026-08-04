@@ -34,6 +34,20 @@ tests/                             Playwright behaviour + axe accessibility
    mandatory; `validate.py` rejects the build without them.
 4. Rebuild and run the checks.
 
+`title` is inserted as raw HTML, so it can carry markup — and must carry its own entities
+(`&gt;` for `>`). `nav_label`, `keywords` and table cells are escaped by the generator; do not
+pre-escape those or the entity shows up literally.
+
+## Removing a principle
+
+Numbers are permanent identifiers and `validate.py` also requires the numbering to be gapless,
+which is only possible if a deleted number stays accounted for. Delete the principle file, its
+`metadata.yaml` entry, its `sections.yaml` slot and any `conflicts.yaml` refs — then add the
+number to the top-level `retired:` list in `content/sections.yaml`. The number is burned: it
+counts towards continuity and `validate.py` rejects any attempt to hand it to a new card.
+`#pNN` links live in other people's bookmarks, so silently reassigning a number rewrites what
+they saved.
+
 ## Classification is not decoration
 
 Every claim carries a type. A theorem, an empirical observation and a personal editorial
@@ -71,3 +85,10 @@ npm run check                             # validate + html-validate + prettier 
   so Prettier wins.
 - `content/` is excluded from Prettier: it reformats the YAML into flow mappings, and these
   files exist to be read by humans.
+- `templates/page.html` carries one inline `<script>` in `<head>`, and it is the only script
+  allowed to be inline. It applies the stored or system theme before the stylesheet loads;
+  doing it from `assets/app.js` at the end of `<body>` flashes the dark palette on every load
+  for light-theme readers. "No runtime dependencies" is about the network, not about this.
+- `scripts/validate.py` builds into a temporary file and compares. It never writes
+  `index.html`: a check that repairs what it checks turns a failing pre-commit into a silently
+  mutated working tree.

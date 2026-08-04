@@ -12,6 +12,18 @@
     <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры" />
     <meta property="og:description" content="87 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
     <meta property="og:type" content="article" />
+    <!-- Единственный инлайновый скрипт на странице, и он обязан быть здесь:
+         тема, выставленная из assets/app.js в конце body, успевает моргнуть
+         тёмным на каждой загрузке светлой темы. -->
+    <script>
+      try {
+        var theme = localStorage.getItem("principles:theme");
+        if (!theme && matchMedia("(prefers-color-scheme: light)").matches) {
+          theme = "light";
+        }
+        if (theme) document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="assets/style.css" />
     <link
       rel="icon"
@@ -240,6 +252,7 @@
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="caveat"><strong>Область применимости.</strong> Оценки в таблице — редакционная позиция этой страницы, а не консенсус. ISP и DIP тоже дают проверяемые failure modes; «единственный заслуживающий примеров» — утверждение автора, а не свойство SOLID.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">OCP ↔ YAGNI</a></p>
+<p class="sources"><strong>Источники:</strong> <a href="https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html" rel="noopener noreferrer">Robert C. Martin — The Single Responsibility Principle (формулировка через актора)</a></p>
 <div class="tablewrap" tabindex="0">
 <table>
 <thead><tr><th scope="col">Принцип</th><th scope="col">Суть</th><th scope="col">Статус</th></tr></thead>
@@ -250,6 +263,8 @@
 <tr><td>ISP</td><td>Клиент не зависит от неиспользуемых методов</td><td>Переносится куда угодно, полезен</td></tr>
 <tr><td>DIP</td><td>Зависимость направлена к абстракции; интерфейс принадлежит потребителю</td><td>Полезен, но вырождается в интерфейсы с одной реализацией</td></tr>
 </tbody></table></div>
+<p class="note"><strong>«Причина для изменения» — это люди, а не требования.</strong> Поздняя формулировка Мартина: модуль отвечает перед одним и только одним <em>актором</em> — группой людей, которая выдвигает требования. Класс, который хранит список покупок и считает его стоимость, нарушает SRP не потому, что «делает две вещи», а потому что за состав списка и за правила ценообразования отвечают разные люди и их требования меняются независимо. Актор при этом — критерий разреза, а не драйвер дизайна: классы не заводят по одному на стейкхолдера, проверяют обратное — что один артефакт не служит двум хозяевам с несовпадающими графиками изменений.</p>
+<p>Неоперационализируемость от этого никуда не девается: гранулярность произвольна, критерия остановки декомпозиции принцип не даёт — нарушение опознаётся постфактум, а дизайн из него не выводится. Практический тест — история файла: коммиты из несвязанных задач разных людей, систематически сходящиеся в один класс. Ограничитель против обратной крайности, дробления ради дробления, — cohesion (<a href="#p13">13</a>): что меняется вместе, живёт вместе. Операционализируемая замена — information hiding (<a href="#p12">12</a>): вопрос не «сколько здесь ответственностей», а «что сломается снаружи, если это внутреннее решение пересмотрят».</p>
 <p>LSP-нарушение и исправление — единственный SOLID-принцип, заслуживающий примеров.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
@@ -813,9 +828,12 @@ with pool.acquire() as conn, conn.begin() as tx:
 <article class="principle" id="p12" data-keywords="information hiding parnas encapsulation module secret" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">12</span><h3>Information Hiding (Parnas, 1972)</h3><a class="anchor" href="#p12" aria-label="Ссылка на принцип 12">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="versions"><strong>Версии.</strong> Модульная система — JDK 9+, и для модулей на module path строгая инкапсуляция работает с самого начала. Послабление --illegal-access касалось только внутренних пакетов самого JDK: deny по умолчанию с JDK 16 (JEP 396), опция игнорируется с JDK 17 (JEP 403).</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">DOD ↔ information hiding</a></p>
-<p class="sources"><strong>Источники:</strong> <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Module.html" rel="noopener noreferrer">Module (Java SE 25 API)</a></p>
-<p class="lede">Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается, если это решение пересмотрят». SRP — размытый пересказ этого принципа.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Module.html" rel="noopener noreferrer">Module (Java SE 25 API)</a>, <a href="https://openjdk.org/jeps/403" rel="noopener noreferrer">JEP 403 — Strongly Encapsulate JDK Internals</a></p>
+<p class="lede">Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается, если это решение пересмотрят». SRP (<a href="#p1">1</a>) — размытый пересказ этого принципа.</p>
+<p>Секрет — это конкретное решение: формат хранения, кодировка, порядок полей, алгоритм. Интерфейс, отдающий «список ASCII-строк», уже проболтался о кодировке — переход на UTF-8 ломает всех потребителей. Тот же интерфейс, описанный как «названия покупок», пережил бы этот переход незаметно. Разница не в коде, а в том, что объявлено наружу.</p>
+<p class="note"><strong>Зачем Java понадобился отдельный этаж видимости.</strong> До модульной системы <code>public</code> означало «виден всему classpath»: спрятать решение между пакетами одной библиотеки язык не позволял, и вспомогательный класс, сделанный public ради соседнего пакета, по закону Хайрама (<a href="#p16">16</a>) становился чужим контрактом. <code>exports</code> добавляет второй этаж: public <em>и</em> экспортирован — это API; public в неэкспортированном пакете снаружи не существует. Внутри модуля не меняется ничего — пакеты по-прежнему видят public-типы друг друга, экспортированные и нет, а <code>private/protected/public</code> работают как раньше; модуль лишь фильтрует, что из public-поверхности предъявлено миру. Остальные директивы того же файла к hiding отношения не имеют: <code>requires</code> задаёт граф зависимостей, <code>opens</code> точечно разрешает рефлексию, <code>uses</code>/<code>provides</code> связывают ServiceLoader.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -832,11 +850,14 @@ with pool.acquire() as conn, conn.begin() as tx:
 <p class="fallback-note" hidden></p>
 <div class="codepane" role="tabpanel" id="p12f1-pane-java" aria-labelledby="p12f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">// модульная система (module-info.java) — hiding на уровне артефакта
 module billing.core {
-    exports com.acme.billing.api;      // только API
-    // com.acme.billing.internal не экспортирован и не открыт: обычный доступ
-    // запрещён, deep reflection запрещена по умолчанию. Доступ всё ещё можно
-    // выдать явно — opens, Module.addOpens(), --add-opens. Это граница
-    // по умолчанию, а не физическая невозможность.
+    requires transitive billing.model;  // видно потребителям: часть API
+    exports com.acme.billing.api;       // только API
+
+    // com.acme.billing.internal не экспортирован и не открыт:
+    // обычный доступ запрещён, deep reflection (setAccessible — исторический
+    // обход любых модификаторов) тоже. Доступ всё ещё выдаётся явно —
+    // opens, Module.addOpens(), --add-opens: это граница по умолчанию,
+    // а не физическая невозможность.
 }</code></pre></div>
 <div class="codepane" role="tabpanel" id="p12f1-pane-rust" aria-labelledby="p12f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// pub(crate) / приватность по умолчанию — hiding встроен в язык
 pub struct RateLimiter { /* поля приватны */ }
@@ -916,7 +937,7 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
 <div class="p-head"><span class="p-num">16</span><h3>Hyrum's Law</h3><a class="anchor" href="#p16" aria-label="Ссылка на принцип 16">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Contract testing ↔ скорость провайдера</a></p>
-<p class="sources"><strong>Источники:</strong> <a href="https://go.dev/ref/spec" rel="noopener noreferrer">The Go Programming Language Specification</a></p>
+<p class="sources"><strong>Источники:</strong> <a href="https://go.dev/ref/spec" rel="noopener noreferrer">The Go Programming Language Specification</a>, <a href="https://go.dev/blog/maps" rel="noopener noreferrer">Go Blog — Go maps in action (порядок итерации)</a>, <a href="https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/util/ImmutableCollections.java" rel="noopener noreferrer">OpenJDK — ImmutableCollections.java (SALT, порядок между запусками JVM)</a></p>
 <p class="lede">При достаточном числе потребителей все наблюдаемые свойства API — контракт: порядок ключей JSON, латентность, текст сообщений об ошибках.</p>
 <figure class="code" data-multi data-available="go,java">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
@@ -932,11 +953,12 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
 <p class="fallback-note" hidden></p>
 <div class="codepane" role="tabpanel" id="p16f1-pane-go" aria-labelledby="p16f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// proverb-уровень: не давайте наблюдать то, что не обещаете
 // map намеренно рандомизирует порядок итерации — язык защищается от закона Хайрама
-for k := range m { ... } // порядок разный при каждом запуске — зависимость невозможна</code></pre></div>
+for k := range m { ... } // порядок разный при каждом проходе — опереться не выйдет</code></pre></div>
 <div class="codepane" role="tabpanel" id="p16f1-pane-java" aria-labelledby="p16f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">// то же — Set.of()/Map.of() рандомизируют порядок итерации между запусками JVM
 // именно чтобы никто не начал зависеть от него</code></pre></div>
 </figure>
 <p class="note"><strong>Точность.</strong> Спецификация Go говорит, что порядок итерации по map <em>не определён</em> и не гарантирован между итерациями, а не что он «случайный и всегда разный». Практический вывод тот же: зависеть от него нельзя — но формулировка «рандомизирует» описывает реализацию, а не контракт языка.</p>
+<p class="note">Механика к тому же разная по силе. Рантайм Go берёт случайные смещения при каждой инициализации итератора: две итерации по одной и той же неизменённой map в одном процессе дают разный порядок. Java считает SALT один раз при старте JVM (<code>ImmutableCollections</code>, комментарий в исходнике прямо называет цель — «iteration order will vary between JVM runs»): внутри запуска порядок стабилен, между запусками разный. Контракт у обоих одинаков — порядок не определён; различается настойчивость, с которой реализация мешает на него опереться, и она сама может измениться в следующем релизе, что и есть главный довод не опираться.</p>
 </article>
 
 <article class="principle" id="p17" data-keywords="expand migrate contract parallel change zero downtime rename column" data-kind="pattern" data-confidence="established">

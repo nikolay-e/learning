@@ -19,6 +19,9 @@ principles:
     caveat: Оценки в таблице — редакционная позиция этой страницы, а не консенсус. ISP и DIP тоже
       дают проверяемые failure modes; «единственный заслуживающий примеров» — утверждение автора,
       а не свойство SOLID.
+    sources:
+      - title: 'Robert C. Martin — The Single Responsibility Principle (формулировка через актора)'
+        url: https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html
   2:
     kind: pattern
     confidence: established
@@ -66,9 +69,14 @@ principles:
     kind: heuristic
     confidence: established
     example_status: fragment
+    versions: 'Модульная система — JDK 9+, и для модулей на module path строгая инкапсуляция работает
+      с самого начала. Послабление --illegal-access касалось только внутренних пакетов самого JDK:
+      deny по умолчанию с JDK 16 (JEP 396), опция игнорируется с JDK 17 (JEP 403).'
     sources:
       - title: Module (Java SE 25 API)
         url: https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Module.html
+      - title: 'JEP 403 — Strongly Encapsulate JDK Internals'
+        url: https://openjdk.org/jeps/403
   13:
     kind: heuristic
     confidence: established
@@ -88,6 +96,10 @@ principles:
     sources:
       - title: The Go Programming Language Specification
         url: https://go.dev/ref/spec
+      - title: 'Go Blog — Go maps in action (порядок итерации)'
+        url: https://go.dev/blog/maps
+      - title: 'OpenJDK — ImmutableCollections.java (SALT, порядок между запусками JVM)'
+        url: https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/util/ImmutableCollections.java
   17:
     kind: pattern
     confidence: established

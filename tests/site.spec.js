@@ -29,17 +29,15 @@ test("каждый принцип попал в оглавление и в ра�
       count: domIds.length,
       sameOrder: JSON.stringify(domIds) === JSON.stringify(railIds),
       dead,
-      // номера — стабильные идентификаторы: по документу они идут не по порядку
-      // (72–74 стоят в разделе III), но множество обязано быть p1..pN без дыр
-      gaps: Array.from({ length: domIds.length }, (_, i) => `p${i + 1}`).filter(
-        (id) => !domIds.includes(id),
-      ),
+      // сплошность нумерации (с учётом retired) проверяет validate.py по
+      // исходнику; странице остаётся не выдать один номер дважды
+      duplicates: domIds.filter((id, i) => domIds.indexOf(id) !== i),
     };
   });
   expect(result.count).toBeGreaterThan(0);
   expect(result.sameOrder).toBe(true);
   expect(result.dead).toEqual([]);
-  expect(result.gaps).toEqual([]);
+  expect(result.duplicates).toEqual([]);
 });
 
 test("у каждого принципа проставлен тип утверждения и уверенность", async ({
@@ -193,6 +191,51 @@ test("табы языков доступны с клавиатуры", async ({ 
   await expect(tabs.nth(1)).toBeFocused();
 });
 
+test("активный таб языка видно, а не только слышно", async ({ page }) => {
+  const fig = page.locator("#p1 .code[data-multi]").first();
+  await fig.locator(".langtab").first().click();
+  // курсор остаётся на кнопке после click(), и :hover подделывает выделение —
+  // без увода мыши тест зелёный даже когда правило выбора мёртвое
+  await page.mouse.move(0, 0);
+  const [on, off] = await Promise.all([
+    fig
+      .locator('.langtab[aria-selected="true"]')
+      .evaluate((el) => getComputedStyle(el).backgroundColor),
+    fig
+      .locator('.langtab[aria-selected="false"]')
+      .first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor),
+  ]);
+  expect(on).not.toBe(off);
+});
+
+test("двойной клик по «копировать» не оставляет кнопку залипшей", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => {} },
+    });
+  });
+  const btn = page.locator("#p1 .copy");
+  const label = (await btn.textContent()).trim();
+  await btn.click();
+  await btn.click();
+  await expect(btn).toHaveText(label, { timeout: 4000 });
+});
+
+test("тема применяется до загрузки app.js", async ({ context, page }) => {
+  await context.addInitScript(() =>
+    localStorage.setItem("principles:theme", "light"),
+  );
+  // если app.js не загрузился, а тема всё равно светлая — значит её выставил
+  // скрипт в <head>, то есть вспышки тёмной темы не будет
+  await page.route("**/assets/app.js", (route) => route.abort());
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});
+
 test("мобильное меню открывается и сообщает состояние", async ({
   page,
 }, info) => {
@@ -211,11 +254,17 @@ test("страница не скроллится по горизонтали", a
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test("в консоли нет ошибок", async ({ page }) => {
+test("в консоли нет ошибок", async ({ page }, info) => {
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
-  await page.reload();
-  await page.waitForTimeout(500);
+  await page.reload({ waitUntil: "networkidle" });
+  // обработчики падают на взаимодействии, а не на загрузке, поэтому проверка
+  // привязана к реальным действиям, а не к произвольной паузе
+  if (isMobile(info)) await page.locator("#rail-toggle").click();
+  await page.locator('.langpick button[data-lang="go"]').click();
+  await page.locator("#p1 .langtab").first().click();
+  await page.locator("#search").fill("outbox");
+  await expect(page.locator("#empty")).toBeHidden();
   expect(errors).toEqual([]);
 });

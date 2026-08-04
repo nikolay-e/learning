@@ -12,6 +12,18 @@
     <meta property="og:title" content="__TITLE__" />
     <meta property="og:description" content="__OG_DESCRIPTION__" />
     <meta property="og:type" content="article" />
+    <!-- Единственный инлайновый скрипт на странице, и он обязан быть здесь:
+         тема, выставленная из assets/app.js в конце body, успевает моргнуть
+         тёмным на каждой загрузке светлой темы. -->
+    <script>
+      try {
+        var theme = localStorage.getItem("principles:theme");
+        if (!theme && matchMedia("(prefers-color-scheme: light)").matches) {
+          theme = "light";
+        }
+        if (theme) document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="assets/style.css" />
     <link
       rel="icon"

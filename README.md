@@ -25,7 +25,9 @@ python3 -m http.server 8000
 open http://localhost:8000
 ```
 
-The published page has **no runtime dependencies**: no CDN, no fonts, no network calls.
+The published page has **no runtime dependencies**: no CDN, no fonts, no network calls. The
+one inline script sits in `<head>` and applies the saved theme before the stylesheet loads, so
+light-theme readers do not get a dark flash on every visit.
 `assets/highlight.min.js` and the `protobuf` grammar are vendored, with versions and SHA-256
 hashes recorded in [`THIRD_PARTY.md`](THIRD_PARTY.md). There is a build step, but it runs
 before commit, not in the browser — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
@@ -48,7 +50,9 @@ mislabelling the language.
 - Copy button labels each language when copying a multi-language figure
 
 Principle numbers are stable identifiers: new entries are appended to the numbering and placed
-in the topical section, so numbering inside a section is not contiguous. Nothing is renumbered.
+in the topical section, so numbering inside a section is not contiguous. Nothing is renumbered,
+and a number freed by a deleted entry is retired rather than handed to a new one — `#pNN` links
+keep meaning what they meant.
 
 ## Working on it
 

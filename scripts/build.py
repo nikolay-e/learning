@@ -1,5 +1,6 @@
 """content/*.yaml -> index.html. Единственный способ менять страницу: правишь YAML, гоняешь build."""
 
+import argparse
 import html
 import pathlib
 import sys
@@ -176,7 +177,16 @@ def principle_html(p, meta, site, conflicts_for):
     return "\n".join(out)
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--out",
+        type=pathlib.Path,
+        default=ROOT / "index.html",
+        help="куда писать страницу (по умолчанию index.html в корне)",
+    )
+    args = parser.parse_args(argv)
+
     site = load("site.yaml")
     meta_all = load("metadata.yaml")
     sections = load("sections.yaml")
@@ -296,7 +306,7 @@ def main():
     }.items():
         page = page.replace(token, value)
 
-    (ROOT / "index.html").write_text(page, encoding="utf-8")
+    args.out.write_text(page, encoding="utf-8")
     figures = sum(
         1 for p in principles.values() for b in p["blocks"] if b["type"] == "code"
     )
@@ -307,7 +317,8 @@ def main():
         if b["type"] == "code"
     )
     print(
-        f"built index.html — {count} принципов, {figures} фигур, {panes} панелей кода"
+        f"built {args.out.name} — {count} принципов, {figures} фигур, "
+        f"{panes} панелей кода"
     )
     return 0
 
