@@ -19,6 +19,16 @@ def esc(text):
     return html.escape(text, quote=True)
 
 
+def plural_principles(n):
+    if 11 <= n % 100 <= 14:
+        return "принципов"
+    if n % 10 == 1:
+        return "принцип"
+    if n % 10 in (2, 3, 4):
+        return "принципа"
+    return "принципов"
+
+
 def load_principles():
     items = []
     for path in sorted((CONTENT / "principles").glob("*.yaml")):
@@ -193,6 +203,7 @@ def main(argv=None):
     conflicts = load("conflicts.yaml")["conflicts"]
     principles = load_principles()
     count = len(principles)
+    counted = {"count": count, "principles": plural_principles(count)}
 
     back = {}
     for row in conflicts:
@@ -272,7 +283,7 @@ def main(argv=None):
     langpick.append("</div>")
 
     hero = [
-        f'<div class="eyebrow">{esc(site["hero"]["eyebrow"].format(count=count))}</div>',
+        f'<div class="eyebrow">{esc(site["hero"]["eyebrow"].format(**counted))}</div>',
         f'<h1>{esc(site["title"])}</h1>',
     ]
     hero += [f"<p>{para}</p>" for para in site["hero"]["paragraphs"]]
@@ -283,7 +294,7 @@ def main(argv=None):
     )
 
     footer = [
-        f"<span>Справочник · {count} принципов</span>",
+        f'<span>Справочник · {counted["count"]} {counted["principles"]}</span>',
         "<span>Java · Rust · Go · Python 3.12+</span>",
         f'<span>Технический пересмотр: {esc(site["last_reviewed"])}</span>',
         f'<span><a href="{esc(site["repo"])}" rel="noopener noreferrer">Исходники '
@@ -295,7 +306,7 @@ def main(argv=None):
         "__TITLE__": esc(site["title"]),
         "__DESCRIPTION__": esc(" ".join(site["description"].split())),
         "__OG_DESCRIPTION__": esc(
-            " ".join(site["og_description"].format(count=count).split())
+            " ".join(site["og_description"].format(**counted).split())
         ),
         "__BRAND__": f'{esc(site["brand"][0])} <span>{esc(site["brand"][1])}</span>',
         "__LANGPICK__": "\n".join(langpick),
@@ -317,7 +328,7 @@ def main(argv=None):
         if b["type"] == "code"
     )
     print(
-        f"built {args.out.name} — {count} принципов, {figures} фигур, "
+        f"built {args.out.name} — {count} {plural_principles(count)}, {figures} фигур, "
         f"{panes} панелей кода"
     )
     return 0

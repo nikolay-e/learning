@@ -38,7 +38,7 @@ blocks:
         label: Go · relay
         highlight: go
         code:
-          "// доставка и пометка — идемпотентная петля\nrows := tx.Query(`SELECT event_id, payload FROM\
+          "// at-least-once петля: пометка — после подтверждённой публикации\nrows := tx.Query(`SELECT event_id, payload FROM\
           \ outbox\n                  WHERE published_at IS NULL ORDER BY seq LIMIT 100 FOR UPDATE SKIP LOCKED`)\n\
           \nfor _, e := range rows {\n    if err := producer.Send(ctx, e); err != nil { break } // не помечаем\
           \ — придём снова\n    tx.Exec(`UPDATE outbox SET published_at = now() WHERE event_id = $1`, e.ID)\n\

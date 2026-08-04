@@ -1357,19 +1357,36 @@ lifecycle {
 <button type="button" class="copy">копировать</button>
 </div>
 <p class="fallback-note" hidden></p>
-<pre tabindex="0"><code class="language-go">// новая реализация получает трафик, но не право голоса
+<pre tabindex="0"><code class="language-go">// АНТИПАТТЕРН: горутина на каждый запрос — неограниченная конкурентность,
+// контекст отменён сразу после ответа клиенту, ни таймаута, ни recover
+go func() {
+    nu, nerr := m.next.Get(ctx, id)          // ctx уже отменён
+    m.compare.Record(id, old, err, nu, nerr) // паника здесь снимает процесс
+}()
+
+// НОРМА: новая реализация получает трафик, но не право голоса —
+// через ограниченную очередь, со своим контекстом и таймаутом
 func (m *Migrator) Get(ctx context.Context, id UserID) (User, error) {
     old, err := m.legacy.Get(ctx, id)
-    go func() { // теневой вызов вне критического пути
-        nu, nerr := m.next.Get(shadowCtx(ctx), id)
-        m.compare.Record(id, old, err, nu, nerr) // расхождения → метрика, не паника
-    }()
-    return old, err // источник правды пока старый; cutover — когда diff-rate &lt; порога
-                    // N дней подряд, и это число записано ДО начала
+    m.shadow.Offer(job{id, old, err}) // неблокирующе: очередь полна —
+    return old, err                   // сэмпл выбрасывается, клиент не ждёт
+}   // источник правды пока старый; cutover — когда diff-rate &lt; порога
+    // N дней подряд, и это число записано ДО начала
+
+func (m *Migrator) shadowWorker() {
+    for j := range m.shadow.Jobs() {
+        func() {
+            defer func() { _ = recover() }() // паника воркера не роняет процесс
+            ctx, cancel := context.WithTimeout(m.shadowBase, 200*time.Millisecond)
+            defer cancel()
+            nu, nerr := m.next.Get(ctx, j.id)
+            m.compare.Record(j.id, redact(j.old), j.err, redact(nu), nerr)
+        }()
+    }
 }</code></pre>
 </figure>
 <p class="note"><strong>Честная оценка.</strong> Организационные миграции (gitflow → trunk, monorepo, платформа) подчиняются той же механике, что и технические: dual-run = обе модели разрешены, cutover = новые сервисы только на новой, contract = старая выключена <em>датой</em>, объявленной заранее. «Добровольно и бессрочно» — это не миграция, а вечное удвоение поддержки. Критерий отмены тоже пишется до старта: миграция без условия «когда мы откатываемся» — ловушка sunk cost в производственном масштабе.</p>
-<p class="note"><strong>Опасность теневого вызова.</strong> Горутина на каждый запрос — это неограниченная конкурентность, отмена контекста сразу после ответа клиенту, отсутствие таймаута и незакрытая паника. Рабочая форма: пул с ограниченной очередью и сэмплированием, отдельный короткоживущий контекст (только разрешённые correlation-атрибуты, без пользовательских данных), таймаут и circuit breaker на теневой путь, recover в воркере и редакция PII перед записью расхождений.</p>
+<p class="note">Чего не видно в коде: <code>shadowBase</code> — не производный от запроса контекст, а собственный, несущий только разрешённые correlation-атрибуты и ни одного пользовательского; на теневой путь нужен circuit breaker, иначе деградация новой системы начинает съедать ресурсы старой; а очередь обязана иметь метрику отброшенных сэмплов — молча теряемый теневой трафик превращает diff-rate в цифру, измеряющую саму себя.</p>
 </article>
 
 </section>
@@ -1724,8 +1741,7 @@ impl Store {
     pub fn write(&amp;self, w: Fenced&lt;Write&gt;) -&gt; Result&lt;(), Stale&gt; { ... }
 }</code></pre></div>
 </figure>
-<p class="note"><strong>Честная оценка.</strong> Redlock без fencing — известный спор Kleppmann vs antirez; практический вывод: если ресурс не умеет проверять токен (S3 без precondition, внешний API), лок даёт <em>efficiency</em> (не делать работу дважды), но не <em>correctness</em>. Не путать эти два применения — вторая половина инцидентов с «distributed lock» именно отсюда. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; своей реализации ему не пишут, берут готовую.</p>
-<p class="note">Точнее: ресурс обязан применять <em>монотонную</em> проверку — fencing token, версию или conditional write / compare-and-swap. Fencing token — частный случай; CAS и preconditions выражают ту же защиту. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; свою реализацию для него не пишут.</p>
+<p class="note"><strong>Честная оценка.</strong> Требование к ресурсу точнее формулируется как <em>монотонная</em> проверка: fencing token — частный случай, версия и conditional write / compare-and-swap выражают ту же защиту. Если же ресурс не умеет ничего из этого (S3 без precondition, внешний API), лок даёт <em>efficiency</em> — не делать работу дважды, — но не <em>correctness</em>; путаница этих двух применений и есть вторая половина инцидентов с «distributed lock», включая известный спор Kleppmann vs antirez про Redlock. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; своей реализации ему не пишут, берут готовую.</p>
 </article>
 
 <article class="principle" id="p67" data-keywords="clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы" data-kind="pattern" data-confidence="established">
@@ -1794,7 +1810,7 @@ COMMIT;
 
 -- relay (Debezium / поллер) читает outbox → Kafka; доставка at-least-once,
 -- поэтому дедупликация у потребителя по event_id обязательна (см. 21)</code></pre></div>
-<div class="codepane" role="tabpanel" id="p68f1-pane-go" aria-labelledby="p68f1-tab-go" data-lang="go"><div class="paneflag">Go · relay</div><pre tabindex="0"><code class="language-go">// доставка и пометка — идемпотентная петля
+<div class="codepane" role="tabpanel" id="p68f1-pane-go" aria-labelledby="p68f1-tab-go" data-lang="go"><div class="paneflag">Go · relay</div><pre tabindex="0"><code class="language-go">// at-least-once петля: пометка — после подтверждённой публикации
 rows := tx.Query(`SELECT event_id, payload FROM outbox
                   WHERE published_at IS NULL ORDER BY seq LIMIT 100 FOR UPDATE SKIP LOCKED`)
 
@@ -1840,7 +1856,7 @@ record ChargeCard(Cents amount) implements SagaStep {
 <div class="p-head"><span class="p-num">70</span><h3>Кэш — это реплика с задокументированным бюджетом staleness</h3><a class="anchor" href="#p70" aria-label="Ссылка на принцип 70">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Кэш ↔ консистентность</a></p>
-<p class="lede">Кэш — не «ускорение», а осознанное ослабление консистентности: TTL — это SLA на устаревание, и он должен быть выведен из бизнес-требования («цена может врать 60 секунд»), а не из «ну пусть 5 минут». Инвалидация по событию и TTL как страховочный пол — не «или», а «и»: событие теряется (at-least-once ≠ exactly-once), TTL ограничивает ущерб потери.</p>
+<p class="lede">Кэш — не «ускорение», а осознанное ослабление консистентности: TTL — это SLA на устаревание, и он должен быть выведен из бизнес-требования («цена может врать 60 секунд»), а не из «ну пусть 5 минут». Инвалидация по событию и TTL как страховочный пол — хороший дефолт именно вместе: инвалидация теряется не от семантики доставки, а от операционных отказов — упавшего релея, переполнения, ошибки маршрутизации, рассинхрона после rebalance, — и TTL ограничивает ущерб такой потери. Это дефолт, а не обязанность: durable write-through с явно заданными гарантиями тоже корректен.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1860,7 +1876,6 @@ var pricePolicy = CachePolicy{TTL: 60 * time.Second, StaleWhileRevalidate: 10 * 
 // ревью-вопрос: &quot;откуда 60?&quot; должен иметь ответ со ссылкой на требование</code></pre>
 </figure>
 <p class="note">Cache-aside / read-through / write-through / write-behind — не вкусовщина: write-behind теряет данные при падении кэша и допустим только для восстановимого (счётчики, метрики). Ключ с двумя писателями (сервис и инвалидатор) — гонка по построению; версионируйте значение или пишите через одну точку.</p>
-<p class="note"><strong>Точность.</strong> At-least-once сама по себе не теряет инвалидации — потери приходят от конкретных операционных отказов: падения релея, переполнения, ошибки маршрутизации, рассинхрона после rebalance. Событие плюс TTL — хороший дефолт, а не универсальная обязанность: durable write-through с явно заданными гарантиями тоже корректен.</p>
 </article>
 
 <article class="principle" id="p71" data-keywords="cache stampede thundering herd singleflight negative caching xfetch jitter" data-kind="pattern" data-confidence="established">
@@ -1971,9 +1986,11 @@ stream.keyBy(Event::customerId)
 <p class="fallback-note" hidden></p>
 <div class="codepane" role="tabpanel" id="p80f1-pane-java" aria-labelledby="p80f1-tab-java" data-lang="java"><div class="paneflag">Java</div><pre tabindex="0"><code class="language-java">// враг replay — недетерминизм, спрятанный в трансформации
 
-// ПЛОХО:  enrich(event, dict.current())        // replay через месяц даст другой результат
-// ХОРОШО: enrich(event, dict.asOf(event.ts())) // temporal join по event time —
-//                                              // replay воспроизводит прошлое побайтово</code></pre></div>
+// ПЛОХО:  enrich(event, dict.current())        // replay через месяц даст
+//                                              // другой результат
+// ХОРОШО: enrich(event, dict.asOf(event.ts())) // temporal join по event time:
+//                                              // результат воспроизводим
+//                                              // в пределах контракта данных</code></pre></div>
 <div class="codepane" role="tabpanel" id="p80f1-pane-go" aria-labelledby="p80f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// replay-запрос как явный тип: границы, скорость, назначение
 type ReplayJob struct {
     Source    TopicRange   // {topic, partitions, fromOffset/fromTs, toTs}
@@ -1983,7 +2000,7 @@ type ReplayJob struct {
 }</code></pre></div>
 </figure>
 <p class="note">Replay в <em>тот же</em> даунстрим требует, чтобы вся цепочка ниже была идемпотентна (<a href="#p22">22</a>, дедуп по event_id — <a href="#p21">21</a>); иначе replay в теневой sink, сравнение, cutover. Kappa-архитектура — это принцип replay, возведённый в архитектуру: batch = replay стрима. Следствие для retention: срок хранения топика — не стоимость диска, а страховой горизонт репроцессинга; резать его — решение уровня one-way door (<a href="#p20">20</a>).</p>
-<p class="note">«Побайтово» достижимо только если версионирована вся транзитивная зависимость: код трансформации, схемы и парсеры, справочники, библиотеки, окружение с плавающей точкой. Практический ориентир скромнее — воспроизводимость в пределах объявленного контракта данных, проверяемая сравнением, а не декларацией. Сюда же: стратегия сверки, reconciliation, ограничения retention по закону и приватности, и разделение ресурсов между replay и живым трафиком.</p>
+<p class="note">Побайтовое совпадение достижимо только если версионирована вся транзитивная зависимость: код трансформации, схемы и парсеры, справочники, библиотеки, окружение с плавающей точкой. Поэтому «воспроизводимость» проверяется сравнением, а не декларируется, и объявляется в границах контракта данных. Сюда же: стратегия сверки, reconciliation, ограничения retention по закону и приватности, и разделение ресурсов между replay и живым трафиком.</p>
 </article>
 
 <article class="principle" id="p81" data-keywords="poison pill dead letter queue dlq re-drive partition stuck ordering отравленное сообщение" data-kind="pattern" data-confidence="context-dependent">
@@ -2265,13 +2282,14 @@ ps.setString(1, email);</code></pre></div>
 <p class="sources"><strong>Источники:</strong> <a href="https://go.dev/wiki/Modules" rel="noopener noreferrer">Go Wiki: Go Modules</a></p>
 <p class="lede">Главный практический вектор атак последних лет — не ваш код.</p>
 <p>Два сокращения из заголовка отвечают на разные вопросы. SBOM — опись того, из чего собран артефакт: пакеты, версии, хеши. Она нужна не для отчётности, а чтобы на вопрос «затрагивает ли нас эта CVE» отвечать за минуты машинным запросом, а не за неделю опроса команд. SLSA — уровневая шкала требований не к коду, а к самой сборке: что она идёт из версионированного источника, на изолированном раннере, с подписанным provenance «этот бинарник собран из этого коммита этим пайплайном». Короче: SBOM говорит, что внутри, SLSA — можно ли верить тому, кто это собрал. Пиннинг — предусловие для обоих: без него опись описывает не то, что уедет в прод завтра (<a href="#p83">83</a>).</p>
-<figure class="code" data-multi data-available="rust,go,python">
+<figure class="code" data-multi data-available="rust,go,python,java">
 <figcaption class="sr-only">Пример кода (конфигурация)</figcaption>
 <div class="langbar">
 <div class="langtabs" role="tablist" aria-label="Язык примера">
 <button type="button" class="langtab" role="tab" id="p35f1-tab-rust" data-lang="rust" aria-selected="false" tabindex="-1" aria-controls="p35f1-pane-rust">Rust</button>
 <button type="button" class="langtab" role="tab" id="p35f1-tab-go" data-lang="go" aria-selected="false" tabindex="-1" aria-controls="p35f1-pane-go">Go</button>
-<button type="button" class="langtab" role="tab" id="p35f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p35f1-pane-python">Python / Java</button>
+<button type="button" class="langtab" role="tab" id="p35f1-tab-python" data-lang="python" aria-selected="false" tabindex="-1" aria-controls="p35f1-pane-python">Python</button>
+<button type="button" class="langtab" role="tab" id="p35f1-tab-java" data-lang="java" aria-selected="false" tabindex="-1" aria-controls="p35f1-pane-java">Java</button>
 </div>
 <span class="grow"></span>
 <span class="status" title="Декларативный конфиг, а не исполняемый код">конфигурация</span>
@@ -2292,8 +2310,14 @@ vulnerability = &quot;deny&quot;</code></pre></div>
 //                                они ОТКЛЮЧАЮТ сверку, а не включают её
 //
 // govulncheck в CI — вызовной анализ: алертит только на реально достижимые уязвимости</code></pre></div>
-<div class="codepane" role="tabpanel" id="p35f1-pane-python" aria-labelledby="p35f1-tab-python" data-lang="python"><div class="paneflag">Python / Java</div><pre tabindex="0"><code class="language-bash"># lock-файлы (uv.lock / gradle verification-metadata.xml),
-# запрет плавающих версий, генерация SBOM (syft) на каждый релиз</code></pre></div>
+<div class="codepane" role="tabpanel" id="p35f1-pane-python" aria-labelledby="p35f1-tab-python" data-lang="python"><div class="paneflag">Python · uv</div><pre tabindex="0"><code class="language-bash"># lock коммитится; плавающие версии запрещены, SBOM — на каждый релиз
+uv lock --check      # CI падает, если lock разошёлся с pyproject.toml
+uv sync --frozen     # ставим ровно то, что в lock, без пересчёта
+syft dir:. -o spdx-json &gt; sbom.json</code></pre></div>
+<div class="codepane" role="tabpanel" id="p35f1-pane-java" aria-labelledby="p35f1-tab-java" data-lang="java"><div class="paneflag">Java · Gradle</div><pre tabindex="0"><code class="language-bash"># verification-metadata.xml фиксирует хеши всех артефактов сборки
+./gradlew --write-verification-metadata sha256 help   # сгенерировать
+./gradlew build      # падает, если хеш зависимости не совпал
+# Maven — тот же смысл через dependency-lock и checksum-политику репозитория</code></pre></div>
 </figure>
 </article>
 

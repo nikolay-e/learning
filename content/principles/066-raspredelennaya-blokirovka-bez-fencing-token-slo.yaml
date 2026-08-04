@@ -41,13 +41,10 @@ blocks:
           \ ... }\n}"
   - type: note
     html:
-      "<strong>Честная оценка.</strong> Redlock без fencing — известный спор Kleppmann vs antirez; практический
-      вывод: если ресурс не умеет проверять токен (S3 без precondition, внешний API), лок даёт <em>efficiency</em>
-      (не делать работу дважды), но не <em>correctness</em>. Не путать эти два применения — вторая половина
-      инцидентов с «distributed lock» именно отсюда. И отдельно: consensus (Raft/Paxos) — алгоритм, а не
-      эвристика; своей реализации ему не пишут, берут готовую."
-  - type: note
-    html:
-      "Точнее: ресурс обязан применять <em>монотонную</em> проверку — fencing token, версию или conditional
-      write / compare-and-swap. Fencing token — частный случай; CAS и preconditions выражают ту же защиту.
-      И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; свою реализацию для него не пишут."
+      "<strong>Честная оценка.</strong> Требование к ресурсу точнее формулируется как <em>монотонная</em>
+      проверка: fencing token — частный случай, версия и conditional write / compare-and-swap выражают ту
+      же защиту. Если же ресурс не умеет ничего из этого (S3 без precondition, внешний API), лок даёт
+      <em>efficiency</em> — не делать работу дважды, — но не <em>correctness</em>; путаница этих двух
+      применений и есть вторая половина инцидентов с «distributed lock», включая известный спор Kleppmann
+      vs antirez про Redlock. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; своей
+      реализации ему не пишут, берут готовую."

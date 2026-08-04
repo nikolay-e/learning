@@ -238,8 +238,13 @@ count = len(principles)
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 if f"{count} principles" not in readme:
     fail(f"README не упоминает «{count} principles»")
-if f"{count} принципов" not in page:
-    fail(f"страница не упоминает «{count} принципов»")
+sys.path.insert(0, str(ROOT / "scripts"))
+from build import \
+    plural_principles  # noqa: E402  — правило склонения одно на оба скрипта
+
+count_phrase = f"{count} {plural_principles(count)}"
+if count_phrase not in page:
+    fail(f"страница не упоминает «{count_phrase}»")
 
 # --- вендоренные бандлы -----------------------------------------------------
 

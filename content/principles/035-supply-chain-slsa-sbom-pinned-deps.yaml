@@ -53,9 +53,20 @@ blocks:
 
           // govulncheck в CI — вызовной анализ: алертит только на реально достижимые уязвимости"
       - lang: python
-        tab: Python / Java
-        label: Python / Java
+        tab: Python
+        label: Python · uv
         highlight: bash
-        code: "# lock-файлы (uv.lock / gradle verification-metadata.xml),
-
-          # запрет плавающих версий, генерация SBOM (syft) на каждый релиз"
+        code: |-
+          # lock коммитится; плавающие версии запрещены, SBOM — на каждый релиз
+          uv lock --check      # CI падает, если lock разошёлся с pyproject.toml
+          uv sync --frozen     # ставим ровно то, что в lock, без пересчёта
+          syft dir:. -o spdx-json > sbom.json
+      - lang: java
+        tab: Java
+        label: Java · Gradle
+        highlight: bash
+        code: |-
+          # verification-metadata.xml фиксирует хеши всех артефактов сборки
+          ./gradlew --write-verification-metadata sha256 help   # сгенерировать
+          ./gradlew build      # падает, если хеш зависимости не совпал
+          # Maven — тот же смысл через dependency-lock и checksum-политику репозитория

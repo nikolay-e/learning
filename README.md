@@ -38,9 +38,10 @@ mislabelling the language.
 
 ## Site features
 
-- Language switcher — pick Java / Rust / Go / Python and every code block follows. Where a
-  figure has no example in the selected language it says so instead of silently showing a
-  different one
+- Language switcher — pick Java / Rust / Go / Python and every multi-language figure follows.
+  Where such a figure has no example in the selected language it says so instead of silently
+  showing a different one. Architectural entries carry a single representative example and sit
+  out the switch; the figure's label always names the language it is actually showing
 - `/` focuses the filter; typing narrows the page and updates `?q=` so a filtered view is
   linkable. Each principle carries English synonyms, so Russian-titled entries are findable
   by their canonical English name ("robustness principle", "thundering herd", "false sharing")

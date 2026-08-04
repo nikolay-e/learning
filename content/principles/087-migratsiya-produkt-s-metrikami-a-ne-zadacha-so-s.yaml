@@ -19,13 +19,34 @@ blocks:
         tab: null
         label: Go · shadow-compare
         highlight: go
-        code:
-          "// новая реализация получает трафик, но не право голоса\nfunc (m *Migrator) Get(ctx context.Context,\
-          \ id UserID) (User, error) {\n    old, err := m.legacy.Get(ctx, id)\n    go func() { // теневой\
-          \ вызов вне критического пути\n        nu, nerr := m.next.Get(shadowCtx(ctx), id)\n        m.compare.Record(id,\
-          \ old, err, nu, nerr) // расхождения → метрика, не паника\n    }()\n    return old, err // источник\
-          \ правды пока старый; cutover — когда diff-rate < порога\n                    // N дней подряд,\
-          \ и это число записано ДО начала\n}"
+        code: |-
+          // АНТИПАТТЕРН: горутина на каждый запрос — неограниченная конкурентность,
+          // контекст отменён сразу после ответа клиенту, ни таймаута, ни recover
+          go func() {
+              nu, nerr := m.next.Get(ctx, id)          // ctx уже отменён
+              m.compare.Record(id, old, err, nu, nerr) // паника здесь снимает процесс
+          }()
+
+          // НОРМА: новая реализация получает трафик, но не право голоса —
+          // через ограниченную очередь, со своим контекстом и таймаутом
+          func (m *Migrator) Get(ctx context.Context, id UserID) (User, error) {
+              old, err := m.legacy.Get(ctx, id)
+              m.shadow.Offer(job{id, old, err}) // неблокирующе: очередь полна —
+              return old, err                   // сэмпл выбрасывается, клиент не ждёт
+          }   // источник правды пока старый; cutover — когда diff-rate < порога
+              // N дней подряд, и это число записано ДО начала
+
+          func (m *Migrator) shadowWorker() {
+              for j := range m.shadow.Jobs() {
+                  func() {
+                      defer func() { _ = recover() }() // паника воркера не роняет процесс
+                      ctx, cancel := context.WithTimeout(m.shadowBase, 200*time.Millisecond)
+                      defer cancel()
+                      nu, nerr := m.next.Get(ctx, j.id)
+                      m.compare.Record(j.id, redact(j.old), j.err, redact(nu), nerr)
+                  }()
+              }
+          }
   - type: note
     html:
       "<strong>Честная оценка.</strong> Организационные миграции (gitflow → trunk, monorepo, платформа)
@@ -35,8 +56,8 @@ blocks:
       условия «когда мы откатываемся» — ловушка sunk cost в производственном масштабе."
   - type: note
     html:
-      "<strong>Опасность теневого вызова.</strong> Горутина на каждый запрос — это неограниченная конкурентность,
-      отмена контекста сразу после ответа клиенту, отсутствие таймаута и незакрытая паника. Рабочая форма:
-      пул с ограниченной очередью и сэмплированием, отдельный короткоживущий контекст (только разрешённые
-      correlation-атрибуты, без пользовательских данных), таймаут и circuit breaker на теневой путь, recover
-      в воркере и редакция PII перед записью расхождений."
+      "Чего не видно в коде: <code>shadowBase</code> — не производный от запроса контекст, а собственный,
+      несущий только разрешённые correlation-атрибуты и ни одного пользовательского; на теневой путь
+      нужен circuit breaker, иначе деградация новой системы начинает съедать ресурсы старой; а очередь
+      обязана иметь метрику отброшенных сэмплов — молча теряемый теневой трафик превращает diff-rate
+      в цифру, измеряющую саму себя."
