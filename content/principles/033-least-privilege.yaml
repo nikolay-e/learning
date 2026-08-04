@@ -5,6 +5,12 @@ nav_label: Least privilege
 section: s6
 keywords: least privilege capability rbac securitycontext narrow interface
 blocks:
+  - type: lede
+    html: 'Компонент получает ровно те права, которых требует его задача, потому что цена ошибки
+      и цена компрометации определяются не намерениями компонента, а его возможностями. Это не только
+      про IAM и securityContext: в коде тот же принцип — узкий интерфейс. Сервису отчётов, которому
+      передали OrderReader вместо всего репозитория, нечем испортить заказ — ни по злому умыслу,
+      ни по опечатке.'
   - type: code
     panes:
       - lang: go

@@ -5,6 +5,12 @@ nav_label: Design by contract
 section: s1
 keywords: design by contract eiffel precondition postcondition invariant assertion
 blocks:
+  - type: lede
+    html: 'Предусловие, постусловие, инвариант — и главное, что из них следует: кто виноват.
+      Нарушенное предусловие — ошибка вызывающего: она возможна в корректной программе, проверяется
+      всегда и отвечает исключением. Нарушенный инвариант — ваша собственная ошибка и признак уже
+      испорченного состояния: продолжать работу нельзя, отсюда assert или panic, а не аккуратный
+      возврат ошибки (25).'
   - type: code
     panes:
       - lang: java

@@ -5,6 +5,11 @@ nav_label: Least Astonishment
 section: s8
 keywords: principle of least astonishment surprise pola mutable default argument deref
 blocks:
+  - type: lede
+    html: 'Мера удивления — не вкус автора, а сложившаяся идиома языка и окружающего кода: удивляет
+      то, что ведёт себя иначе, чем девяносто девять похожих мест. Практическое правило: если
+      поведение приходится объяснять комментарием, дешевле убрать поведение, чем написать комментарий —
+      читатель, не заглянувший в него, всё равно ошибётся (<a href="#p47">47</a>).'
   - type: code
     panes:
       - lang: python

@@ -384,6 +384,7 @@ class Email:
 <div class="p-head"><span class="p-num">03</span><h3>Make illegal states unrepresentable</h3><a class="anchor" href="#p3" aria-label="Ссылка на принцип 3">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="lede">Sum types вместо комбинаций флагов. <code>{isLoading, data, error}</code> имеет 4 невозможных состояния из 8; sum type — ноль.</p>
+<p>Откуда восемь: три независимых поля, каждое либо есть, либо нет — 2³. Осмысленных из них четыре: ничего не начиналось, идёт загрузка, пришли данные, пришла ошибка. Остальные четыре — «загрузка и данные разом», «данные и ошибка», «загрузка и ошибка», «всё сразу» — представимы в типе, недостижимы по смыслу, и каждая ветка кода обязана решать, что с ними делать: обычно она этого не делает, и невозможное состояние доезжает до пользователя. Sum type снимает сам вопрос — состояний ровно четыре, потому что пятое не выражается.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -570,6 +571,7 @@ async def settle_daily(db: Db, fx: FxClient) -&gt; None:
 <article class="principle" id="p6" data-keywords="immutable persistent data structure defensive copy value object" data-kind="heuristic" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">06</span><h3>Immutability по умолчанию</h3><a class="anchor" href="#p6" aria-label="Ссылка на принцип 6">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Значение, которое нельзя изменить, нельзя изменить и у вас за спиной: пропадает целый класс вопросов «кто ещё держит эту ссылку», а разделение между потоками перестаёт требовать блокировок. Цена — копирование при изменении, и платится она на границе: принятая конструктором коллекция копируется, иначе вызывающий сохранил рычаг к вашему состоянию.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -642,6 +644,7 @@ type UserService interface{} // func (h *Handler) route(...) { h.db.QueryUser(..
 <article class="principle" id="p8" data-keywords="design by contract eiffel precondition postcondition invariant assertion" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">08</span><h3>Design by contract</h3><a class="anchor" href="#p8" aria-label="Ссылка на принцип 8">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Предусловие, постусловие, инвариант — и главное, что из них следует: кто виноват. Нарушенное предусловие — ошибка вызывающего: она возможна в корректной программе, проверяется всегда и отвечает исключением. Нарушенный инвариант — ваша собственная ошибка и признак уже испорченного состояния: продолжать работу нельзя, отсюда assert или panic, а не аккуратный возврат ошибки (25).</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -688,6 +691,7 @@ def apply(self, entry: LedgerEntry) -&gt; None:
 <article class="principle" id="p9" data-keywords="property based testing quickcheck fuzzing invariant roundtrip" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">09</span><h3>Property-based / type-driven testing</h3><a class="anchor" href="#p9" aria-label="Ссылка на принцип 9">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Пример-тест проверяет случаи, которые вы придумали; свойство-тест проверяет утверждение, обязанное держаться на любом входе, а контрпример ищет генератор — и, найдя, ужимает его до минимального. Свойства, окупающиеся почти везде: roundtrip (разобрать записанное даёт исходное), сохранение (сумма не меняется), согласие с наивной эталонной реализацией. Типы — та же идея на шаг раньше: то, что гарантирует компилятор (<a href="#p3">3</a>), тестировать уже не нужно.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -739,6 +743,7 @@ def test_settlement_conserves_money(trades):
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">DOD ↔ information hiding</a></p>
 <p class="lede">Дизайн от layout данных: SoA вместо AoS, cache lines, батчи вместо поэлементной обработки. Противоречит инкапсуляции — это осознанный трейдофф для hot path.</p>
+<p>AoS (array of structs) — массив записей, как их пишет человек; SoA (struct of arrays) — по массиву на каждое поле. Разница проявляется, когда цикл читает одно поле у миллиона записей: процессор тащит память строками по 64 байта, поэтому AoS втягивает в кэш всю запись целиком и выбрасывает почти всю строку, а SoA кладёт рядом ровно то, что читается. Отсюда и конфликт с инкапсуляцией (<a href="#p12">12</a>): SoA разбирает объект на части и лишает его права прятать своё представление — поэтому и применяется точечно, на измеренном (<a href="#p37">37</a>) горячем пути, а не по всей кодовой базе.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -788,6 +793,7 @@ class Particles:
 <article class="principle" id="p11" data-keywords="raii ownership borrow lifetime resource leak defer context manager" data-kind="pattern" data-confidence="established">
 <div class="p-head"><span class="p-num">11</span><h3>Ownership / управление ресурсами</h3><a class="anchor" href="#p11" aria-label="Ссылка на принцип 11">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">У каждого ресурса ровно один владелец, отвечающий за освобождение, и момент освобождения привязан к области видимости, а не к дисциплине программиста. Языки различаются только тем, кто за этим следит: Rust проверяет владение компилятором, остальные дают конструкцию (try-with-resources, defer, with) и ловят забытое линтером. Сборщик мусора эту роль не исполняет: он отвечает за память, а не за дескрипторы, соединения и блокировки, и момент финализации не определён.</p>
 <figure class="code" data-multi data-available="rust,java,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -874,6 +880,7 @@ __all__ = [&quot;RateLimiter&quot;]   # публичный контракт за
 <div class="p-head"><span class="p-num">13</span><h3>Coupling / Cohesion</h3><a class="anchor" href="#p13" aria-label="Ссылка на принцип 13">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="lede">Единственная пара метрик дизайна, поддающаяся измерению (afferent/efferent coupling, instability). Практика: направленные зависимости проверяются в CI, а не в head-каноне ревьюера.</p>
+<p>Что именно считается: Ca (afferent) — сколько модулей зависят от вас, Ce (efferent) — от скольких зависите вы, instability I = Ce / (Ca + Ce). I = 0 — от вас зависят все, вы ни от кого: менять дорого, зато никто не ломает вас. I = 1 — наоборот. Ценность не в самих числах, а в направлении: устойчивое не должно зависеть от неустойчивого, иначе изменение в самом изменчивом модуле поднимается вверх по графу ко всем его читателям. Cohesion той же линейкой не меряется — это вопрос «меняется ли содержимое модуля по одной причине» (<a href="#p1">1</a>), и он остаётся суждением.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1026,6 +1033,7 @@ class UserOut(BaseModel):
 <p class="caveat"><strong>Область применимости.</strong> additive-only — безопасная политика по умолчанию, но не полное описание совместимости: она зависит от формата, defaults, compatibility mode и сочетания версий reader/writer. Отдельные удаления с reserved и часть изменений типов wire-compatible, оставаясь semantic-breaking.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Postel ↔ эволюция схем</a></p>
 <p class="lede">Protobuf/Avro-правила: additive-only, никогда не переиспользовать номера полей, <code>reserved</code> для удалённых.</p>
+<p>Все три правила выводятся из одного факта: в wire-формате поле опознаётся номером, а не именем — имя живёт только в <code>.proto</code> и в сгенерированном коде. Отсюда переименование поля безопасно (номер тот же), смена номера равносильна подмене поля, а незнакомый номер старый читатель пропускает как unknown field — поэтому добавление совместимо. И отсюда же худший случай: номер удалённого поля, отданный новому полю другого типа, старый читатель разберёт по старой схеме и молча получит чужие данные — не ошибку, а правдоподобный мусор. <code>reserved</code> существует ровно затем, чтобы компилятор не дал это сделать; это тот же сожжённый идентификатор, что и retired-номер принципа в этом справочнике.</p>
 <figure class="code" data-multi data-available="protobuf,java,rust">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1964,6 +1972,7 @@ log.info(&quot;request_completed&quot;, duration_ms=ms, outcome=&quot;declined&q
 <article class="principle" id="p29" data-keywords="trace id opentelemetry propagation distributed tracing span context" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">29</span><h3>Trace ID сквозь границы — часть контракта</h3><a class="anchor" href="#p29" aria-label="Ссылка на принцип 29">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Логи десяти сервисов без общего идентификатора — это десять несвязанных историй об одном запросе. Trace ID полезен ровно настолько, насколько переживает каждый переход: один сервис, потерявший контекст, разрывает цепочку целиком — поэтому пропагация это обязательство на каждой границе, а не настройка библиотеки в одном месте.</p>
 <figure class="code" data-multi data-available="java,rust">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2060,6 +2069,7 @@ class DryRunExecutor:            # печатает план; логика ВЫ�
 <article class="principle" id="p32" data-keywords="trust boundary taint tracking sanitization untrusted input xss" data-kind="pattern" data-confidence="established">
 <div class="p-head"><span class="p-num">32</span><h3>Trust boundaries явно; всё пересекающее границу — парсится</h3><a class="anchor" href="#p32" aria-label="Ссылка на принцип 32">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Граница доверия — место, где данные приходят от того, кем вы не управляете: HTTP-запрос, очередь, файл, ответ чужого API, выход модели (<a href="#p48">48</a>). Правило одно: на границе вход разбирается в тип, а не проверяется по дороге — проверка выбрасывает знание о том, что она прошла (<a href="#p2">2</a>), и следующий по коду обязан проверять заново. Тип это знание хранит, и компилятор не даёт о нём забыть.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2085,6 +2095,7 @@ impl Untrusted&lt;String&gt; {
 <article class="principle" id="p33" data-keywords="least privilege capability rbac securitycontext narrow interface" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">33</span><h3>Least privilege</h3><a class="anchor" href="#p33" aria-label="Ссылка на принцип 33">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Компонент получает ровно те права, которых требует его задача, потому что цена ошибки и цена компрометации определяются не намерениями компонента, а его возможностями. Это не только про IAM и securityContext: в коде тот же принцип — узкий интерфейс. Сервису отчётов, которому передали OrderReader вместо всего репозитория, нечем испортить заказ — ни по злому умыслу, ни по опечатке.</p>
 <figure class="code" data-multi data-available="go,yaml">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2113,6 +2124,7 @@ type OrderWriter interface{ PutOrder(ctx context.Context, o Order) error }
 <article class="principle" id="p34" data-keywords="sql injection prepared statement parameterized query owasp secrets" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">34</span><h3>Секреты и инъекции: параметризация, не конкатенация</h3><a class="anchor" href="#p34" aria-label="Ссылка на принцип 34">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Инъекция — это стирание границы между программой и данными: склеенная строка уходит интерпретатору (SQL, shell, LDAP, HTML) целиком, и он не может знать, какая её часть была вводом пользователя. Параметризация не «экранирует опасные символы» — она передаёт запрос и значения по разным каналам, поэтому значение в принципе не становится кодом. Ручное экранирование не эквивалент: оно снова полагается на то, что вы угадали грамматику приёмника.</p>
 <figure class="code" data-multi data-available="python,java">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2138,6 +2150,7 @@ ps.setString(1, email);</code></pre></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Декларативный конфиг, а не исполняемый код">конфигурация</span></li></ul>
 <p class="sources"><strong>Источники:</strong> <a href="https://go.dev/wiki/Modules" rel="noopener noreferrer">Go Wiki: Go Modules</a></p>
 <p class="lede">Главный практический вектор атак последних лет — не ваш код.</p>
+<p>Два сокращения из заголовка отвечают на разные вопросы. SBOM — опись того, из чего собран артефакт: пакеты, версии, хеши. Она нужна не для отчётности, а чтобы на вопрос «затрагивает ли нас эта CVE» отвечать за минуты машинным запросом, а не за неделю опроса команд. SLSA — уровневая шкала требований не к коду, а к самой сборке: что она идёт из версионированного источника, на изолированном раннере, с подписанным provenance «этот бинарник собран из этого коммита этим пайплайном». Короче: SBOM говорит, что внутри, SLSA — можно ли верить тому, кто это собрал. Пиннинг — предусловие для обоих: без него опись описывает не то, что уедет в прод завтра (<a href="#p83">83</a>).</p>
 <figure class="code" data-multi data-available="rust,go,python">
 <figcaption class="sr-only">Пример кода (конфигурация)</figcaption>
 <div class="langbar">
@@ -2252,6 +2265,7 @@ $ py-spy record --pid 4711 --format speedscope</code></pre></div>
 <p class="caveat"><strong>Область применимости.</strong> Все примеры исходят из cache line 64 B — это platform-specific. Размер проверяется на целевой платформе, выигрыш — hardware counters, а не рассуждением. @Contended — internal API JDK и требует отдельного флага запуска.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Boring technology ↔ mechanical sympathy</a></p>
 <p class="lede">Cache line 64B, false sharing, NUMA, стоимость syscall. Смежно с DOD, но шире — включает знание рантайма.</p>
+<p>Ключ ко всему списку один: процессор работает не с байтами, а со строками кэша по 64 байта. False sharing — два потока пишут в разные переменные, случайно попавшие в одну строку: логически конкуренции нет, физически строка мечется между ядрами, и код тормозит без единого лока (лечится паддингом до размера строки). NUMA — на многосокетной машине у памяти есть «свой» и «чужой» сокет, обращение к чужому дороже, поэтому важно, где поток запущен относительно своих данных. Syscall дорог не переключением как таковым, а тем, что после него кэши и предсказатель переходов работают уже не на вас, — отсюда батчинг вместо поштучных вызовов. Общее у всех четырёх: стоимость невидима в исходнике и проявляется только измерением (<a href="#p37">37</a>).</p>
 <figure class="code" data-multi data-available="java,rust,go">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2364,6 +2378,7 @@ logger.Info(&quot;request_completed&quot;,
 <article class="principle" id="p46" data-keywords="principle of least astonishment surprise pola mutable default argument deref" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">46</span><h3>Least Astonishment</h3><a class="anchor" href="#p46" aria-label="Ссылка на принцип 46">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="lede">Мера удивления — не вкус автора, а сложившаяся идиома языка и окружающего кода: удивляет то, что ведёт себя иначе, чем девяносто девять похожих мест. Практическое правило: если поведение приходится объяснять комментарием, дешевле убрать поведение, чем написать комментарий — читатель, не заглянувший в него, всё равно ошибётся (<a href="#p47">47</a>).</p>
 <figure class="code" data-multi data-available="python,rust">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
