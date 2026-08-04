@@ -2,6 +2,7 @@
 
 import ast
 import datetime
+import hashlib
 import pathlib
 import re
 import subprocess
@@ -83,6 +84,11 @@ ids = sorted(principles)
 # Номер — вечный идентификатор: удалённый принцип уходит в sections.yaml:retired,
 # и его номер больше никому не достаётся. Сплошность проверяется по объединению,
 # иначе «номера не переиспользуются» и «нумерация без дыр» несовместимы.
+bad_retired = [pid for pid in retired if not isinstance(pid, int)]
+if bad_retired:
+    # без этого sorted() по смеси int и str падает трейсбеком вместо сообщения
+    fail(f"retired содержит не номера: {bad_retired}")
+    retired = [pid for pid in retired if isinstance(pid, int)]
 if len(set(retired)) != len(retired):
     fail(f"дубли в retired: {retired}")
 reused = sorted(set(retired) & set(ids))
@@ -139,7 +145,11 @@ for pid in sorted(principles):
     if not stamp:
         warn(f"p{pid}: есть versions, но нет last_reviewed — свежесть непроверяема")
         continue
-    reviewed = datetime.date.fromisoformat(str(stamp))
+    try:
+        reviewed = datetime.date.fromisoformat(str(stamp))
+    except ValueError:
+        fail(f"p{pid}: last_reviewed={stamp!r} — не дата в формате ГГГГ-ММ-ДД")
+        continue
     age = (today - reviewed).days
     if age > STALE_AFTER_DAYS:
         warn(
@@ -230,6 +240,31 @@ if f"{count} principles" not in readme:
     fail(f"README не упоминает «{count} principles»")
 if f"{count} принципов" not in page:
     fail(f"страница не упоминает «{count} принципов»")
+
+# --- вендоренные бандлы -----------------------------------------------------
+
+# Хеши в THIRD_PARTY.md — обещание, что в assets/ лежит ровно то, что скачал
+# vendor-highlight.sh. Без сверки это обещание никто не проверяет, а подмена
+# бандла — единственный способ выполнить чужой код на этой странице.
+third_party = (ROOT / "THIRD_PARTY.md").read_text(encoding="utf-8")
+recorded = dict(re.findall(r"`(assets/[^`]+\.js)`.*?`([0-9a-f]{64})`", third_party))
+vendored = sorted(p.name for p in (ROOT / "assets").glob("*.min.js"))
+for name in vendored:
+    path = ROOT / "assets" / name
+    key = f"assets/{name}"
+    if key not in recorded:
+        fail(f"{key} не описан в THIRD_PARTY.md")
+        continue
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != recorded[key]:
+        fail(
+            f"{key}: SHA-256 не совпадает с THIRD_PARTY.md "
+            f"(в файле {actual[:16]}…, записан {recorded[key][:16]}…) — "
+            "обновляйте только через scripts/vendor-highlight.sh"
+        )
+for key in recorded:
+    if not (ROOT / key).is_file():
+        fail(f"THIRD_PARTY.md описывает отсутствующий {key}")
 
 # --- код --------------------------------------------------------------------
 

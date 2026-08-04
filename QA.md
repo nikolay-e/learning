@@ -10,18 +10,18 @@ from `main` at the repository root. `index.html` is **generated** from `content/
 
 ## Applicability matrix
 
-| Checklist item           | Applies | Why                                                         |
-| ------------------------ | ------- | ----------------------------------------------------------- |
-| Forge / CI               | yes     | GitHub, Actions (`ci.yml` per push, `links.yml` weekly)     |
-| CD / ArgoCD / K8s / pods | no      | GitHub Pages, no cluster                                    |
-| Backend smoke / DB       | no      | no backend                                                  |
-| Client-error telemetry   | no      | no ingest endpoint; a beacon would need a backend           |
-| Browser QA               | yes     | the page is the whole product                               |
-| Tests                    | yes     | `npm test` — Playwright + axe, desktop and mobile projects  |
-| Autoqa pipeline / pin    | no      | no autoqa job; the Playwright + axe suite is the equivalent |
-| SonarCloud               | no      | no Sonar project, no `sonar-project.properties`             |
-| Bug intake               | partial | GitHub issues only — the single channel that exists         |
-| Test accounts            | no      | nothing to log into                                         |
+| Checklist item           | Applies | Why                                                        |
+| ------------------------ | ------- | ---------------------------------------------------------- |
+| Forge / CI               | yes     | GitHub, Actions (`ci.yml` per push, `links.yml` weekly)    |
+| CD / ArgoCD / K8s / pods | no      | GitHub Pages, no cluster                                   |
+| Backend smoke / DB       | no      | no backend                                                 |
+| Client-error telemetry   | no      | no ingest endpoint; a beacon would need a backend          |
+| Browser QA               | yes     | the page is the whole product                              |
+| Tests                    | yes     | `npm test` — Playwright + axe, desktop and mobile projects |
+| Autoqa pipeline / pin    | no      | no autoqa job (see "Standing in for autoqa")               |
+| SonarCloud               | no      | no Sonar project, no `sonar-project.properties`            |
+| Bug intake               | partial | GitHub issues — the only channel (see "Bug channels")      |
+| Test accounts            | no      | nothing to log into                                        |
 
 ## Forge
 
@@ -63,17 +63,34 @@ flash on load with the light theme stored (the theme script lives in `<head>` fo
 
 ## Content checks that are not in the test suite
 
-`scripts/validate.py` covers structure. Two things it cannot check on its own:
+`scripts/validate.py` covers structure. What is automated elsewhere, and what still needs a
+human:
 
 - **External source links.** Links in `content/metadata.yaml` under `sources` are fetched
   weekly by `.github/workflows/links.yml` (lychee, cron + `workflow_dispatch`), which opens
   an issue instead of failing an unrelated PR. Rot is caught; a citation that resolves but
   never said what the card claims is not — that still needs a human opening the page.
+- **Vendored bundle integrity** is no longer manual: `validate.py` re-hashes every
+  `assets/*.min.js` against the SHA-256 table in `THIRD_PARTY.md` and fails on a mismatch in
+  either direction. A bundle swapped without `scripts/vendor-highlight.sh` no longer ships.
 - **Whether a claim is still true.** API surfaces move (Flink `Time`→`Duration`, Java preview
   APIs, Go stdlib). `versions` on a card is a promise about a specific runtime; when a
   release moves, that card is stale even though every check is green. `validate.py` narrows
   the manual pass to a list: it warns (does not fail) for every card carrying `versions`
   whose `last_reviewed` is older than 180 days. Re-read those, then bump the date.
+
+## Standing in for autoqa
+
+`sync-autoqa-pin.sh --repo .` reports "no autoqa pin, skip" — there is no post-deploy autoqa
+job here and no sensor. What the missing pipeline would have covered, and who covers it instead:
+
+- **Crawler / broken links / JS errors / a11y** — the Playwright + axe suite covers the built
+  bytes, and CI proves the deployed file equals them. Each pass additionally fetch the served
+  page and check every `href`/`src` it contains resolves (18 external + 4 assets today).
+- **Schemathesis** — nothing to test: no API, no OpenAPI document.
+- **ZAP** — deliberately **not** run. An active scan of `nikolay-e.github.io` is a scan of
+  GitHub's infrastructure, not of this app; there is no backend, form, cookie or auth here for
+  it to find anything in. Skipping is the decision, not an oversight.
 
 ## Known-good states that look like problems
 
@@ -87,5 +104,18 @@ flash on load with the light theme stored (the theme script lives in `<head>` fo
 
 ## Bug channels
 
-GitHub issues, and nothing else — there is no in-app queue, no bot, no telemetry. If a channel
-is ever added, list it here.
+GitHub issues, and nothing else. Re-verified from code each pass, not from memory: no beacon or
+`fetch`/`sendBeacon` in `assets/app.js` or the template, no form, no `mailto:`, no backend, no
+database, no bot. `links.yml` files into the same GitHub issues channel — an open issue titled
+about broken links is that workflow reporting, not a human. If a channel is ever added, list it
+here.
+
+## diffctx omits files the repo un-ignores
+
+`SECURITY.md` is hidden by the global `~/.config/git/ignore` (it reserves that filename for
+`/review-security` output) and un-ignored here by `!SECURITY.md` in `.gitignore`. `diffctx
+--diff` treats a `git check-ignore -v` record as "ignored" and so drops any file matched by a
+negation pattern — filed as [diffctx#193](https://github.com/nikolay-e/diffctx/issues/193).
+
+Until that ships: cross-check the diff-context file list against `git diff --name-only <range>`
+and read anything missing by hand. The full map (`diffctx .`) is unaffected — only `--diff`.

@@ -236,6 +236,29 @@ test("тема применяется до загрузки app.js", async ({ co
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
+test("страница работает, когда localStorage запрещён", async ({
+  context,
+  page,
+}) => {
+  await context.addInitScript(() => {
+    const boom = () => {
+      throw new DOMException("denied", "SecurityError");
+    };
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get: () => ({ getItem: boom, setItem: boom, removeItem: boom }),
+    });
+  });
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(String(e)));
+  await page.goto("/");
+  // поиск инициализируется последним: работает он — значит скрипт дожил до конца
+  await page.locator("#search").fill("outbox");
+  await expect(page.locator("#empty")).toBeHidden();
+  await expect(page.locator(".principle:not([hidden])").first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("мобильное меню открывается и сообщает состояние", async ({
   page,
 }, info) => {

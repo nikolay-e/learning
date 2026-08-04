@@ -15,6 +15,27 @@
   };
   const langName = (id) => LANG_NAMES[id] || id;
 
+  // localStorage бросает там, где хранилище запрещено: встраивание в iframe,
+  // жёсткие настройки приватности. Одна такая ошибка убивала весь скрипт —
+  // без поиска, без табов, без темы. Настройка не переживёт перезагрузку, и это
+  // единственное, что должно теряться.
+  const store = {
+    get(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    },
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        /* хранилище недоступно — работаем без запоминания */
+      }
+    },
+  };
+
   /* ---------- theme ---------- */
 
   // начальная тема выставляется инлайновым скриптом в <head> — иначе светлая
@@ -32,7 +53,7 @@
   }
   themeBtn.addEventListener("click", () => {
     root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light";
-    localStorage.setItem(THEME_KEY, root.dataset.theme);
+    store.set(THEME_KEY, root.dataset.theme);
     syncTheme();
   });
   syncTheme();
@@ -78,7 +99,7 @@
     document.querySelectorAll(".langpick button").forEach((b) => {
       b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
     });
-    localStorage.setItem(LANG_KEY, lang);
+    store.set(LANG_KEY, lang);
   }
 
   figures.forEach((fig) => {
@@ -109,7 +130,7 @@
     b.addEventListener("click", () => applyLang(b.dataset.lang));
   });
 
-  const savedLang = localStorage.getItem(LANG_KEY);
+  const savedLang = store.get(LANG_KEY);
   applyLang(
     LANGS.includes(savedLang) || savedLang === "all" ? savedLang : "all",
   );
