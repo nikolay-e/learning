@@ -64,10 +64,10 @@ blocks:
         label: Go
         highlight: go
         code: |-
-          // в Go нет ни requires transitive, ни re-export: транзитивность
-          // утекает через подпись — единственное место, где её вообще видно
-          func Charge(ctx context.Context, id string) (*pq.Error, error) // потребитель
-                                    // обязан импортировать lib/pq, чтобы разобрать ошибку
+          // в Go нет ни requires transitive, ни re-export: транзитивность утекает
+          // через подпись — единственное место, где её вообще видно. Потребитель
+          // обязан импортировать lib/pq, чтобы разобрать эту ошибку
+          func Charge(ctx context.Context, id string) (*pq.Error, error)
 
           // граница: чужая ошибка заворачивается в свою, контракт — errors.Is
           var ErrDuplicate = errors.New("billing: duplicate charge")

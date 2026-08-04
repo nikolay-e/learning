@@ -1023,10 +1023,10 @@ pub struct SettlementDate(NaiveDate);
 // право добавлять поля, не ломая потребителей
 #[non_exhaustive]
 pub struct Settlement { pub date: SettlementDate }</code></pre></div>
-<div class="codepane" role="tabpanel" id="p88f1-pane-go" aria-labelledby="p88f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// в Go нет ни requires transitive, ни re-export: транзитивность
-// утекает через подпись — единственное место, где её вообще видно
-func Charge(ctx context.Context, id string) (*pq.Error, error) // потребитель
-                          // обязан импортировать lib/pq, чтобы разобрать ошибку
+<div class="codepane" role="tabpanel" id="p88f1-pane-go" aria-labelledby="p88f1-tab-go" data-lang="go"><div class="paneflag">Go</div><pre tabindex="0"><code class="language-go">// в Go нет ни requires transitive, ни re-export: транзитивность утекает
+// через подпись — единственное место, где её вообще видно. Потребитель
+// обязан импортировать lib/pq, чтобы разобрать эту ошибку
+func Charge(ctx context.Context, id string) (*pq.Error, error)
 
 // граница: чужая ошибка заворачивается в свою, контракт — errors.Is
 var ErrDuplicate = errors.New(&quot;billing: duplicate charge&quot;)
@@ -2542,8 +2542,17 @@ if err != nil {        // истина — и это удивляет каждо
 
 // НОРМА: наружу возвращается error, а не конкретный тип ошибки
 func find() error { return nil } // здесь err == nil, как и ожидается</code></pre></div>
-<div class="codepane" role="tabpanel" id="p46f1-pane-rust" aria-labelledby="p46f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// не implement Deref для &quot;наследования&quot; — это удивляет
-// (Deref предназначен для указателей, не для is-a)</code></pre></div>
+<div class="codepane" role="tabpanel" id="p46f1-pane-rust" aria-labelledby="p46f1-tab-rust" data-lang="rust"><div class="paneflag">Rust</div><pre tabindex="0"><code class="language-rust">// Deref предназначен для указателей, а не для is-a: через него методы
+// Inner молча появляются у Wrapper, и читатель не найдёт их объявления
+impl Deref for Wrapper {
+    type Target = Inner;
+    fn deref(&amp;self) -&gt; &amp;Inner { &amp;self.0 }
+}
+
+// НОРМА: делегировать явно ровно то, что обещано наружу (88)
+impl Wrapper {
+    pub fn id(&amp;self) -&gt; Id { self.0.id() }
+}</code></pre></div>
 </figure>
 </article>
 

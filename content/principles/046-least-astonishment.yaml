@@ -54,6 +54,15 @@ blocks:
         tab: Rust
         label: Rust
         highlight: rust
-        code: '// не implement Deref для "наследования" — это удивляет
+        code: |-
+          // Deref предназначен для указателей, а не для is-a: через него методы
+          // Inner молча появляются у Wrapper, и читатель не найдёт их объявления
+          impl Deref for Wrapper {
+              type Target = Inner;
+              fn deref(&self) -> &Inner { &self.0 }
+          }
 
-          // (Deref предназначен для указателей, не для is-a)'
+          // НОРМА: делегировать явно ровно то, что обещано наружу (88)
+          impl Wrapper {
+              pub fn id(&self) -> Id { self.0.id() }
+          }
