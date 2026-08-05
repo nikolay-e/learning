@@ -2,7 +2,9 @@
 # validate.py падает, если чего-то нет. caveat заполняется там, где формулировка принципа
 # сильнее, чем её область применимости; sources — только проверенные канонические ссылки.
 #
-# kind:            theorem | empirical-law | heuristic | pattern | practice | editorial
+# kind:            theorem | model | empirical-law | heuristic | pattern | practice | editorial
+#   theorem, model и empirical-law обязаны нести sources — это проверяет validate.py:
+#   ярлык «доказано / измерено / подогнано по данным» без первоисточника — просто тон
 # confidence:      established | context-dependent | opinionated
 # example_status:  fragment | config | pseudocode | none
 #   fragment    — реальный синтаксис, но не самостоятельная программа (нужны окружающие типы)
@@ -59,6 +61,11 @@ principles:
     kind: practice
     confidence: established
     example_status: fragment
+    caveat: 'Property-based testing и type-driven design закрывают разные части задачи: первое ищет
+      контрпример в пространстве входов, второе сокращает само пространство, делая часть входов непредставимой
+      (3). Ни то, ни другое не отвечает на вопрос, каким должен быть правильный результат: оракул
+      задаётся отдельно — свойством, эталонной реализацией или метаморфным отношением, — и его отсутствие
+      не лечится количеством прогонов.'
   10:
     kind: pattern
     confidence: context-dependent
@@ -102,12 +109,23 @@ principles:
     example_status: fragment
   15:
     kind: empirical-law
-    confidence: established
+    confidence: context-dependent
     example_status: none
+    caveat: 'Это устойчивая корреляция с несколькими механизмами, а не доказанный закон: вклад дают
+      границы владения, каналы согласования, релизные границы и когнитивная нагрузка команды, и по
+      отдельности они управляются по-разному. Inverse Conway maneuver работает там, где орг-структуру
+      действительно можно менять; чаще она сама следствие бюджета, найма и истории поглощений.'
+    sources:
+      - title: 'Melvin Conway — How Do Committees Invent? (1968)'
+        url: https://www.melconway.com/Home/Committees_Paper.html
   16:
     kind: empirical-law
     confidence: established
     example_status: fragment
+    caveat: 'Закон масштабируется числом потребителей, а не выполняется для любого API: «при достаточном
+      количестве» намеренно не квантифицировано. Зависимостью становится не всякое наблюдаемое свойство,
+      а то, которое дёшево заметить и дорого проверить по спецификации. Практический вывод — не «всё
+      сломается», а «что не зафиксировано и не рандомизировано, зафиксируют за вас».'
     sources:
       - title: The Go Programming Language Specification
         url: https://go.dev/ref/spec
@@ -156,6 +174,10 @@ principles:
     kind: pattern
     confidence: established
     example_status: fragment
+    caveat: 'Таймаут, ретрай с jitter, circuit breaker и bulkhead не взаимозаменяемы — они закрывают
+      разные отказы: слишком медленный ответ, разовую ошибку, устойчивую деградацию зависимости и
+      растекание отказа между пулами. Ни один из них не заменяет ограничение очереди и сброс нагрузки
+      (23); ретрай без бюджета и сквозного дедлайна усиливает перегрузку, а не смягчает её.'
   25:
     kind: practice
     confidence: context-dependent
@@ -227,9 +249,15 @@ principles:
       - title: net/http/pprof
         url: https://pkg.go.dev/net/http/pprof
   38:
-    kind: theorem
-    confidence: established
+    kind: model
+    confidence: context-dependent
     example_status: none
+    caveat: 'USL — модель с подгоняемыми параметрами, а не теорема: σ и κ получают регрессией по измерениям
+      конкретной системы и между системами они не переносятся. Предсказательная сила ограничена диапазоном,
+      в котором мерили; дальше это экстраполяция, и её честно называть гипотезой для следующего эксперимента.'
+    sources:
+      - title: 'Neil Gunther — A General Theory of Computational Scalability Based on Rational Functions'
+        url: https://arxiv.org/abs/0808.1431
   39:
     kind: heuristic
     confidence: context-dependent
@@ -243,14 +271,20 @@ principles:
     example_status: none
   41:
     kind: heuristic
-    confidence: opinionated
+    confidence: context-dependent
     example_status: none
+    caveat: 'Исходная формулировка Галла — «спроектированная сложной с нуля не работает и не может
+      быть починена» — афоризм, а не закон: спроектированные наперёд сложные системы существуют там,
+      где спецификация зафиксирована заранее, а цена ошибки запрещает итерации, — авионика, протоколы,
+      кремний. Эвристика работает там, где требования уточняются по ходу, то есть в большинстве продуктовой
+      разработки, и стоит она ровно столько, сколько стоит промежуточное состояние.'
   42:
     kind: heuristic
-    confidence: opinionated
+    confidence: context-dependent
     example_status: none
-    caveat: '«Ровно на третьем повторении» — мнемоника, а не порог. Критерий тот же, что в 7: доказанная
-      общая ось изменения.'
+    caveat: 'Критерий — доказанная общая ось изменения (тот же, что в 7), а не счётчик копий; «три»
+      живёт в названии как мнемоника. Обратная крайность так же реальна: одно знание, размноженное
+      по десяти местам, расходится молча (43).'
   43:
     kind: heuristic
     confidence: context-dependent
@@ -264,7 +298,11 @@ principles:
     confidence: context-dependent
     example_status: none
     caveat: Законы Лемана выведены для E-type систем (встроенных в изменяющуюся среду) на материале
-      1970–90-х. Это эмпирические наблюдения, а не теоремы.
+      1970–90-х. Это эмпирические наблюдения, а не теоремы, а «термодинамика» в заголовке — метафора,
+      которая не наследует ни одного свойства физической энтропии.
+    sources:
+      - title: 'Lehman, Ramil, Wernick — Metrics and Laws of Software Evolution: The Nineties View'
+        url: https://users.ece.utexas.edu/~perry/work/papers/feast1.pdf
   46:
     kind: heuristic
     confidence: established
@@ -273,7 +311,8 @@ principles:
     kind: editorial
     confidence: opinionated
     example_status: none
-    caveat: «На порядок чаще» — риторическая оценка, а не измерение.
+    caveat: «На порядок чаще» из расхожей формулировки — риторическая оценка, а не измерение; проверяемая
+      часть утверждения не в множителе, а в наборе проходов, через которые текст идёт после написания.
   48:
     kind: practice
     confidence: established
@@ -343,19 +382,37 @@ principles:
     caveat: '«Качество генерации = качество контекста» редуктивно: результат зависит ещё от модели,
       задачи, инструментов, policy и eval-петли. Маленькие файлы — не самоцель, связность важнее размера.'
   63:
-    kind: empirical-law
+    kind: heuristic
     confidence: established
     example_status: none
+    caveat: 'Это таксономия неверных допущений, а не наблюдаемая регулярность: список Дойча ничего
+      не предсказывает, он перечисляет предпосылки, которые дизайн обязан опровергнуть явно. Проверяется
+      чек-листом на каждой сетевой границе, а не измерением, и потому живёт в ревью, а не в мониторинге.'
   64:
-    kind: theorem
+    kind: heuristic
     confidence: established
     example_status: none
+    caveat: 'CAP и PACELC — утверждения разного рода, и карточка объединяет их сознательно. CAP доказан
+      Гилбертом и Линчем для конкретной модели: асинхронная сеть, разделяемый регистр, требование,
+      чтобы каждый живой узел отвечал. PACELC — таксономия дизайна, расширяющая разговор на нормальный
+      режим, а не теорема; «CP/AP-база» — маркетинговый ярлык. Собственное утверждение страницы —
+      что уровень консистентности выбирается на операцию, а не на систему — редакционное.'
+    sources:
+      - title: 'Gilbert, Lynch — Brewer''s Conjecture and the Feasibility of Consistent, Available,
+          Partition-Tolerant Web Services'
+        url: https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
+      - title: 'Daniel Abadi — Consistency Tradeoffs in Modern Distributed Database System Design (PACELC)'
+        url: https://www.cs.umd.edu/~abadi/papers/abadi-pacelc.pdf
   65:
     kind: pattern
     confidence: established
     example_status: fragment
-    caveat: '«Иерархия по цене» — упрощение: causal consistency и session guarantees покрывают разные
-      оси и не образуют тотального порядка во всех системах.'
+    caveat: 'Консистентность — вектор гарантий, а не одна шкала: causal consistency и session guarantees
+      покрывают разные оси и не образуют тотального порядка. Единственное, что упорядочено строго,
+      — цена реального времени: linearizability требует его, sequential и causal — нет.'
+    sources:
+      - title: 'Herlihy, Wing — Linearizability: A Correctness Condition for Concurrent Objects'
+        url: https://cs.brown.edu/~mph/HerlihyW90/p463-herlihy.pdf
   66:
     kind: pattern
     confidence: established
@@ -364,6 +421,13 @@ principles:
     kind: pattern
     confidence: established
     example_status: fragment
+    caveat: Логические часы решают одну задачу — отношение «произошло раньше». Длительности и дедлайны
+      считаются монотонными часами, доменное и человеческое время остаётся за wall clock, а владение
+      ресурсом подтверждается номером поколения (66), а не временем вовсе. Утверждение карточки —
+      про упорядочивание между узлами, а не про то, что wall clock не нужен.
+    sources:
+      - title: 'Leslie Lamport — Time, Clocks, and the Ordering of Events in a Distributed System'
+        url: https://lamport.azurewebsites.net/pubs/time-clocks.pdf
   68:
     kind: pattern
     confidence: established
@@ -401,8 +465,14 @@ principles:
     kind: empirical-law
     confidence: context-dependent
     example_status: none
-    caveat: Закон Брукса зависит от декомпозируемости задачи, стоимости онбординга и стадии проекта;
-      это наблюдение из «Мифического человеко-месяца», не универсальное ограничение.
+    caveat: 'В карточке два разных наблюдения. Закон Брукса — про стоимость координации: он зависит
+      от декомпозируемости задачи, цены онбординга и стадии проекта, и на слабо связанной работе с
+      готовым онбордингом почти не проявляется. Second-system effect — про мотивацию автора, а не
+      про арифметику коммуникаций, и наступает даже в команде постоянного размера. Оба — наблюдения
+      из «Мифического человеко-месяца», не универсальные ограничения.'
+    sources:
+      - title: 'Frederick P. Brooks — The Mythical Man-Month (первоисточник обоих наблюдений)'
+        url: https://openlibrary.org/works/OL1866641W/The_Mythical_Man-Month
   77:
     kind: practice
     confidence: context-dependent
@@ -460,3 +530,16 @@ principles:
     kind: heuristic
     confidence: context-dependent
     example_status: fragment
+  89:
+    kind: theorem
+    confidence: established
+    example_status: none
+    caveat: 'Формула доказана для фиксированного размера задачи и идеального распараллеливания остатка:
+      она не учитывает ни стоимость самой координации (её добавляет USL, 38), ни рост объёма работы
+      вместе с ресурсами (контрапункт Густафсона). Практическая трудность не в математике, а в измерении
+      s: последовательная доля редко видна в коде и обычно обнаруживается как общий ресурс — лидер,
+      блокировка, одна партиция.'
+    sources:
+      - title: 'Gene Amdahl — Validity of the Single Processor Approach to Achieving Large Scale Computing
+          Capabilities (AFIPS 1967)'
+        url: https://inst.eecs.berkeley.edu/~n252/paper/Amdahl.pdf

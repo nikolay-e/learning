@@ -1,15 +1,27 @@
 id: 67
 slug: wall-clock-vret-uporyadochivanie-tolko-logichesk
-title: "Wall clock врёт: упорядочивание — только логическими часами"
+title: "Wall clock врёт: упорядочивание — не его работа"
 nav_label: Wall clock врёт
 section: s11
 keywords: clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы
+  monotonic clock nanotime дедлайн длительность
 blocks:
   - type: lede
     html:
       "NTP-дрейф, leap smearing, VM-паузы: <code>System.currentTimeMillis()</code> двух машин несравним,
       и «last write wins по timestamp» молча теряет записи. Упорядочивание — Lamport clock / HLC / версионные
       векторы; wall clock — только для людей (логи, метрики) и для TTL с запасом."
+  - type: note
+    html: '<strong>Трое часов, которых путают.</strong> <em>Wall clock</em> (<code>currentTimeMillis</code>,
+      <code>CLOCK_REALTIME</code>) отвечает на вопрос «когда по календарю»: логи, доменные даты, TTL
+      с запасом. Он прыгает — вперёд и назад — при NTP-коррекции. <em>Monotonic clock</em> (<code>nanoTime</code>,
+      <code>CLOCK_MONOTONIC</code>) не прыгает и потому единственный годится для длительностей, таймаутов
+      и дедлайнов, — но несравним между машинами и обнуляется при перезапуске, поэтому хранить его
+      бессмысленно. <em>Логические часы</em> (Lamport, векторные, HLC) — единственный источник отношения
+      «произошло раньше» между узлами. Типовые баги ровно на подмене: длительность, посчитанная по
+      wall clock, во время коррекции становится отрицательной, а «порядок» по monotonic не имеет смысла
+      за пределами процесса. Отдельный слой — fencing token (<a href="#p66">66</a>): там нужен не
+      порядок событий, а номер поколения владельца.'
   - type: code
     panes:
       - lang: python

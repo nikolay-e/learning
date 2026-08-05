@@ -127,6 +127,11 @@ for pid, (path, data) in principles.items():
     for src in m.get("sources", []):
         if not src.get("url", "").startswith("https://"):
             fail(f"p{pid}: источник без https-ссылки: {src}")
+    # Утверждение, заявленное как доказанное, измеренное или подогнанное по данным,
+    # обязано указывать, кем: без первоисточника такой ярлык — просто более
+    # уверенный тон. Для эвристик, паттернов и практик ссылка не требуется.
+    if m.get("kind") in ("theorem", "empirical-law", "model") and not m.get("sources"):
+        fail(f"p{pid}: kind={m['kind']} требует первоисточник в sources")
 
 for pid in meta["principles"]:
     if pid not in principles:

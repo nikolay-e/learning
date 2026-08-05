@@ -1,14 +1,25 @@
 id: 23
 slug: backpressure-buferizatsiya
-title: Backpressure &gt; буферизация
-nav_label: Backpressure > буферизация
+title: 'Очередь ограничена: backpressure или сброс нагрузки'
+nav_label: Backpressure и сброс нагрузки
 section: s4
-keywords: backpressure little law load shedding bounded queue reactive streams
+keywords: backpressure little law load shedding bounded queue reactive streams admission control
+  сброс нагрузки лимит конкурентности
 blocks:
   - type: lede
     html:
       "Неограниченная очередь превращает отказ в latency-коллапс (Little's law: <code>L = λW</code>;
       растёт очередь — растёт время ответа при том же λ)."
+  - type: text
+    html: 'Буфер и backpressure — не альтернативы на одной шкале. Защита от перегрузки собирается
+      из четырёх разных вещей: ограниченный буфер (поглощает всплеск, но не тренд), лимит конкурентности
+      и admission control (решают, сколько работы вообще принять), backpressure (передаёт давление
+      туда, откуда пришла работа) и сброс нагрузки (быстрый отказ там, где давление передать некуда).
+      Выбор между двумя последними определяется одним вопросом: способен ли продьюсер притормозить.
+      Внутренний сервис на gRPC-стриме — да; браузер случайного пользователя — нет, и для него честный
+      ответ — <code>429</code> с <code>Retry-After</code>, а не место в очереди на тридцать секунд.
+      Сквозной дедлайн и ретрай-бюджет (<a href="#p24">24</a>) — часть той же конструкции: без них
+      сброшенная нагрузка возвращается ретраями и добивает то, что защищали.'
   - type: code
     panes:
       - lang: go

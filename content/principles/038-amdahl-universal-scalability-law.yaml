@@ -1,14 +1,21 @@
 id: 38
 slug: amdahl-universal-scalability-law
-title: Amdahl / Universal Scalability Law
-nav_label: Amdahl / USL
+title: Universal Scalability Law
+nav_label: USL
 section: s7
-keywords: amdahl universal scalability law usl gunther coherency contention crosstalk
+keywords: amdahl universal scalability law usl gunther coherency contention crosstalk модель подгонка
 blocks:
   - type: lede
     html:
       "USL: пропускная способность <code>C(N) = λN / (1 + σ(N−1) + κN(N−1))</code>. Второй член (когерентность
       κ) объясняет, почему добавление узлов даёт отрицательный прирост: crosstalk растёт квадратично."
+  - type: text
+    html: 'Отношение к закону Амдала (<a href="#p89">89</a>) прямое: при κ = 0 USL вырождается в него,
+      а σ — та самая последовательная доля. Разница в том, что закон Амдала выводится из арифметики
+      и даёт <em>потолок</em> — кривая выходит на плато, — а USL добавляет член, из-за которого кривая
+      после максимума идёт <em>вниз</em>: согласование между узлами само становится работой. И разница
+      в статусе: у Амдала нечего подгонять, у USL σ и κ существуют только как результат регрессии
+      по вашим измерениям.'
   - type: note
     html:
       "Практический вывод для Kafka/Flink: перед горизонтальным скейлом измерь σ и κ на нагрузочном

@@ -134,9 +134,15 @@ test("фильтр сужает страницу, отражается в URL и
 });
 
 test("фильтр восстанавливается из URL", async ({ page }) => {
+  const total = await page.locator(".principle").count();
   await page.goto("/?q=fencing");
   await expect(page.locator("#search")).toHaveValue("fencing");
-  await expect(page.locator(".principle:not([hidden])")).toHaveCount(1);
+  // проверяется восстановление фильтра, а не то, сколько карточек упоминают
+  // слово: точное число ломается от любой перекрёстной ссылки в тексте
+  await expect(page.locator("#p66")).toBeVisible();
+  const shown = await page.locator(".principle:not([hidden])").count();
+  expect(shown).toBeGreaterThan(0);
+  expect(shown).toBeLessThan(total);
 });
 
 test("поиск находит принцип по английскому синониму русского заголовка", async ({

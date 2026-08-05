@@ -10,7 +10,7 @@
       content="scripts/build.py — не редактируйте index.html вручную"
     />
     <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры" />
-    <meta property="og:description" content="88 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
+    <meta property="og:description" content="89 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
     <meta property="og:type" content="article" />
     <!-- Единственный инлайновый скрипт на странице, и он обязан быть здесь:
          тема, выставленная из assets/app.js в конце body, успевает моргнуть
@@ -125,7 +125,7 @@
 <ol>
 <li data-for="p21"><a href="#p21"><span class="rail-num">21</span> End-to-End Argument</a></li>
 <li data-for="p22"><a href="#p22"><span class="rail-num">22</span> Идемпотентность</a></li>
-<li data-for="p23"><a href="#p23"><span class="rail-num">23</span> Backpressure &gt; буферизация</a></li>
+<li data-for="p23"><a href="#p23"><span class="rail-num">23</span> Backpressure и сброс нагрузки</a></li>
 <li data-for="p24"><a href="#p24"><span class="rail-num">24</span> Retry с jitter, breaker, bulkhead</a></li>
 <li data-for="p25"><a href="#p25"><span class="rail-num">25</span> Crash-only software</a></li>
 <li data-for="p26"><a href="#p26"><span class="rail-num">26</span> Tail at Scale</a></li>
@@ -179,7 +179,8 @@
 <a href="#s7">IX · Эмпирика вместо вкуса</a>
 <ol>
 <li data-for="p37"><a href="#p37"><span class="rail-num">37</span> Измерь, потом оптимизируй</a></li>
-<li data-for="p38"><a href="#p38"><span class="rail-num">38</span> Amdahl / USL</a></li>
+<li data-for="p89"><a href="#p89"><span class="rail-num">89</span> Закон Амдала</a></li>
+<li data-for="p38"><a href="#p38"><span class="rail-num">38</span> USL</a></li>
 <li data-for="p39"><a href="#p39"><span class="rail-num">39</span> Mechanical sympathy</a></li>
 <li data-for="p78"><a href="#p78"><span class="rail-num">78</span> Стоимость как SLI</a></li>
 </ol>
@@ -194,7 +195,7 @@
 <li data-for="p44"><a href="#p44"><span class="rail-num">44</span> Chesterton&#x27;s Fence</a></li>
 <li data-for="p45"><a href="#p45"><span class="rail-num">45</span> Lehman&#x27;s Laws</a></li>
 <li data-for="p46"><a href="#p46"><span class="rail-num">46</span> Least Astonishment</a></li>
-<li data-for="p47"><a href="#p47"><span class="rail-num">47</span> Код читается чаще</a></li>
+<li data-for="p47"><a href="#p47"><span class="rail-num">47</span> Оптимизация под чтение</a></li>
 <li data-for="p75"><a href="#p75"><span class="rail-num">75</span> Choose boring technology</a></li>
 <li data-for="p76"><a href="#p76"><span class="rail-num">76</span> Brooks&#x27;s Law</a></li>
 </ol>
@@ -233,10 +234,10 @@
       </nav>
 
       <main class="main" id="main">
-        <div class="hero"><div class="eyebrow">Справочник · 88 принципов · 4 языка</div>
+        <div class="hero"><div class="eyebrow">Справочник · 89 принципов · 4 языка</div>
 <h1>Принципы программной инженерии: от SOLID до AI-эры</h1>
 <p>Примеры на современной Java, Rust, Go и Python (3.12+). Принципы сгруппированы по осям; для код-уровневых даны примеры на всех четырёх языках, для архитектурных — представительный пример. Версия рантайма указана на карточке там, где API от неё зависит.</p>
-<p>У каждого принципа проставлен <strong>тип утверждения</strong> — теорема, эмпирический закон, эвристика, паттерн, практика или редакционная позиция — и уровень уверенности. Это главное, что отличает справочник от списка «лучших практик»: закон Амдала и «выбирай скучные технологии» не одного сорта, и страница не делает вид, что одного.</p>
+<p>У каждого принципа проставлен <strong>тип утверждения</strong> — теорема, модель, эмпирический закон, эвристика, паттерн, практика или редакционная позиция — и уровень уверенности. Это главное, что отличает справочник от списка «лучших практик»: закон Амдала (<a href="#p89">89</a>) выводится из арифметики, USL (<a href="#p38">38</a>) подгоняется по вашим измерениям, а «выбирай скучные технологии» — ничем не подкреплённый совет, и страница не делает вид, что это одно и то же. Теоремы, модели и эмпирические законы обязаны нести ссылку на первоисточник — это проверяет CI, а не добрая воля автора.</p>
 <p><a href="#s10">Раздел XIII</a> перечисляет пары принципов, которые противоречат друг другу, и способ разрешения. Номера принципов — стабильные идентификаторы: новые дописываются в конец нумерации и встают в тематический раздел, поэтому внутри раздела последовательность не сплошная.</p>
 <p>Скоуп — технические и инженерно-экономические принципы, включая организационные практики, которые непосредственно определяют архитектуру, delivery model, операционный риск или интерфейс внутренней платформы (<a href="#p15">15</a>, <a href="#p76">76</a>, <a href="#p84">84</a>, <a href="#p85">85</a>). Вне скоупа — практики, не оставляющие следа в системе: постмортемы, найм, перформанс-ревью.</p>
 <p>Все примеры — <strong>фрагменты</strong>: реальный синтаксис, но не самостоятельные программы, они опираются на типы и импорты за кадром. Статус помечен на каждой карточке; CI проверяет то, что проверяемо статически.</p>
@@ -733,6 +734,7 @@ def apply(self, entry: LedgerEntry) -&gt; None:
 <article class="principle" id="p9" data-keywords="property based testing quickcheck fuzzing invariant roundtrip" data-kind="practice" data-confidence="established">
 <div class="p-head"><span class="p-num">09</span><h3>Property-based / type-driven testing</h3><a class="anchor" href="#p9" aria-label="Ссылка на принцип 9">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Операционная процедура или инженерная дисциплина">практика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Property-based testing и type-driven design закрывают разные части задачи: первое ищет контрпример в пространстве входов, второе сокращает само пространство, делая часть входов непредставимой (3). Ни то, ни другое не отвечает на вопрос, каким должен быть правильный результат: оракул задаётся отдельно — свойством, эталонной реализацией или метаморфным отношением, — и его отсутствие не лечится количеством прогонов.</p>
 <p class="lede">Пример-тест проверяет случаи, которые вы придумали; свойство-тест проверяет утверждение, обязанное держаться на любом входе, а контрпример ищет генератор — и, найдя, ужимает его до минимального. Свойства, окупающиеся почти везде: roundtrip (разобрать записанное даёт исходное), сохранение (сумма не меняется), согласие с наивной эталонной реализацией. Типы — та же идея на шаг раньше: то, что гарантирует компилятор (<a href="#p3">3</a>), тестировать уже не нужно.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
@@ -971,9 +973,11 @@ pub struct Customer { pub id: CustomerId, pub segments: Vec&lt;Segment&gt; }
 </figure>
 </article>
 
-<article class="principle" id="p15" data-keywords="conway law inverse conway maneuver team topologies org chart" data-kind="empirical-law" data-confidence="established">
+<article class="principle" id="p15" data-keywords="conway law inverse conway maneuver team topologies org chart" data-kind="empirical-law" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">15</span><h3>Conway's Law</h3><a class="anchor" href="#p15" aria-label="Ссылка на принцип 15">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Это устойчивая корреляция с несколькими механизмами, а не доказанный закон: вклад дают границы владения, каналы согласования, релизные границы и когнитивная нагрузка команды, и по отдельности они управляются по-разному. Inverse Conway maneuver работает там, где орг-структуру действительно можно менять; чаще она сама следствие бюджета, найма и истории поглощений.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://www.melconway.com/Home/Committees_Paper.html" rel="noopener noreferrer">Melvin Conway — How Do Committees Invent? (1968)</a></p>
 <p class="lede">Архитектура сойдётся к структуре коммуникаций организации. Не совет, а наблюдение: хотите другую архитектуру — сначала перестройте команды (inverse Conway maneuver).</p>
 <p class="note">Кодом не выражается; выражается орг-диаграммой.</p>
 </article>
@@ -1063,6 +1067,7 @@ __all__ = [&quot;Settlement&quot;, &quot;Client&quot;]</code></pre></div>
 <article class="principle" id="p16" data-keywords="hyrum law implicit dependencies observable behavior" data-kind="empirical-law" data-confidence="established">
 <div class="p-head"><span class="p-num">16</span><h3>Hyrum's Law</h3><a class="anchor" href="#p16" aria-label="Ссылка на принцип 16">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Закон масштабируется числом потребителей, а не выполняется для любого API: «при достаточном количестве» намеренно не квантифицировано. Зависимостью становится не всякое наблюдаемое свойство, а то, которое дёшево заметить и дорого проверить по спецификации. Практический вывод — не «всё сломается», а «что не зафиксировано и не рандомизировано, зафиксируют за вас».</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Contract testing ↔ скорость провайдера</a></p>
 <p class="sources"><strong>Источники:</strong> <a href="https://go.dev/ref/spec" rel="noopener noreferrer">The Go Programming Language Specification</a>, <a href="https://go.dev/blog/maps" rel="noopener noreferrer">Go Blog — Go maps in action (порядок итерации)</a>, <a href="https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/util/ImmutableCollections.java" rel="noopener noreferrer">OpenJDK — ImmutableCollections.java (SALT, порядок между запусками JVM)</a></p>
 <p class="lede">При достаточном числе потребителей все наблюдаемые свойства API — контракт: порядок ключей JSON, латентность, текст сообщений об ошибках.</p>
@@ -1346,7 +1351,7 @@ lifecycle {
 }</code></pre>
 </figure>
 <p class="note"><strong>Чего <code>prevent_destroy</code> не делает.</strong> Он защищает ресурс, пока тот описан в конфигурации: удалите сам resource block — и защита уедет вместе с ним, а ресурс будет уничтожен. Значит защита не может жить только в HCL. Нужны: policy-as-code, заваливающая plan с destroy на stateful-ресурсах; CI, применяющий <em>сохранённый</em> plan, а не пересчитанный на apply; проверка на удаление resource block в диффе; проверенные бэкапы и учения по восстановлению; и явная break-glass процедура. Отдельно: drift виден только в пределах того, что провайдер умеет прочитать.</p>
-<p class="note">Cattle, not pets — для compute; данные — всегда pet: immutable-инфраструктура означает «пересоздаём машины, <em>мигрируем</em> данные», и путаница этих двух — стандартный сценарий потери стейта. Drift detection — не аудит раз в квартал, а continuous (<code>plan</code> по крону с алертом на непустой дифф): дрифт, найденный через месяц, уже оброс зависимостями — Hyrum (<a href="#p16">16</a>) для инфраструктуры.</p>
+<p class="note">«Cattle, not pets» — правило про способ изменения, а не про сорт ресурса: заменять целиком можно то, что восстановимо из кода и реплик, а всё, что держит единственный экземпляр состояния, требует явных протоколов миграции, восстановления и совместимости версий. Реплицированное состояние с кворумом или объектное хранилище управляются декларативно наравне с compute; уникальная машина с локальным диском — нет, как бы она ни называлась в теге. Путаница этих двух — стандартный сценарий потери стейта. Drift detection — не аудит раз в квартал, а continuous (<code>plan</code> по крону с алертом на непустой дифф): дрифт, найденный через месяц, уже оброс зависимостями — Hyrum (<a href="#p16">16</a>) для инфраструктуры.</p>
 </article>
 
 <article class="principle" id="p87" data-keywords="migration dual run shadow compare cutover diff rate sunk cost миграция владелец отмена" data-kind="heuristic" data-confidence="context-dependent">
@@ -1472,11 +1477,12 @@ pub struct CreatePayment { pub idempotency_key: Uuid, pub amount: Cents }</code>
 </figure>
 </article>
 
-<article class="principle" id="p23" data-keywords="backpressure little law load shedding bounded queue reactive streams" data-kind="pattern" data-confidence="established">
-<div class="p-head"><span class="p-num">23</span><h3>Backpressure &gt; буферизация</h3><a class="anchor" href="#p23" aria-label="Ссылка на принцип 23">#</a></div>
+<article class="principle" id="p23" data-keywords="backpressure little law load shedding bounded queue reactive streams admission control сброс нагрузки лимит конкурентности" data-kind="pattern" data-confidence="established">
+<div class="p-head"><span class="p-num">23</span><h3>Очередь ограничена: backpressure или сброс нагрузки</h3><a class="anchor" href="#p23" aria-label="Ссылка на принцип 23">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Backpressure ↔ availability</a></p>
 <p class="lede">Неограниченная очередь превращает отказ в latency-коллапс (Little's law: <code>L = λW</code>; растёт очередь — растёт время ответа при том же λ).</p>
+<p>Буфер и backpressure — не альтернативы на одной шкале. Защита от перегрузки собирается из четырёх разных вещей: ограниченный буфер (поглощает всплеск, но не тренд), лимит конкурентности и admission control (решают, сколько работы вообще принять), backpressure (передаёт давление туда, откуда пришла работа) и сброс нагрузки (быстрый отказ там, где давление передать некуда). Выбор между двумя последними определяется одним вопросом: способен ли продьюсер притормозить. Внутренний сервис на gRPC-стриме — да; браузер случайного пользователя — нет, и для него честный ответ — <code>429</code> с <code>Retry-After</code>, а не место в очереди на тридцать секунд. Сквозной дедлайн и ретрай-бюджет (<a href="#p24">24</a>) — часть той же конструкции: без них сброшенная нагрузка возвращается ретраями и добивает то, что защищали.</p>
 <figure class="code" data-multi data-available="go,java,rust,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1513,6 +1519,7 @@ await queue.put(job)   # блокируется при заполнении — 
 <article class="principle" id="p24" data-keywords="retry jitter exponential backoff circuit breaker bulkhead timeout deadline" data-kind="pattern" data-confidence="established">
 <div class="p-head"><span class="p-num">24</span><h3>Timeout + retry с jitter, circuit breaker, bulkhead</h3><a class="anchor" href="#p24" aria-label="Ссылка на принцип 24">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Таймаут, ретрай с jitter, circuit breaker и bulkhead не взаимозаменяемы — они закрывают разные отказы: слишком медленный ответ, разовую ошибку, устойчивую деградацию зависимости и растекание отказа между пулами. Ни один из них не заменяет ограничение очереди и сброс нагрузки (23); ретрай без бюджета и сквозного дедлайна усиливает перегрузку, а не смягчает её.</p>
 <p class="lede">Retry без jitter — распределённый метроном: синхронизированная толпа добивает восстанавливающийся сервис.</p>
 <figure class="code" data-multi data-available="rust,go,java,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
@@ -1658,17 +1665,20 @@ blast_radius: cell-eu-1      # одна ячейка, не флот</code></pre>
 
 <div class="section-head"><span class="numeral">V</span><h2>Распределённые данные и консистентность</h2></div>
 
-<article class="principle" id="p63" data-keywords="fallacies of distributed computing deutsch gosling заблуждения сеть надёжна" data-kind="empirical-law" data-confidence="established">
+<article class="principle" id="p63" data-keywords="fallacies of distributed computing deutsch gosling заблуждения сеть надёжна" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">63</span><h3>Fallacies of Distributed Computing</h3><a class="anchor" href="#p63" aria-label="Ссылка на принцип 63">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Это таксономия неверных допущений, а не наблюдаемая регулярность: список Дойча ничего не предсказывает, он перечисляет предпосылки, которые дизайн обязан опровергнуть явно. Проверяется чек-листом на каждой сетевой границе, а не измерением, и потому живёт в ревью, а не в мониторинге.</p>
 <p class="lede">Восемь заблуждений (Deutsch / Gosling): сеть надёжна, латентность нулевая, полоса бесконечна, сеть безопасна, топология неизменна, администратор один, транспорт бесплатен, сеть однородна. Каждое «очевидно ложно» — и каждое регулярно закладывается в дизайн неявно.</p>
 <p class="note"><strong>Проверяемая форма.</strong> Любой межсервисный вызов в коде обязан отвечать на три вопроса: таймаут? ретрай-политика? что при недоступности? Отсутствие ответа = заложенное заблуждение №1. Кодом не выражается; выражается чек-листом ревью для каждой сетевой границы.</p>
 </article>
 
-<article class="principle" id="p64" data-keywords="cap theorem pacelc partition consistency availability latency кворум" data-kind="theorem" data-confidence="established">
+<article class="principle" id="p64" data-keywords="cap theorem pacelc partition consistency availability latency кворум" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">64</span><h3>CAP недостаточен; PACELC добавляет trade-off нормального режима</h3><a class="anchor" href="#p64" aria-label="Ссылка на принцип 64">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Доказуемое утверждение с формальными предпосылками">теорема</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> CAP и PACELC — утверждения разного рода, и карточка объединяет их сознательно. CAP доказан Гилбертом и Линчем для конкретной модели: асинхронная сеть, разделяемый регистр, требование, чтобы каждый живой узел отвечал. PACELC — таксономия дизайна, расширяющая разговор на нормальный режим, а не теорема; «CP/AP-база» — маркетинговый ярлык. Собственное утверждение страницы — что уровень консистентности выбирается на операцию, а не на систему — редакционное.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Linearizability ↔ latency/availability (PACELC)</a></p>
+<p class="sources"><strong>Источники:</strong> <a href="https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf" rel="noopener noreferrer">Gilbert, Lynch — Brewer&#x27;s Conjecture and the Feasibility of Consistent, Available, Partition-Tolerant Web Services</a>, <a href="https://www.cs.umd.edu/~abadi/papers/abadi-pacelc.pdf" rel="noopener noreferrer">Daniel Abadi — Consistency Tradeoffs in Modern Distributed Database System Design (PACELC)</a></p>
 <p class="lede">CAP в популярной форме вырожден: P не выбирается — partition случается, выбор только между C и A <em>во время</em> partition. PACELC честнее: даже без partition (E) выбор между latency (L) и consistency (C) существует всегда — синхронная репликация стоит RTT на каждую запись.</p>
 <p class="note"><strong>Честная оценка.</strong> «CP или AP» как ярлык базы данных — маркетинговая таксономия; реальные системы настраиваются per-operation (<code>quorum</code> vs <code>one</code> в Cassandra, <code>synchronous_commit</code> в Postgres). Принцип: уровень консистентности — свойство операции, не системы, и выбирается по инварианту, который операция защищает.</p>
 <p class="note">PACELC не отменяет CAP, а расширяет его: CAP описывает поведение во время partition, PACELC добавляет выбор в нормальном режиме. Заголовок про «мёртв» относится к популярному использованию CAP как ярлыка для баз данных. И <code>synchronous_commit</code> в PostgreSQL — параметр подтверждения коммита и durability/репликации, а не переключатель модели консистентности на операцию.</p>
@@ -1677,9 +1687,10 @@ blast_radius: cell-eu-1      # одна ячейка, не флот</code></pre>
 <article class="principle" id="p65" data-keywords="consistency model linearizable causal session guarantees read your writes monotonic reads" data-kind="pattern" data-confidence="established">
 <div class="p-head"><span class="p-num">65</span><h3>Модели консистентности — часть контракта API</h3><a class="anchor" href="#p65" aria-label="Ссылка на принцип 65">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
-<p class="caveat"><strong>Область применимости.</strong> «Иерархия по цене» — упрощение: causal consistency и session guarantees покрывают разные оси и не образуют тотального порядка во всех системах.</p>
+<p class="caveat"><strong>Область применимости.</strong> Консистентность — вектор гарантий, а не одна шкала: causal consistency и session guarantees покрывают разные оси и не образуют тотального порядка. Единственное, что упорядочено строго, — цена реального времени: linearizability требует его, sequential и causal — нет.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Linearizability ↔ latency/availability (PACELC)</a></p>
-<p class="lede">«Прочитал то, что записал» — не свойство базы, а гарантия, которую сервис либо даёт, либо нет, и это должно быть написано в контракте. Иерархия по цене: linearizable &gt; sequential &gt; causal &gt; read-your-writes / monotonic reads (session guarantees) &gt; eventual. Большинству фич хватает session guarantees — платить за linearizability по умолчанию значит платить за то, чем не пользуешься.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://cs.brown.edu/~mph/HerlihyW90/p463-herlihy.pdf" rel="noopener noreferrer">Herlihy, Wing — Linearizability: A Correctness Condition for Concurrent Objects</a></p>
+<p class="lede">«Прочитал то, что записал» — не свойство базы, а гарантия, которую сервис либо даёт, либо нет, и это должно быть написано в контракте. Консистентность — не одна шкала «сильнее/слабее», а набор наблюдаемых гарантий: порядок операций, видимость чужих записей, свежесть, поведение внутри сессии, привязка к реальному времени. Linearizability дороже всех, потому что требует последнего: операция обязана выглядеть выполненной в один момент между вызовом и ответом. Большинству фич хватает session guarantees (read-your-writes, monotonic reads) — платить за linearizability по умолчанию значит платить за то, чем не пользуешься.</p>
 <figure class="code" data-multi data-available="java,go">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1750,10 +1761,13 @@ impl Store {
 <p class="note"><strong>Честная оценка.</strong> Требование к ресурсу точнее формулируется как <em>монотонная</em> проверка: fencing token — частный случай, версия и conditional write / compare-and-swap выражают ту же защиту. Если же ресурс не умеет ничего из этого (S3 без precondition, внешний API), лок даёт <em>efficiency</em> — не делать работу дважды, — но не <em>correctness</em>; путаница этих двух применений и есть вторая половина инцидентов с «distributed lock», включая известный спор Kleppmann vs antirez про Redlock. И отдельно: consensus (Raft/Paxos) — алгоритм, а не эвристика; своей реализации ему не пишут, берут готовую.</p>
 </article>
 
-<article class="principle" id="p67" data-keywords="clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы" data-kind="pattern" data-confidence="established">
-<div class="p-head"><span class="p-num">67</span><h3>Wall clock врёт: упорядочивание — только логическими часами</h3><a class="anchor" href="#p67" aria-label="Ссылка на принцип 67">#</a></div>
+<article class="principle" id="p67" data-keywords="clock skew ntp lamport hybrid logical clock hlc truetime spanner last write wins часы monotonic clock nanotime дедлайн длительность" data-kind="pattern" data-confidence="established">
+<div class="p-head"><span class="p-num">67</span><h3>Wall clock врёт: упорядочивание — не его работа</h3><a class="anchor" href="#p67" aria-label="Ссылка на принцип 67">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Логические часы решают одну задачу — отношение «произошло раньше». Длительности и дедлайны считаются монотонными часами, доменное и человеческое время остаётся за wall clock, а владение ресурсом подтверждается номером поколения (66), а не временем вовсе. Утверждение карточки — про упорядочивание между узлами, а не про то, что wall clock не нужен.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf" rel="noopener noreferrer">Leslie Lamport — Time, Clocks, and the Ordering of Events in a Distributed System</a></p>
 <p class="lede">NTP-дрейф, leap smearing, VM-паузы: <code>System.currentTimeMillis()</code> двух машин несравним, и «last write wins по timestamp» молча теряет записи. Упорядочивание — Lamport clock / HLC / версионные векторы; wall clock — только для людей (логи, метрики) и для TTL с запасом.</p>
+<p class="note"><strong>Трое часов, которых путают.</strong> <em>Wall clock</em> (<code>currentTimeMillis</code>, <code>CLOCK_REALTIME</code>) отвечает на вопрос «когда по календарю»: логи, доменные даты, TTL с запасом. Он прыгает — вперёд и назад — при NTP-коррекции. <em>Monotonic clock</em> (<code>nanoTime</code>, <code>CLOCK_MONOTONIC</code>) не прыгает и потому единственный годится для длительностей, таймаутов и дедлайнов, — но несравним между машинами и обнуляется при перезапуске, поэтому хранить его бессмысленно. <em>Логические часы</em> (Lamport, векторные, HLC) — единственный источник отношения «произошло раньше» между узлами. Типовые баги ровно на подмене: длительность, посчитанная по wall clock, во время коррекции становится отрицательной, а «порядок» по monotonic не имеет смысла за пределами процесса. Отдельный слой — fencing token (<a href="#p66">66</a>): там нужен не порядок событий, а номер поколения владельца.</p>
 <figure class="code" data-multi data-available="python,java">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1833,7 +1847,7 @@ for _, e := range rows {
 <div class="p-head"><span class="p-num">69</span><h3>Saga: распределённая транзакция = компенсации минус изоляция</h3><a class="anchor" href="#p69" aria-label="Ссылка на принцип 69">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Saga ↔ изоляция</a></p>
-<p class="lede">Распределённые ACID-транзакции существуют (XA, 2PC), но платят доступностью, латентностью и связностью: координатор становится единой точкой отказа, а участники держат блокировки на время всего протокола. Для продолжительных межсервисных процессов практичнее saga — цепочка локальных транзакций с компенсирующим действием на каждую. Главная цена, которую забывают: <strong>пропала изоляция</strong> — промежуточные состояния видимы другим участникам, и компенсация не «откатывает», а пишет новый факт (refund ≠ отмена charge).</p>
+<p class="lede">Распределённые ACID-транзакции существуют (XA, 2PC) и дают более сильный контракт — атомарность на всех участниках сразу, — но платят координацией: участники держат блокировки до конца протокола, а между <code>prepare</code> и решением не вправе решить сами. Реплицированный координатор (журнал решений под Raft) убирает единую точку отказа, но ни блокировки, ни лишних round-trip не убирает. Для продолжительных межсервисных процессов практичнее saga — цепочка локальных транзакций с компенсирующим действием на каждую. Главная цена, которую забывают: <strong>пропала изоляция</strong> — промежуточные состояния видимы другим участникам, и компенсация не «откатывает», а пишет новый факт (refund ≠ отмена charge).</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -1938,7 +1952,8 @@ def should_refresh(expires_at: float, delta: float, beta: float = 1.0) -&gt; boo
 <p class="versions"><strong>Версии.</strong> Flink 1.20 / 2.x: в 2.x перегрузки с org.apache.flink.streaming.api.windowing.time.Time удалены в пользу java.time.Duration — сверяйтесь с версией кластера.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">Watermark: полнота ↔ латентность</a></p>
 <p class="sources"><strong>Источники:</strong> <a href="https://nightlies.apache.org/flink/flink-docs-stable/docs/learn-flink/streaming_analytics/" rel="noopener noreferrer">Apache Flink — Streaming Analytics</a></p>
-<p class="lede">Время события и время обработки расходятся всегда: сеть, ретраи, офлайн-клиенты, replay. Watermark — это явное заявление «данные старше T считаем прибывшими», то есть выбор между полнотой и латентностью, который делает бизнес, а не фреймворк. Late data — нормальный режим, не ошибка: у каждого окна должна быть политика, выбранная осознанно.</p>
+<p class="lede">Время события и время обработки расходятся всегда: сеть, ретраи, офлайн-клиенты, replay. Watermark — это <em>оценка прогресса event-time</em>: заявление системы «событий старше T мы больше не ждём», из которого следует, когда окно можно считать достаточно полным. Насколько это оценка, а насколько гарантия, задаёт источник: у партиции с монотонным временем — почти гарантия, у мобильных клиентов с офлайном — эвристика с хвостом. Выбор T — компромисс между полнотой и латентностью, и делает его бизнес, а не фреймворк. Late data — нормальный режим, не ошибка: у каждого окна должна быть политика, выбранная осознанно.</p>
+<p>Дальше watermark распадается на четыре разных решения, которые в API выглядят как одна настройка: сколько ждать (сам watermark), сколько ещё принимать после закрытия окна (allowed lateness), что делать с тем, что пришло позже (сброс в боковой поток или потеря) и что делать с уже отданным результатом (повторный firing, retraction, ничего). Отдельным пунктом — idle-источник: партиция, в которую перестали писать, замораживает общий watermark, потому что он берётся как минимум по всем партициям, и конвейер встаёт при полностью исправных данных.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2079,7 +2094,7 @@ StateTtlConfig ttl = StateTtlConfig         // 2. TTL — из бизнес-го
 <div class="p-head"><span class="p-num">28</span><h3>Observability ≠ мониторинг</h3><a class="anchor" href="#p28" aria-label="Ссылка на принцип 28">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Редакционная точка зрения этой страницы, не консенсус">позиция автора</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="caveat"><strong>Область применимости.</strong> Wide events не заменяют метрики. Рабочая позиция — комплементарность: метрики для дешёвого агрегатного детектирования, трейсы для причинной цепочки, события для деталей, профили для CPU/памяти. Высокая кардинальность требует контроля стоимости и приватности.</p>
-<p class="lede">Способность отвечать на вопросы, которые не были предвидены. Wide structured events с высокой кардинальностью вместо заранее агрегированных счётчиков.</p>
+<p class="lede">Мониторинг проверяет заранее сформулированные условия; observability — способность разобраться в состоянии, которое никто не предвидел, не выкатывая ради этого новый код. Wide structured events с высокой кардинальностью — сильный механизм такой способности, а не её определение: метрики, трейсы и профили отвечают на другие вопросы и не заменяются событиями.</p>
 <figure class="code" data-multi data-available="go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -2395,10 +2410,23 @@ $ py-spy record --pid 4711 --format speedscope</code></pre></div>
 <p class="note"><strong>Оговорки к примерам.</strong> JMH — стандарт для JVM-микробенчмарков, но не единственный корректный способ измерения: продовые профили и нагрузочные стенды отвечают на другие вопросы. <code>testing.B.Loop</code> требует Go 1.24+. <code>net/http/pprof</code> не «включён всегда»: пакет нужно импортировать и поднять HTTP-обработчик, а в проде закрыть сетью и аутентификацией — это отладочная поверхность.</p>
 </article>
 
-<article class="principle" id="p38" data-keywords="amdahl universal scalability law usl gunther coherency contention crosstalk" data-kind="theorem" data-confidence="established">
-<div class="p-head"><span class="p-num">38</span><h3>Amdahl / Universal Scalability Law</h3><a class="anchor" href="#p38" aria-label="Ссылка на принцип 38">#</a></div>
+<article class="principle" id="p89" data-keywords="amdahl law speedup serial fraction parallel закон амдала ускорение последовательная доля gustafson" data-kind="theorem" data-confidence="established">
+<div class="p-head"><span class="p-num">89</span><h3>Закон Амдала: последовательная доля — это потолок</h3><a class="anchor" href="#p89" aria-label="Ссылка на принцип 89">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Доказуемое утверждение с формальными предпосылками">теорема</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Формула доказана для фиксированного размера задачи и идеального распараллеливания остатка: она не учитывает ни стоимость самой координации (её добавляет USL, 38), ни рост объёма работы вместе с ресурсами (контрапункт Густафсона). Практическая трудность не в математике, а в измерении s: последовательная доля редко видна в коде и обычно обнаруживается как общий ресурс — лидер, блокировка, одна партиция.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://inst.eecs.berkeley.edu/~n252/paper/Amdahl.pdf" rel="noopener noreferrer">Gene Amdahl — Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities (AFIPS 1967)</a></p>
+<p class="lede">Ускорение при N исполнителях <code>S(N) = 1 / (s + (1−s)/N)</code>, где s — доля работы, которую нельзя выполнить параллельно. При N → ∞ предел равен <code>1/s</code>: 5 % последовательного кода означают потолок ×20, сколько ядер, узлов или воркеров ни добавляй.</p>
+<p>Практическая ценность не в формуле, а в том, что она заставляет назвать s. В сервисах последовательная доля почти никогда не выглядит как «однопоточный участок кода»: это единственный писатель, глобальная блокировка, автоинкрементный ключ, координация транзакции, лидер в кворуме, общий рейт-лимитер, одна партиция, в которую сходится горячий ключ. Пока эта доля не найдена и не измерена, горизонтальное масштабирование — покупка ядер под потолок, посчитанный кем-то другим.</p>
+<p class="note">Закон посчитан для <strong>фиксированного размера задачи</strong>, и в этом его граница. Контрапункт Густафсона: если с ростом ресурсов растёт и объём работы (больше данных, выше разрешение, шире окно), доля последовательной части падает, и практический выигрыш ведёт себя лучше, чем обещает формула. Оба утверждения верны и отвечают на разные вопросы: «во сколько раз быстрее та же задача» и «насколько большую задачу можно взять за то же время». Что закон Амдала не описывает вовсе — падение производительности от самого согласования; это добавляет USL (<a href="#p38">38</a>).</p>
+</article>
+
+<article class="principle" id="p38" data-keywords="amdahl universal scalability law usl gunther coherency contention crosstalk модель подгонка" data-kind="model" data-confidence="context-dependent">
+<div class="p-head"><span class="p-num">38</span><h3>Universal Scalability Law</h3><a class="anchor" href="#p38" aria-label="Ссылка на принцип 38">#</a></div>
+<ul class="meta"><li><span class="badge badge-kind" title="Параметры подгоняются по измерениям; предсказывает в диапазоне данных, не выводится из аксиом">модель</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> USL — модель с подгоняемыми параметрами, а не теорема: σ и κ получают регрессией по измерениям конкретной системы и между системами они не переносятся. Предсказательная сила ограничена диапазоном, в котором мерили; дальше это экстраполяция, и её честно называть гипотезой для следующего эксперимента.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://arxiv.org/abs/0808.1431" rel="noopener noreferrer">Neil Gunther — A General Theory of Computational Scalability Based on Rational Functions</a></p>
 <p class="lede">USL: пропускная способность <code>C(N) = λN / (1 + σ(N−1) + κN(N−1))</code>. Второй член (когерентность κ) объясняет, почему добавление узлов даёт отрицательный прирост: crosstalk растёт квадратично.</p>
+<p>Отношение к закону Амдала (<a href="#p89">89</a>) прямое: при κ = 0 USL вырождается в него, а σ — та самая последовательная доля. Разница в том, что закон Амдала выводится из арифметики и даёт <em>потолок</em> — кривая выходит на плато, — а USL добавляет член, из-за которого кривая после максимума идёт <em>вниз</em>: согласование между узлами само становится работой. И разница в статусе: у Амдала нечего подгонять, у USL σ и κ существуют только как результат регрессии по вашим измерениям.</p>
 <p class="note">Практический вывод для Kafka/Flink: перед горизонтальным скейлом измерь σ и κ на нагрузочном стенде — иначе платишь за ноды, снижающие throughput.</p>
 <p class="note">σ (contention) и κ (coherency) не известны заранее — они оцениваются подгонкой кривой по измерениям на нескольких уровнях конкурентности. USL полезен как модель для экстраполяции и как язык для разговора, а не как формула, в которую подставляют числа из документации.</p>
 </article>
@@ -2480,19 +2508,20 @@ logger.Info(&quot;request_completed&quot;,
 <p class="note">Вопрос на ревью: <strong>«какую essential-сложность выражает этот слой?»</strong> Нет ответа — слой accidental.</p>
 </article>
 
-<article class="principle" id="p41" data-keywords="gall law walking skeleton incremental big bang" data-kind="heuristic" data-confidence="opinionated">
+<article class="principle" id="p41" data-keywords="gall law walking skeleton incremental big bang" data-kind="heuristic" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">41</span><h3>Gall's Law</h3><a class="anchor" href="#p41" aria-label="Ссылка на принцип 41">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
-<p class="lede">Работающая сложная система всегда эволюционировала из работающей простой. Спроектированная сложной с нуля — не работает и не чинится.</p>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Исходная формулировка Галла — «спроектированная сложной с нуля не работает и не может быть починена» — афоризм, а не закон: спроектированные наперёд сложные системы существуют там, где спецификация зафиксирована заранее, а цена ошибки запрещает итерации, — авионика, протоколы, кремний. Эвристика работает там, где требования уточняются по ходу, то есть в большинстве продуктовой разработки, и стоит она ровно столько, сколько стоит промежуточное состояние.</p>
+<p class="lede">Сложную систему безопаснее выращивать через работающие промежуточные состояния, чем вводить одним big-bang: на эволюционном пути каждый шаг даёт работающую систему, которую можно измерить и откатить, а у большого взрыва первая встреча с реальностью совпадает с датой запуска.</p>
 <p class="note">Практика: walking skeleton → инкременты, никогда big-bang.</p>
 </article>
 
-<article class="principle" id="p42" data-keywords="yagni rule of three aha avoid hasty abstraction duplication you aren&#x27;t gonna need it фабрика преждевременная абстракция" data-kind="heuristic" data-confidence="opinionated">
+<article class="principle" id="p42" data-keywords="yagni rule of three aha avoid hasty abstraction duplication you aren&#x27;t gonna need it фабрика преждевременная абстракция" data-kind="heuristic" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">42</span><h3>YAGNI + Rule of Three (AHA)</h3><a class="anchor" href="#p42" aria-label="Ссылка на принцип 42">#</a></div>
-<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
-<p class="caveat"><strong>Область применимости.</strong> «Ровно на третьем повторении» — мнемоника, а не порог. Критерий тот же, что в 7: доказанная общая ось изменения.</p>
+<ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
+<p class="caveat"><strong>Область применимости.</strong> Критерий — доказанная общая ось изменения (тот же, что в 7), а не счётчик копий; «три» живёт в названии как мнемоника. Обратная крайность так же реальна: одно знание, размноженное по десяти местам, расходится молча (43).</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">OCP ↔ YAGNI</a></p>
-<p class="lede">Абстракция появляется на третьем повторении. Первое дублирование дешевле неверной абстракции: неверная абстракция заставляет все будущие случаи врать о своей природе.</p>
+<p class="lede">Абстракция появляется тогда, когда повторения обнажили общую ось изменения, — а не по счётчику копий. Первое дублирование дешевле неверной абстракции: неверная абстракция заставляет все будущие случаи врать о своей природе. «На третьем повторении» — мнемоника: к третьему разу ось обычно уже видна.</p>
 <p>YAGNI — You Aren't Gonna Need It — читается буквально: не пишите код, который сегодня никому не нужен. Ни функцию «пусть будет», ни параметр «вдруг понадобится», ни фабрику под единственную реализацию. Платят не за строки: этот код с первого дня требует чтения, тестов, правки при каждом рефакторинге — и сообщает читателю ось изменения, которой не существует. Практический тест: если вы не можете назвать второй случай, уже присутствующий в коде, — второго случая нет. «Наверное, понадобится» на практике означает «не понадобится, а если понадобится — форма будет другая».</p>
 <p class="note"><strong>Как это выглядит на OCP.</strong> Интерфейс плюс фабрика вместо <code>if</code> по типу — каноническое «расширение новым кодом, не правкой старого» (<a href="#p1">1</a>): новый вариант добавляется реализацией, старый код не трогают. Ровно эта конструкция и есть типовое нарушение YAGNI, пока реализация одна: три сущности вместо одной ветки ради оси изменения, которую никто не доказал. Порядок обратный привычному — сначала второе и третье повторение, потом абстракция; OCP применяют к оси, которая уже проявилась, а не к предсказанной.</p>
 </article>
@@ -2527,11 +2556,13 @@ logger.Info(&quot;request_completed&quot;,
 <p class="lede">Не удаляй код, назначения которого не понял. <code>git log -S"strange_condition"</code> перед удалением — минимальная процедура. Контрмера к рефакторинг-энтузиазму.</p>
 </article>
 
-<article class="principle" id="p45" data-keywords="lehman laws technical debt entropy software evolution" data-kind="empirical-law" data-confidence="context-dependent">
+<article class="principle" id="p45" data-keywords="lehman laws technical debt entropy software evolution e-type энтропия метафора" data-kind="empirical-law" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">45</span><h3>Lehman's Laws / технический долг как термодинамика</h3><a class="anchor" href="#p45" aria-label="Ссылка на принцип 45">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
-<p class="caveat"><strong>Область применимости.</strong> Законы Лемана выведены для E-type систем (встроенных в изменяющуюся среду) на материале 1970–90-х. Это эмпирические наблюдения, а не теоремы.</p>
+<p class="caveat"><strong>Область применимости.</strong> Законы Лемана выведены для E-type систем (встроенных в изменяющуюся среду) на материале 1970–90-х. Это эмпирические наблюдения, а не теоремы, а «термодинамика» в заголовке — метафора, которая не наследует ни одного свойства физической энтропии.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://users.ece.utexas.edu/~perry/work/papers/feast1.pdf" rel="noopener noreferrer">Lehman, Ramil, Wernick — Metrics and Laws of Software Evolution: The Nineties View</a></p>
 <p class="lede">Используемая система обязана меняться; её сложность растёт, пока в неё не вкладывают работу специально. Бюджет на снижение энтропии — регулярная статья, а не «когда-нибудь потом».</p>
+<p>Два разных утверждения в одной карточке, и они разного веса. Наблюдения Лемана — эмпирика: система, встроенная в изменяющуюся среду (E-type), либо меняется, либо теряет пригодность, и её структура деградирует, если работу по её сохранению не финансируют отдельно. «Термодинамика» же — метафора, и она врёт в главном: рост сложности не самопроизвольный процесс, а сумма локально рациональных решений, каждое из которых по отдельности дешевле правильного. Из физической аналогии следовало бы «сопротивляться бесполезно»; из эмпирики следует ровно обратное — это статья бюджета, и она управляема.</p>
 </article>
 
 <article class="principle" id="p46" data-keywords="principle of least astonishment surprise pola mutable default argument deref typed nil equals hashcode" data-kind="heuristic" data-confidence="established">
@@ -2590,11 +2621,12 @@ impl Wrapper {
 </figure>
 </article>
 
-<article class="principle" id="p47" data-keywords="readability explicit over implicit zen of python magic reflection" data-kind="editorial" data-confidence="opinionated">
-<div class="p-head"><span class="p-num">47</span><h3>Код читается на порядок чаще, чем пишется</h3><a class="anchor" href="#p47" aria-label="Ссылка на принцип 47">#</a></div>
+<article class="principle" id="p47" data-keywords="readability explicit over implicit zen of python magic reflection код читается чаще чем пишется" data-kind="editorial" data-confidence="opinionated">
+<div class="p-head"><span class="p-num">47</span><h3>Код оптимизируется под чтение, а не под скорость написания</h3><a class="anchor" href="#p47" aria-label="Ссылка на принцип 47">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Редакционная точка зрения этой страницы, не консенсус">позиция автора</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
-<p class="caveat"><strong>Область применимости.</strong> «На порядок чаще» — риторическая оценка, а не измерение.</p>
+<p class="caveat"><strong>Область применимости.</strong> «На порядок чаще» из расхожей формулировки — риторическая оценка, а не измерение; проверяемая часть утверждения не в множителе, а в наборе проходов, через которые текст идёт после написания.</p>
 <p class="lede">Обоснование явности над магией: в Java — меньше рефлексии и аннотационной магии; в Rust — меньше макро-DSL; в Go — это философия языка целиком; в Python — «explicit is better than implicit» из <code>import this</code>.</p>
+<p>Расхожая формулировка — «код читается на порядок чаще, чем пишется». «На порядок» здесь риторика, а не измерение, и держать надо не её. Проверяемая часть: после первого набора текст проходит через ревью, диагностику инцидента, правку соседней команды и чтение того, кто ищет, где именно ломается, — и стоимость каждого из этих проходов зависит от того, сколько поведения выражено явно. Магия экономит время ровно один раз — в момент написания, тем, кто уже держит всю картину в голове.</p>
 </article>
 
 <article class="principle" id="p75" data-keywords="choose boring technology innovation tokens скучные технологии постгрес выбор стека" data-kind="heuristic" data-confidence="opinionated">
@@ -2609,7 +2641,8 @@ impl Wrapper {
 <article class="principle" id="p76" data-keywords="brooks law mythical man-month second-system effect найм скоуп переписывание" data-kind="empirical-law" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">76</span><h3>Brooks's Law и second-system effect</h3><a class="anchor" href="#p76" aria-label="Ссылка на принцип 76">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
-<p class="caveat"><strong>Область применимости.</strong> Закон Брукса зависит от декомпозируемости задачи, стоимости онбординга и стадии проекта; это наблюдение из «Мифического человеко-месяца», не универсальное ограничение.</p>
+<p class="caveat"><strong>Область применимости.</strong> В карточке два разных наблюдения. Закон Брукса — про стоимость координации: он зависит от декомпозируемости задачи, цены онбординга и стадии проекта, и на слабо связанной работе с готовым онбордингом почти не проявляется. Second-system effect — про мотивацию автора, а не про арифметику коммуникаций, и наступает даже в команде постоянного размера. Оба — наблюдения из «Мифического человеко-месяца», не универсальные ограничения.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://openlibrary.org/works/OL1866641W/The_Mythical_Man-Month" rel="noopener noreferrer">Frederick P. Brooks — The Mythical Man-Month (первоисточник обоих наблюдений)</a></p>
 <p class="lede">Добавление людей в опаздывающий проект замедляет его: коммуникация растёт квадратично, онбординг отбирает самых знающих. Second-system effect: вторая версия — самая опасная, в неё сгружают всё, что «не влезло» в первую, — прямое нарушение Gall's Law (<a href="#p41">41</a>) изнутри команды-автора.</p>
 <p class="note">Кодом не выражается; выражается решением «резать скоуп, а не нанимать» и требованием к rewrite-предложениям проходить через strangler fig (<a href="#p73">73</a>), а не через «на этот раз сделаем правильно».</p>
 </article>
@@ -3053,7 +3086,7 @@ class GroundedAnswer(BaseModel):
 
 </section>
 
-        <footer class="footer"><span>Справочник · 88 принципов</span>
+        <footer class="footer"><span>Справочник · 89 принципов</span>
 <span>Java · Rust · Go · Python 3.12+</span>
 <span>Технический пересмотр: 2026-08-04</span>
 <span><a href="https://github.com/nikolay-e/learning" rel="noopener noreferrer">Исходники и правки — на GitHub</a></span></footer>
