@@ -277,6 +277,58 @@ test("страница не скроллится по горизонтали", a
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
+// Плавная прокрутка ограничена по длительности: на длинном документе переход
+// обрывался на полпути — в адресе правильный якорь, на экране чужой принцип.
+// Chromium из комплекта Playwright доводит такую прокрутку до конца, а Chrome
+// у читателя — нет, поэтому одного поведенческого прохода мало: рядом стоит
+// проверка самого условия, при котором ломается.
+test("длинный документ не полагается на плавную прокрутку", async ({
+  page,
+}) => {
+  const { docHeight, behavior } = await page.evaluate(() => ({
+    docHeight: document.documentElement.scrollHeight,
+    behavior: getComputedStyle(document.documentElement).scrollBehavior,
+  }));
+  if (docHeight > 20000) expect(behavior).not.toBe("smooth");
+});
+
+test("оглавление доводит до принципа через весь документ", async ({
+  page,
+}, info) => {
+  // порядок в оглавлении не совпадает с порядком в документе, а обрывается
+  // именно длинный перегон — поэтому цели берутся по краям самого документа
+  const ids = await page.evaluate(() =>
+    [...document.querySelectorAll(".principle")].map((a) => a.id),
+  );
+  const jumps = [ids.at(-1), ids[0], ids[Math.floor(ids.length / 2)]];
+
+  for (const id of jumps) {
+    if (isMobile(info)) await page.locator("#rail-toggle").click();
+    await page.locator(`.rail-group li a[href="#${id}"]`).click();
+    // измеряется только после остановки: на лету цель проходит мимо нужной
+    // отметки, и опрос движущейся страницы зеленеет даже когда прокрутка
+    // уезжает дальше
+    const top = await page.evaluate(async (target) => {
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      let prev = NaN;
+      let still = 0;
+      while (still < 5) {
+        await wait(100);
+        if (Math.abs(scrollY - prev) < 1) still++;
+        else still = 0;
+        prev = scrollY;
+      }
+      return Math.round(
+        document.getElementById(target).getBoundingClientRect().top,
+      );
+    }, id);
+    expect(
+      Math.abs(top - 86),
+      `клик по «${id}» в оглавлении не привёл к принципу`,
+    ).toBeLessThan(64);
+  }
+});
+
 test("в консоли нет ошибок", async ({ page }, info) => {
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));

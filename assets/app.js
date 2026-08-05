@@ -330,10 +330,14 @@
         if (!link || !entry.isIntersecting) return;
         links.forEach((l) => l.classList.remove("current"));
         link.classList.add("current");
+        // Прокручивается только сам rail: scrollIntoView двигает и окно тоже,
+        // то есть слежение за позицией начинает менять саму позицию.
         const box = link.getBoundingClientRect();
         const railBox = rail.getBoundingClientRect();
-        if (box.top < railBox.top || box.bottom > railBox.bottom) {
-          link.scrollIntoView({ block: "nearest" });
+        if (box.top < railBox.top) {
+          rail.scrollTop -= railBox.top - box.top;
+        } else if (box.bottom > railBox.bottom) {
+          rail.scrollTop += box.bottom - railBox.bottom;
         }
       });
     },

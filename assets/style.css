@@ -48,8 +48,10 @@ html[data-theme="light"] {
   box-sizing: border-box;
 }
 
+/* Без scroll-behavior: smooth — намеренно. Плавная прокрутка ограничена
+   по длительности, и на документе в ~80 000 px переход дальше ~20 000 px
+   останавливается на полпути: в адресе #p3, на экране принцип 60. */
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 86px;
 }
 
@@ -971,9 +973,6 @@ caption {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   * {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
