@@ -49,6 +49,12 @@ gh run list --workflow=pages-build-deployment --limit 3 \
 and confirm against the served bytes (`curl` the page and grep for something the new commit
 introduced) before concluding the deploy is stuck.
 
+The mirror-image trap costs more time: **a browser that already visited the page serves the
+old HTML from its own cache.** Re-navigating to the same URL after a deploy shows pre-deploy
+content while `curl` shows the new bytes — that contradiction is the browser, not Pages. Add a
+throwaway query (`?cachebust=<sha>`) for every post-deploy browser check; `curl` is the
+tiebreaker.
+
 ## Production verification
 
 Anything asserting against production must use the **trailing slash**:
@@ -79,6 +85,14 @@ human:
   the manual pass to a list: it warns (does not fail) for every card carrying `versions`
   whose `last_reviewed` is older than 180 days. Re-read those, then bump the date.
 
+  The 180-day warning is a floor, not the check — a preview API can move twice inside it.
+  Web-search each `versions` card against the **current** release rather than trusting the
+  page or training memory: this is how p26 was caught shipping `anySuccessfulResultOrThrow()`,
+  renamed to `anySuccessfulOrThrow()` when JDK 26 re-previewed structured concurrency under
+  JEP 525. Preview APIs (`--enable-preview`) are the highest-risk group: they are re-previewed
+  yearly, and each round is free to rename things. Set a per-card `last_reviewed` on the cards
+  actually re-verified rather than leaning on the global default.
+
 ## Standing in for autoqa
 
 `sync-autoqa-pin.sh --repo .` reports "no autoqa pin, skip" — there is no post-deploy autoqa
@@ -86,7 +100,15 @@ job here and no sensor. What the missing pipeline would have covered, and who co
 
 - **Crawler / broken links / JS errors / a11y** — the Playwright + axe suite covers the built
   bytes, and CI proves the deployed file equals them. Each pass additionally fetch the served
-  page and check every `href`/`src` it contains resolves (18 external + 4 assets today).
+  page and check every `href`/`src` it contains resolves (27 external + 4 assets today), and
+  run axe against **production** in the four combinations the suite covers only locally —
+  desktop/mobile × light/dark. A throwaway script under the repo root is the cheapest way:
+  `@playwright/test` and `@axe-core/playwright` resolve only from there, not from a scratch
+  directory. Delete it before committing. `github.com` answering `429` in a sequential link
+  sweep is the QA traffic being rate-limited, not link rot — re-check that one URL alone.
+- **Source-link rot on demand** — `links.yml` only runs weekly, so a pass that adds citations
+  is not covered by it. `gh workflow run links.yml` after pushing; it checks Markdown too, so
+  it also catches a README link the same pass broke.
 - **Schemathesis** — nothing to test: no API, no OpenAPI document.
 - **ZAP** — deliberately **not** run. An active scan of `nikolay-e.github.io` is a scan of
   GitHub's infrastructure, not of this app; there is no backend, form, cookie or auth here for
