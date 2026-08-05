@@ -30,6 +30,8 @@ principles:
     kind: pattern
     confidence: established
     example_status: fragment
+    versions: 'Java-пример: record — финально с Java 16, sealed — с 17, record patterns и проверка
+      полноты switch — с 21. Отсюда пометка «Java 21» на панели.'
   4:
     kind: heuristic
     confidence: context-dependent

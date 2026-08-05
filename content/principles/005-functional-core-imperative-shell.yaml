@@ -51,3 +51,9 @@ blocks:
           \ — по конструкции\n\nasync def settle_daily(db: Db, fx: FxClient) -> None:\n    trades, rates =\
           \ await asyncio.gather(db.trades(TODAY), fx.rates(TODAY))\n    await db.save(settle(trades, rates,\
           \ TODAY))"
+  - type: note
+    html: 'Haskell превращает это разделение из дисциплины в закон: любой побочный эффект помечен
+      типом <code>IO</code>, и компилятор не даст вызвать его из чистой функции — functional core /
+      imperative shell там не стиль, а следствие системы типов. (Точность попутно: монады — не «только
+      для I/O»; Maybe, List, State — тоже монады, IO лишь самая известная.) В Java/Go/Python граница
+      держится конвенцией и линтером — что и показывают примеры.'

@@ -248,7 +248,7 @@
 
 <div class="section-head"><span class="numeral">I</span><h2>Код внутри процесса</h2></div>
 
-<article class="principle" id="p1" data-keywords="solid srp ocp lsp isp dip liskov substitution single responsibility" data-kind="heuristic" data-confidence="opinionated">
+<article class="principle" id="p1" data-keywords="solid srp ocp lsp isp dip liskov substitution single responsibility rectangle square прямоугольник квадрат поведение контракта" data-kind="heuristic" data-confidence="opinionated">
 <div class="p-head"><span class="p-num">01</span><h3>SOLID — кратко, с честной оценкой</h3><a class="anchor" href="#p1" aria-label="Ссылка на принцип 1">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="caveat"><strong>Область применимости.</strong> Оценки в таблице — редакционная позиция этой страницы, а не консенсус. ISP и DIP тоже дают проверяемые failure modes; «единственный заслуживающий примеров» — утверждение автора, а не свойство SOLID.</p>
@@ -266,6 +266,7 @@
 </tbody></table></div>
 <p class="note"><strong>«Причина для изменения» — это люди, а не требования.</strong> Поздняя формулировка Мартина: модуль отвечает перед одним и только одним <em>актором</em> — группой людей, которая выдвигает требования. Класс, который хранит список покупок и считает его стоимость, нарушает SRP не потому, что «делает две вещи», а потому что за состав списка и за правила ценообразования отвечают разные люди и их требования меняются независимо. Актор при этом — критерий разреза, а не драйвер дизайна: классы не заводят по одному на стейкхолдера, проверяют обратное — что один артефакт не служит двум хозяевам с несовпадающими графиками изменений.</p>
 <p>Неоперационализируемость от этого никуда не девается: гранулярность произвольна, критерия остановки декомпозиции принцип не даёт — нарушение опознаётся постфактум, а дизайн из него не выводится. Практический тест — история файла: коммиты из несвязанных задач разных людей, систематически сходящиеся в один класс. Ограничитель против обратной крайности, дробления ради дробления, — cohesion (<a href="#p13">13</a>): что меняется вместе, живёт вместе. Операционализируемая замена — information hiding (<a href="#p12">12</a>): вопрос не «сколько здесь ответственностей», а «что сломается снаружи, если это внутреннее решение пересмотрят».</p>
+<p>У контракта два слоя. Сигнатуры — какие методы, какие типы — проверяет компилятор. Поведение — что метод <em>обещает делать</em> — не проверяет никто, кроме ревью и тестов. LSP требует держать оба: подтип, совпавший по сигнатурам и нарушивший обещание, ломает каждого, кто писал код против супертипа. Канонический пример: у Rectangle есть setWidth и setHeight; Square, наследуя его, обязан держать стороны равными — его setWidth(5) тайком меняет и высоту, и код, полагавшийся на «поставил ширину — высота не тронута», ломается именно на квадрате. Компилятор доволен, контракт нарушен. Лечение в примерах ниже — не чинить наследование, а убрать его: закрытый набор вариантов без мутирующего setWidth (<a href="#p3">3</a>) и контрактные тесты, прогоняемые по всем реализациям.</p>
 <p>LSP-нарушение и исправление — единственный SOLID-принцип, заслуживающий примеров.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
@@ -321,6 +322,7 @@ def storage_contract_suite(impl: Storage):   # один набор тестов 
 <div class="p-head"><span class="p-num">02</span><h3>Parse, don't validate</h3><a class="anchor" href="#p2" aria-label="Ссылка на принцип 2">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="lede">Функция возвращает тип, который конструктивно не может быть невалидным. Валидация выбрасывает знание, парсинг сохраняет его в типе.</p>
+<p class="note">Бытовой эквивалент — разъёмы. Штекер питания не входит в USB не потому, что кто-то проверяет его на входе, а потому что форма другая. Валидация — наклейка «сюда не вставлять», парсинг — другая форма разъёма; ошибка первого рода ловится в рантайме и только если проверку не забыли, второго — не совершается вовсе. Та же аналогия тянется на соседние карточки: <a href="#p3">3</a> — разъёмов ровно столько, сколько осмысленных вариантов, лишний нельзя даже изготовить; LSP (<a href="#p1">1</a>) — если штекер подошёл, на контактах обязано быть напряжение, обещанное на этикетке.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -384,6 +386,7 @@ class Email:
 <article class="principle" id="p3" data-keywords="sum type adt algebraic data type exhaustiveness illegal states" data-kind="pattern" data-confidence="established">
 <div class="p-head"><span class="p-num">03</span><h3>Make illegal states unrepresentable</h3><a class="anchor" href="#p3" aria-label="Ссылка на принцип 3">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Повторяемое решение известной задачи">паттерн</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
+<p class="versions"><strong>Версии.</strong> Java-пример: record — финально с Java 16, sealed — с 17, record patterns и проверка полноты switch — с 21. Отсюда пометка «Java 21» на панели.</p>
 <p class="lede">Sum types вместо комбинаций флагов. <code>{isLoading, data, error}</code> имеет 4 невозможных состояния из 8; sum type — ноль.</p>
 <p>Откуда восемь: три независимых поля, каждое либо есть, либо нет — 2³. Осмысленных из них четыре: ничего не начиналось, идёт загрузка, пришли данные, пришла ошибка. Остальные четыре — «загрузка и данные разом», «данные и ошибка», «загрузка и ошибка», «всё сразу» — представимы в типе, недостижимы по смыслу, и каждая ветка кода обязана решать, что с ними делать: обычно она этого не делает, и невозможное состояние доезжает до пользователя. Sum type снимает сам вопрос — состояний ровно четыре, потому что пятое не выражается.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
@@ -567,6 +570,7 @@ async def settle_daily(db: Db, fx: FxClient) -&gt; None:
     trades, rates = await asyncio.gather(db.trades(TODAY), fx.rates(TODAY))
     await db.save(settle(trades, rates, TODAY))</code></pre></div>
 </figure>
+<p class="note">Haskell превращает это разделение из дисциплины в закон: любой побочный эффект помечен типом <code>IO</code>, и компилятор не даст вызвать его из чистой функции — functional core / imperative shell там не стиль, а следствие системы типов. (Точность попутно: монады — не «только для I/O»; Maybe, List, State — тоже монады, IO лишь самая известная.) В Java/Go/Python граница держится конвенцией и линтером — что и показывают примеры.</p>
 </article>
 
 <article class="principle" id="p6" data-keywords="immutable persistent data structure defensive copy value object" data-kind="heuristic" data-confidence="context-dependent">
@@ -869,7 +873,7 @@ with pool.acquire() as conn, conn.begin() as tx:
 
 <div class="section-head"><span class="numeral">II</span><h2>Границы и связность</h2></div>
 
-<article class="principle" id="p12" data-keywords="information hiding parnas encapsulation module secret" data-kind="heuristic" data-confidence="established">
+<article class="principle" id="p12" data-keywords="information hiding parnas encapsulation module secret classpath classloader serviceloader module path класслоадер загрузчик классов" data-kind="heuristic" data-confidence="established">
 <div class="p-head"><span class="p-num">12</span><h3>Information Hiding (Parnas, 1972)</h3><a class="anchor" href="#p12" aria-label="Ссылка на принцип 12">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
 <p class="versions"><strong>Версии.</strong> Модульная система — JDK 9+, и для модулей на module path строгая инкапсуляция работает с самого начала. Послабление --illegal-access касалось только внутренних пакетов самого JDK: deny по умолчанию с JDK 16 (JEP 396), опция игнорируется с JDK 17 (JEP 403).</p>
@@ -878,6 +882,7 @@ with pool.acquire() as conn, conn.begin() as tx:
 <p class="lede">Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается, если это решение пересмотрят». SRP (<a href="#p1">1</a>) — размытый пересказ этого принципа.</p>
 <p>Секрет — это конкретное решение: формат хранения, кодировка, порядок полей, алгоритм. Интерфейс, отдающий «список ASCII-строк», уже проболтался о кодировке — переход на UTF-8 ломает всех потребителей. Тот же интерфейс, описанный как «названия покупок», пережил бы этот переход незаметно. Разница не в коде, а в том, что объявлено наружу.</p>
 <p class="note"><strong>Зачем Java понадобился отдельный этаж видимости.</strong> До модульной системы <code>public</code> означало «виден всему classpath»: спрятать решение между пакетами одной библиотеки язык не позволял, и вспомогательный класс, сделанный public ради соседнего пакета, по закону Хайрама (<a href="#p16">16</a>) становился чужим контрактом. <code>exports</code> добавляет второй этаж: public <em>и</em> экспортирован — это API; public в неэкспортированном пакете снаружи не существует. Внутри модуля не меняется ничего — пакеты по-прежнему видят public-типы друг друга, экспортированные и нет, а <code>private/protected/public</code> работают как раньше; модуль лишь фильтрует, что из public-поверхности предъявлено миру. Остальные директивы того же файла к hiding отношения не имеют: <code>requires</code> задаёт граф зависимостей, <code>opens</code> точечно разрешает рефлексию, <code>uses</code>/<code>provides</code> связывают ServiceLoader.</p>
+<p class="note"><strong>Три слова рядом с module path.</strong> Classpath — список адресов на диске (каталоги и JAR'ы), где JVM разрешено искать классы: конфигурация запуска, не механизм, и он плоский — отсюда вся история выше. Module path — тот же список, но с прочитанными module-info; только там появляется второй этаж видимости. ClassLoader — тот, кто по имени класса находит байткод и грузит его в JVM, лениво, при первом использовании; собственный загрузчик — единица изоляции (Tomcat выдаёт его каждому приложению, Flink — каждому джобу, child-first, чтобы джоб привозил свои версии библиотек), и один класс, загруженный двумя лоадерами, — для JVM два разных типа: отсюда ClassCastException «между одинаковыми классами». ServiceLoader — «найди все реализации интерфейса, имён которых я не знаю на этапе компиляции»: так JDBC находит драйверы; <code>uses</code>/<code>provides</code> (<a href="#p88">88</a>) — его контракт в модульной системе, до модулей то же делал текстовый файл в META-INF/services.</p>
 <figure class="code" data-multi data-available="java,rust,go,python">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
@@ -928,7 +933,8 @@ __all__ = [&quot;RateLimiter&quot;]   # публичный контракт за
 <button type="button" class="copy">копировать</button>
 </div>
 <p class="fallback-note" hidden></p>
-<pre tabindex="0"><code class="language-java">// правило зависимостей как тест
+<pre tabindex="0"><code class="language-java">// правило зависимостей как тест; definedBy матчит по ИМЕНАМ ПАКЕТОВ —
+// ArchUnit читает байткод, поэтому конвенция имён и есть контракт этого теста
 @ArchTest
 static final ArchRule layering = layeredArchitecture().consideringAllDependencies()
     .layer(&quot;domain&quot;).definedBy(&quot;..domain..&quot;)
@@ -2481,19 +2487,23 @@ logger.Info(&quot;request_completed&quot;,
 <p class="note">Практика: walking skeleton → инкременты, никогда big-bang.</p>
 </article>
 
-<article class="principle" id="p42" data-keywords="yagni rule of three aha avoid hasty abstraction duplication" data-kind="heuristic" data-confidence="opinionated">
+<article class="principle" id="p42" data-keywords="yagni rule of three aha avoid hasty abstraction duplication you aren&#x27;t gonna need it фабрика преждевременная абстракция" data-kind="heuristic" data-confidence="opinionated">
 <div class="p-head"><span class="p-num">42</span><h3>YAGNI + Rule of Three (AHA)</h3><a class="anchor" href="#p42" aria-label="Ссылка на принцип 42">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-opinionated" title="Формулировка сильнее, чем доказательная база">спорное</span></li><li><span class="badge badge-status" title="Принцип не выражается кодом">без кода</span></li></ul>
 <p class="caveat"><strong>Область применимости.</strong> «Ровно на третьем повторении» — мнемоника, а не порог. Критерий тот же, что в 7: доказанная общая ось изменения.</p>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">OCP ↔ YAGNI</a></p>
 <p class="lede">Абстракция появляется на третьем повторении. Первое дублирование дешевле неверной абстракции: неверная абстракция заставляет все будущие случаи врать о своей природе.</p>
+<p>YAGNI — You Aren't Gonna Need It — читается буквально: не пишите код, который сегодня никому не нужен. Ни функцию «пусть будет», ни параметр «вдруг понадобится», ни фабрику под единственную реализацию. Платят не за строки: этот код с первого дня требует чтения, тестов, правки при каждом рефакторинге — и сообщает читателю ось изменения, которой не существует. Практический тест: если вы не можете назвать второй случай, уже присутствующий в коде, — второго случая нет. «Наверное, понадобится» на практике означает «не понадобится, а если понадобится — форма будет другая».</p>
+<p class="note"><strong>Как это выглядит на OCP.</strong> Интерфейс плюс фабрика вместо <code>if</code> по типу — каноническое «расширение новым кодом, не правкой старого» (<a href="#p1">1</a>): новый вариант добавляется реализацией, старый код не трогают. Ровно эта конструкция и есть типовое нарушение YAGNI, пока реализация одна: три сущности вместо одной ветки ради оси изменения, которую никто не доказал. Порядок обратный привычному — сначала второе и третье повторение, потом абстракция; OCP применяют к оси, которая уже проявилась, а не к предсказанной.</p>
 </article>
 
-<article class="principle" id="p43" data-keywords="dry dont repeat yourself knowledge duplication shared code" data-kind="heuristic" data-confidence="context-dependent">
+<article class="principle" id="p43" data-keywords="dry dont repeat yourself knowledge duplication shared code package common utils свалка хелперы" data-kind="heuristic" data-confidence="context-dependent">
 <div class="p-head"><span class="p-num">43</span><h3>DRY — про знание, не про текст</h3><a class="anchor" href="#p43" aria-label="Ссылка на принцип 43">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Правило принятия решений с областью применимости">эвристика</span></li><li><span class="badge badge-context-dependent" title="Верно в очерченных условиях, вне их — нет">зависит от контекста</span></li><li><span class="badge badge-status" title="Иллюстрация формы; синтаксис не гарантирован">псевдокод</span></li></ul>
 <p class="conflicts-ref"><strong>Конфликтует:</strong> <a href="#s10">DRY ↔ bounded contexts</a></p>
 <p class="lede">Одинаковые пять строк в двух bounded contexts — не дублирование: они меняются по разным причинам. Их «устранение» связывает то, что обязано меняться независимо.</p>
+<p>Обе крайности стоят денег. Скопированное <em>знание</em> — одно правило, физически лежащее в трёх местах, — расходится молча: правку внесли в две копии из трёх, третья продолжает считать по-старому, и никто об этом не узнает до инцидента. Устранённое <em>совпадение</em> — сведённый в общий хелпер код двух контекстов, одинаковый только на сегодня, — связывает то, что обязано расходиться: первая же различающаяся правка приезжает флагом в сигнатуре. Вопрос всегда один и тот же: это одно знание или два, которые сейчас выглядят одинаково. Признак второго — <code>package common</code> / <code>utils</code>, растущий бесконечно: у свалки нет владельца и нет собственной причины меняться, потому что причин у неё столько же, сколько потребителей.</p>
+<p class="note"><strong>Bounded context</strong> (<a href="#p14">14</a>) — граница, внутри которой слова значат одно и то же: «Customer» биллинга и «Customer» маркетинга — разные типы, даже когда поля совпадают. DRY действует внутри такой границы. Через границу одинаковый текст — совпадение, а не дублирование, и выносить его в общий модуль значит склеить два контекста через код, который никому из них не принадлежит.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (псевдокод)</figcaption>
 <div class="langbar">

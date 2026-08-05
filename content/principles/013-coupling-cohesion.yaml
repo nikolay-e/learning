@@ -24,7 +24,8 @@ blocks:
         label: Java · ArchUnit
         highlight: java
         code:
-          "// правило зависимостей как тест\n@ArchTest\nstatic final ArchRule layering = layeredArchitecture().consideringAllDependencies()\n\
+          "// правило зависимостей как тест; definedBy матчит по ИМЕНАМ ПАКЕТОВ —\n// ArchUnit читает\
+          \ байткод, поэтому конвенция имён и есть контракт этого теста\n@ArchTest\nstatic final ArchRule layering = layeredArchitecture().consideringAllDependencies()\n\
           \    .layer(\"domain\").definedBy(\"..domain..\")\n    .layer(\"infra\").definedBy(\"..infra..\"\
           )\n    .whereLayer(\"domain\").mayNotAccessAnyLayer(); // домен не знает про инфраструктуру"
   - type: note

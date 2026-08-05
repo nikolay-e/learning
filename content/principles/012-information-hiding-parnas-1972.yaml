@@ -3,7 +3,8 @@ slug: information-hiding-parnas-1972
 title: Information Hiding (Parnas, 1972)
 nav_label: Information Hiding
 section: s2
-keywords: information hiding parnas encapsulation module secret
+keywords: information hiding parnas encapsulation module secret classpath classloader serviceloader
+  module path класслоадер загрузчик классов
 blocks:
   - type: lede
     html: 'Модуль скрывает решение, которое вероятно изменится. Критерий проверяем: «что сломается,
@@ -25,6 +26,18 @@ blocks:
       того же файла к hiding отношения не имеют: <code>requires</code> задаёт граф зависимостей,
       <code>opens</code> точечно разрешает рефлексию, <code>uses</code>/<code>provides</code> связывают
       ServiceLoader.'
+  - type: note
+    html: '<strong>Три слова рядом с module path.</strong> Classpath — список адресов на диске (каталоги
+      и JAR''ы), где JVM разрешено искать классы: конфигурация запуска, не механизм, и он плоский —
+      отсюда вся история выше. Module path — тот же список, но с прочитанными module-info; только
+      там появляется второй этаж видимости. ClassLoader — тот, кто по имени класса находит байткод
+      и грузит его в JVM, лениво, при первом использовании; собственный загрузчик — единица изоляции
+      (Tomcat выдаёт его каждому приложению, Flink — каждому джобу, child-first, чтобы джоб привозил
+      свои версии библиотек), и один класс, загруженный двумя лоадерами, — для JVM два разных типа:
+      отсюда ClassCastException «между одинаковыми классами». ServiceLoader — «найди все реализации
+      интерфейса, имён которых я не знаю на этапе компиляции»: так JDBC находит драйверы; <code>uses</code>/<code>provides</code>
+      (<a href="#p88">88</a>) — его контракт в модульной системе, до модулей то же делал текстовый
+      файл в META-INF/services.'
   - type: code
     panes:
       - lang: java
