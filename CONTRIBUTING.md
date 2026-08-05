@@ -55,8 +55,14 @@ position are presented differently on purpose — if you cannot honestly pick `k
 `confidence`, the entry is not ready. When the wording is stronger than the evidence, put the
 limitation in `caveat` rather than softening the headline into mush.
 
+`model` and `theorem` are not interchangeable: a theorem is derived from stated premises, a
+model has parameters fitted to measurements and predicts only inside the range that produced
+them. Labelling a fitted curve a theorem is the failure mode this vocabulary exists to prevent.
+
 Add `sources` only for links you have actually opened. An invented citation is worse than
-none, and `validate.py` cannot tell the difference.
+none, and `validate.py` cannot tell the difference. It does enforce one half of the rule:
+`theorem`, `model` and `empirical-law` fail the build without `sources`, because "proved" or
+"measured" without a primary source is just a more confident tone.
 
 ## Examples
 

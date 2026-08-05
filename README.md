@@ -10,10 +10,13 @@ Reference notes published as a static site.
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`index.html`](index.html) | Принципы программной инженерии: от SOLID до AI-эры — 89 principles grouped by axis, with examples in Java, Rust, Go and Python 3.12+, plus a table of conflicts between them |
 
-Every entry is classified: `theorem`, `empirical-law`, `heuristic`, `pattern`, `practice` or
-`editorial`, with a confidence level next to it. Amdahl's law and "choose boring technology"
-are not the same kind of claim and the page does not pretend otherwise. Where the wording is
-stronger than the evidence, the card carries an explicit scope note.
+Every entry is classified: `theorem`, `model`, `empirical-law`, `heuristic`, `pattern`,
+`practice` or `editorial`, with a confidence level next to it. Amdahl's law follows from
+arithmetic, the Universal Scalability Law is fitted to your own measurements, and "choose
+boring technology" is backed by nothing but experience — three different kinds of claim, and
+the page does not pretend otherwise. `theorem`, `model` and `empirical-law` must cite a primary
+source; CI rejects the build otherwise. Where the wording is stronger than the evidence, the
+card carries an explicit scope note.
 
 All code is **fragments** — real syntax, not self-contained programs; they lean on types and
 imports off-screen. Each figure says so, and CI checks what can be checked statically.

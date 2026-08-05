@@ -13,16 +13,16 @@ blocks:
     panes:
       - lang: null
         tab: null
-        label: Java · JDK 25 (structured concurrency, JEP 505)
+        label: Java · JDK 26 (structured concurrency, JEP 525)
         highlight: java
         code:
-          "// hedged request на виртуальных потоках\ntry (var scope = StructuredTaskScope.open(Joiner.<Reply>anySuccessfulResultOrThrow()))\
+          "// hedged request на виртуальных потоках\ntry (var scope = StructuredTaskScope.open(Joiner.<Reply>anySuccessfulOrThrow()))\
           \ {\n    scope.fork(() -> replica1.get(key));\n    scope.fork(() -> { Thread.sleep(p95Latency);\
           \ return replica2.get(key); }); // hedge\n    return scope.join();  // первый успешный, второй отменяется\n\
-          }\n\n// На JDK 21, где structured concurrency ещё preview (JEP 453), форма другая:\n// try (var\
-          \ scope = new StructuredTaskScope.ShutdownOnSuccess<Reply>()) {\n//     scope.fork(() -> replica1.get(key));\n\
-          //     scope.fork(() -> { Thread.sleep(p95Latency); return replica2.get(key); });\n//     scope.join();\n\
-          //     return scope.result();\n// }"
+          }\n\n// На JDK 25 (JEP 505) тот же joiner назывался anySuccessfulResultOrThrow().\n// На JDK\
+          \ 21 (JEP 453) форма другая — фабрик ещё не было:\n// try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Reply>())\
+          \ {\n//     scope.fork(() -> replica1.get(key));\n//     scope.fork(() -> { Thread.sleep(p95Latency);\
+          \ return replica2.get(key); });\n//     scope.join();\n//     return scope.result();\n// }"
   - type: note
     html:
       '<strong>Арифметика и цена.</strong> При fan-out в 100 независимых обращений вероятность задеть

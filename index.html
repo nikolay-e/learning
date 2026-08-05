@@ -1597,26 +1597,27 @@ func main() {
 <article class="principle" id="p26" data-keywords="tail at scale hedged requests p99 latency percentile fan-out dean barroso" data-kind="empirical-law" data-confidence="established">
 <div class="p-head"><span class="p-num">26</span><h3>Tail at Scale (Dean &amp; Barroso)</h3><a class="anchor" href="#p26" aria-label="Ссылка на принцип 26">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
-<p class="versions"><strong>Версии.</strong> StructuredTaskScope — preview API в JDK 25 (JEP 505): нужен --enable-preview.</p>
-<p class="sources"><strong>Источники:</strong> <a href="https://openjdk.org/jeps/505" rel="noopener noreferrer">JEP 505: Structured Concurrency (Fifth Preview)</a></p>
+<p class="versions"><strong>Версии.</strong> StructuredTaskScope — по-прежнему preview: JDK 26 превьюит его в шестой раз (JEP 525), нужен --enable-preview. В примере учтено переименование JDK 26: anySuccessfulResultOrThrow() из JEP 505 стал anySuccessfulOrThrow(), а allSuccessfulOrThrow() теперь отдаёт список результатов, а не поток Subtask. Седьмое превью уже заявлено (JEP 533) — финальным API считать рано.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://openjdk.org/jeps/525" rel="noopener noreferrer">JEP 525: Structured Concurrency (Sixth Preview) — JDK 26</a>, <a href="https://openjdk.org/jeps/505" rel="noopener noreferrer">JEP 505: Structured Concurrency (Fifth Preview) — JDK 25, прежние имена</a></p>
 <p class="lede">p99, а не среднее: при fan-out 100 ваш p99 — это медиана пользователя. Hedged requests: отправить дубль после p95-задержки, взять первый ответ.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>
 <div class="langbar">
-<span class="langlabel">Java · JDK 25 (structured concurrency, JEP 505)</span>
+<span class="langlabel">Java · JDK 26 (structured concurrency, JEP 525)</span>
 <span class="grow"></span>
 <span class="status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span>
 <button type="button" class="copy">копировать</button>
 </div>
 <p class="fallback-note" hidden></p>
 <pre tabindex="0"><code class="language-java">// hedged request на виртуальных потоках
-try (var scope = StructuredTaskScope.open(Joiner.&lt;Reply&gt;anySuccessfulResultOrThrow())) {
+try (var scope = StructuredTaskScope.open(Joiner.&lt;Reply&gt;anySuccessfulOrThrow())) {
     scope.fork(() -&gt; replica1.get(key));
     scope.fork(() -&gt; { Thread.sleep(p95Latency); return replica2.get(key); }); // hedge
     return scope.join();  // первый успешный, второй отменяется
 }
 
-// На JDK 21, где structured concurrency ещё preview (JEP 453), форма другая:
+// На JDK 25 (JEP 505) тот же joiner назывался anySuccessfulResultOrThrow().
+// На JDK 21 (JEP 453) форма другая — фабрик ещё не было:
 // try (var scope = new StructuredTaskScope.ShutdownOnSuccess&lt;Reply&gt;()) {
 //     scope.fork(() -&gt; replica1.get(key));
 //     scope.fork(() -&gt; { Thread.sleep(p95Latency); return replica2.get(key); });
