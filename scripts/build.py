@@ -1,6 +1,7 @@
 """content/*.yaml -> index.html. Единственный способ менять страницу: правишь YAML, гоняешь build."""
 
 import argparse
+import hashlib
 import html
 import pathlib
 import sys
@@ -316,6 +317,11 @@ def main(argv=None):
         "__FOOTER__": "\n".join(footer),
     }.items():
         page = page.replace(token, value)
+
+    # The service worker keys its cache on this id and registers under sw.js?v=<id>, so a
+    # rebuilt page installs a new worker instead of comparing byte-identical scripts.
+    build_id = hashlib.sha256(page.encode("utf-8")).hexdigest()[:12]
+    page = page.replace("__BUILD_ID__", build_id)
 
     args.out.write_text(page, encoding="utf-8")
     figures = sum(

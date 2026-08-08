@@ -1,0 +1,33 @@
+{
+  "id": "/learning/",
+  "name": "Принципы программной инженерии",
+  "short_name": "Принципы",
+  "description": "Справочник принципов программной инженерии с примерами на Java, Rust, Go и Python — от SOLID до систем с LLM внутри.",
+  "start_url": "/learning/",
+  "scope": "/learning/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "lang": "ru",
+  "categories": ["education", "reference", "productivity"],
+  "icons": [
+    {
+      "src": "assets/icons/learning-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/learning-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/learning-icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
