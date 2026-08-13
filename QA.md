@@ -63,7 +63,9 @@ origin, so a `baseURL` without the trailing slash silently loads `nikolay-e.gith
 different page that returns 200 and zero principles. This looks exactly like a catastrophic
 regression and is not one. The repo's own config points at localhost, where `/` is correct.
 
-Production smoke worth re-running by hand: 89 articles, every `pre code` carrying `hljs`,
+Production smoke worth re-running by hand: served `<article>` count equals
+`ls content/principles/ | wc -l` (89 at the 2026-08-13 pass — derive both sides live, never
+assert a remembered number), every `pre code` carrying `hljs`,
 zero axe violations at WCAG 2.1 AA in light + dark + mobile, zero console errors, and no dark
 flash on load with the light theme stored (the theme script lives in `<head>` for that reason).
 
