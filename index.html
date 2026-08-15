@@ -12,7 +12,7 @@
     <meta property="og:title" content="Принципы программной инженерии: от SOLID до AI-эры" />
     <meta property="og:description" content="89 принципов, сгруппированных по осям, с примерами на четырёх языках, классификацией типа утверждения и таблицей конфликтов между ними." />
     <meta property="og:type" content="article" />
-    <meta name="app-version" content="41c12cc545b7" />
+    <meta name="app-version" content="2fe620f95fcb" />
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
     <link
       rel="apple-touch-icon"
@@ -1612,8 +1612,8 @@ func main() {
 <article class="principle" id="p26" data-keywords="tail at scale hedged requests p99 latency percentile fan-out dean barroso" data-kind="empirical-law" data-confidence="established">
 <div class="p-head"><span class="p-num">26</span><h3>Tail at Scale (Dean &amp; Barroso)</h3><a class="anchor" href="#p26" aria-label="Ссылка на принцип 26">#</a></div>
 <ul class="meta"><li><span class="badge badge-kind" title="Наблюдение, устойчиво воспроизводимое, но не доказанное">эмпирический закон</span></li><li><span class="badge badge-established" title="Широкий консенсус в индустрии или литературе">устоявшееся</span></li><li><span class="badge badge-status" title="Реальный синтаксис, но не самостоятельная программа">фрагмент</span></li></ul>
-<p class="versions"><strong>Версии.</strong> StructuredTaskScope — по-прежнему preview: JDK 26 превьюит его в шестой раз (JEP 525), нужен --enable-preview. В примере учтено переименование JDK 26: anySuccessfulResultOrThrow() из JEP 505 стал anySuccessfulOrThrow(), а allSuccessfulOrThrow() теперь отдаёт список результатов, а не поток Subtask. Седьмое превью уже заявлено (JEP 533) — финальным API считать рано.</p>
-<p class="sources"><strong>Источники:</strong> <a href="https://openjdk.org/jeps/525" rel="noopener noreferrer">JEP 525: Structured Concurrency (Sixth Preview) — JDK 26</a>, <a href="https://openjdk.org/jeps/505" rel="noopener noreferrer">JEP 505: Structured Concurrency (Fifth Preview) — JDK 25, прежние имена</a></p>
+<p class="versions"><strong>Версии.</strong> StructuredTaskScope — по-прежнему preview: JDK 26 превьюит его в шестой раз (JEP 525), нужен --enable-preview. В примере учтено переименование JDK 26: anySuccessfulResultOrThrow() из JEP 505 стал anySuccessfulOrThrow(), а allSuccessfulOrThrow() теперь отдаёт список результатов, а не поток Subtask. Седьмое превью (JEP 533, JDK 27) эти имена сохраняет — фрагмент компилируется и там, — но финальным API считать по-прежнему рано.</p>
+<p class="sources"><strong>Источники:</strong> <a href="https://openjdk.org/jeps/525" rel="noopener noreferrer">JEP 525: Structured Concurrency (Sixth Preview) — JDK 26</a>, <a href="https://openjdk.org/jeps/533" rel="noopener noreferrer">JEP 533: Structured Concurrency (Seventh Preview) — JDK 27, имена без изменений</a>, <a href="https://openjdk.org/jeps/505" rel="noopener noreferrer">JEP 505: Structured Concurrency (Fifth Preview) — JDK 25, прежние имена</a></p>
 <p class="lede">p99, а не среднее: при fan-out 100 ваш p99 — это медиана пользователя. Hedged requests: отправить дубль после p95-задержки, взять первый ответ.</p>
 <figure class="code">
 <figcaption class="sr-only">Пример кода (фрагмент)</figcaption>

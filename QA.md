@@ -142,6 +142,17 @@ job here and no sensor. What the missing pipeline would have covered, and who co
 
 - `1 skipped` in the Playwright output is the mobile-menu test skipping itself in the desktop
   project. It runs in the mobile project. Not a disabled test.
+- **A red `[desktop]` test naming something impossible is a dead browser, not a regression.**
+  The failure reads `browser.newContext: Target page, context or browser has been closed`, and
+  it lands on whichever test the worker was starting — including the mobile-menu test, which
+  cannot fail in the desktop project because its body skips immediately. `beforeEach` navigates
+  before the skip runs, so the misleading name is structural. Measured on this machine: 3
+  failures per 15 runs at Playwright's default worker count (half of 14 cores = 7 Chromium
+  instances against a 100-article document with four axe passes), 0 per 15 at four. The config
+  caps local workers at 4 for that reason; CI runners have two cores and one worker, which is
+  why this was never visible there. If it returns, lower the cap — do **not** add `retries`: a
+  test whose browser died reports nothing about the page, and retrying it teaches the reader
+  that red is normal.
 - Prettier and html-validate disagree about DOCTYPE case; `doctype-style` is deliberately off.
   `index.html` and `content/` are deliberately outside Prettier. Reasons in `CONTRIBUTING.md`
   under "Tool conflicts, resolved deliberately" — do not "fix" these by re-enabling them.

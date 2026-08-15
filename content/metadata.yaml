@@ -186,14 +186,17 @@ principles:
     kind: empirical-law
     confidence: established
     example_status: fragment
-    last_reviewed: '2026-08-05'
+    last_reviewed: '2026-08-15'
     versions: 'StructuredTaskScope — по-прежнему preview: JDK 26 превьюит его в шестой раз (JEP 525),
       нужен --enable-preview. В примере учтено переименование JDK 26: anySuccessfulResultOrThrow()
       из JEP 505 стал anySuccessfulOrThrow(), а allSuccessfulOrThrow() теперь отдаёт список результатов,
-      а не поток Subtask. Седьмое превью уже заявлено (JEP 533) — финальным API считать рано.'
+      а не поток Subtask. Седьмое превью (JEP 533, JDK 27) эти имена сохраняет — фрагмент компилируется
+      и там, — но финальным API считать по-прежнему рано.'
     sources:
       - title: 'JEP 525: Structured Concurrency (Sixth Preview) — JDK 26'
         url: https://openjdk.org/jeps/525
+      - title: 'JEP 533: Structured Concurrency (Seventh Preview) — JDK 27, имена без изменений'
+        url: https://openjdk.org/jeps/533
       - title: 'JEP 505: Structured Concurrency (Fifth Preview) — JDK 25, прежние имена'
         url: https://openjdk.org/jeps/505
   27:
