@@ -63,6 +63,14 @@ origin, so a `baseURL` without the trailing slash silently loads `nikolay-e.gith
 different page that returns 200 and zero principles. This looks exactly like a catastrophic
 regression and is not one. The repo's own config points at localhost, where `/` is correct.
 
+**The theme is stored under `principles:theme`, not `theme`, and applied as `data-theme` on
+`<html>` — not a class.** A throwaway prod-axe probe that writes the wrong key does not fail:
+the page falls back to its default, both "light" and "dark" runs render the same theme, and
+four green combinations are really two. Assert what actually landed
+(`document.documentElement.dataset.theme`) inside the probe, not just the value you wrote.
+Same trap when clicking controls by selector: `button.iconbtn` matches the table-of-contents
+toggle first; the theme control is `#theme-toggle`.
+
 Production smoke worth re-running by hand: served `<article>` count equals
 `ls content/principles/ | wc -l` (89 at the 2026-08-13 pass — derive both sides live, never
 assert a remembered number), every `pre code` carrying `hljs`,
@@ -111,6 +119,20 @@ job here and no sensor. What the missing pipeline would have covered, and who co
 - **Source-link rot on demand** — `links.yml` only runs weekly, so a pass that adds citations
   is not covered by it. `gh workflow run links.yml` after pushing; it checks Markdown too, so
   it also catches a README link the same pass broke.
+
+  Two things it does not mean. A **timeout is not rot**: `groups.csail.mit.edu` and
+  `www.cs.umd.edu` both answer `200` in ~1.5 s from a laptop and blew the default 20-second
+  budget from a runner, which is what filed issue #2. Verify with `curl` before believing the
+  report, and never "fix" it by excluding the host — that would silence the real disappearance
+  too. And the workflow reports into **one** issue: it appends a comment to the open
+  `sources` issue instead of opening a new one weekly, so a growing pile of identically-titled
+  issues means that step regressed.
+
+- **`docs/` is checked offline, not by lychee.** The learning layer links to cards as
+  `.../learning/#pNN` and to sibling notes by path. Both are verified by `validate.py` on every
+  push — a burned principle number or a renamed lesson fails the build. They are deliberately
+  out of the lychee inputs: they point at our own page, so adding them buys nothing weekly and
+  costs a burst of requests to Pages.
 - **Schemathesis** — nothing to test: no API, no OpenAPI document.
 - **ZAP** — deliberately **not** run. An active scan of `nikolay-e.github.io` is a scan of
   GitHub's infrastructure, not of this app; there is no backend, form, cookie or auth here for

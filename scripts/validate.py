@@ -226,6 +226,20 @@ for href in set(re.findall(r'href="#([^"]+)"', page)):
     if href not in anchors:
         fail(f"битая внутренняя ссылка: #{href}")
 
+# Учебный слой в docs/ ссылается на карточки по #pNN и на соседние конспекты по
+# пути. Ни то ни другое не видно ни сборке (docs/ в неё не входит), ни lychee
+# (он ходит только по списку источников), поэтому сожжённый номер и переименованный
+# файл молча превращались бы в мёртвую ссылку.
+for path in sorted((ROOT / "docs").rglob("*.md")):
+    rel = path.relative_to(ROOT)
+    text = path.read_text(encoding="utf-8")
+    for pid in sorted(set(re.findall(r"learning/#p(\d+)", text))):
+        if f"p{pid}" not in anchors:
+            fail(f"{rel}: ссылка на несуществующий принцип #p{pid}")
+    for target in sorted(set(re.findall(r"\]\((?!https?:|#)([^)#]+)", text))):
+        if not (path.parent / target).exists():
+            fail(f"{rel}: ссылка на отсутствующий файл {target}")
+
 all_ids = re.findall(r'\sid="([^"]+)"', page)
 dup_ids = {i for i in all_ids if all_ids.count(i) > 1}
 if dup_ids:

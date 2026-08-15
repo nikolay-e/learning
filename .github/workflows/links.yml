@@ -22,18 +22,32 @@ jobs:
       - uses: lycheeverse/lychee-action@v2
         id: lychee
         with:
+          # Академические хосты отвечают раннеру медленнее, чем человеку: обе
+          # ссылки на PDF отдают 200 за полторы секунды с ноутбука и упирались
+          # в дефолтные 20 секунд из CI. Таймаут — не гниль ссылки, но и молча
+          # исключать хост нельзя: тогда настоящая пропажа пройдёт незамеченной.
           args: >-
             --no-progress
-            --max-retries 3
+            --max-retries 5
+            --timeout 60
+            --retry-wait-time 5
             --accept 200..=299,429
             content/metadata.yaml
             README.md
             CONTRIBUTING.md
             THIRD_PARTY.md
           fail: false
-      - uses: peter-evans/create-issue-from-file@v5
-        if: steps.lychee.outputs.exit_code != 0
-        with:
-          title: Битые ссылки в источниках
-          content-filepath: ./lychee/out.md
-          labels: sources
+      # Отчёт идёт в один issue: create-issue-from-file заводил новый каждую
+      # неделю, и очередь росла копиями одного и того же. Ссылки в docs/ сюда
+      # не входят намеренно — они ведут на собственную страницу, а их #pNN
+      # проверяет validate.py офлайн, на каждом пуше, а не раз в неделю.
+      - if: steps.lychee.outputs.exit_code != 0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh issue list --label sources --state open --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body-file ./lychee/out.md
+          else
+            gh issue create --title "Битые ссылки в источниках" --label sources --body-file ./lychee/out.md
+          fi

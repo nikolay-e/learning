@@ -39,4 +39,4 @@ repos:
         entry: python3 scripts/validate.py
         language: system
         pass_filenames: false
-        files: '^(content/|templates/|scripts/|README\.md|index\.html)'
+        files: '^(content/|templates/|scripts/|docs/|README\.md|index\.html)'
